@@ -1,18 +1,17 @@
-package dskm.gui;
+package envi.gui;
 
-import dskm.Config;
-import dskm.Constants;
-import dskm.action.Actions;
-import dskm.action.VouseEvent;
-import dskm.connection.MooseServer;
-import dskm.experiment.Experimenter;
-import dskm.experiment.Mologger;
+import envi.Config;
+import envi.Constants;
+import envi.action.Actions;
+import envi.action.VouseEvent;
+import envi.connection.MooseServer;
+import envi.experiment.Experimenter;
+import envi.experiment.Mologger;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 

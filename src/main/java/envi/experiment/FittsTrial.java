@@ -1,6 +1,6 @@
-package dskm.experiment;
+package envi.experiment;
 
-import dskm.Config;
+import envi.Config;
 
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;

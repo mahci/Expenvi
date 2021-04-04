@@ -1,15 +1,14 @@
-package dskm.connection;
+package envi.connection;
 
-import dskm.Constants;
-import dskm.action.*;
-import dskm.experiment.Experimenter;
+import envi.Constants;
+import envi.action.*;
+import envi.experiment.Experimenter;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

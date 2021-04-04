@@ -1,4 +1,4 @@
-package dskm.gui;
+package envi.gui;
 
 import java.awt.*;
 

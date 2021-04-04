@@ -1,7 +1,6 @@
-package dskm.gui;
+package envi.gui;
 
-import dskm.connection.MooseServer;
-import dskm.experiment.Experimenter;
+import envi.experiment.Experimenter;
 
 import javax.swing.*;
 import java.awt.*;

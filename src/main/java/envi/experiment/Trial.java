@@ -1,4 +1,4 @@
-package dskm.experiment;
+package envi.experiment;
 
 /**
  * The base class for every type of trials

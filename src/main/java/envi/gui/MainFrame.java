@@ -1,10 +1,10 @@
-package dskm.gui;
+package envi.gui;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-import dskm.connection.*;
+import envi.connection.*;
 
 
 public class MainFrame extends JFrame {
