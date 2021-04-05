@@ -53,6 +53,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 //            System.out.println(TAG + " <- " + action);
             switch (action) {
                 case Actions.ACT_CLICK:
+                    vPressPrimary();
+                    vReleasePrimary();
                     break;
                 case Actions.ACT_PRESS_PRI:
                     vPressPrimary();
