@@ -81,6 +81,16 @@ public class MainFrame extends JFrame {
         // Start the server
         MooseServer.get().start();
 
+        // Do on close
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
+            @Override
+            public void run()
+            {
+                MooseServer.get().close();
+            }
+        });
+
     }
 
 }

@@ -84,12 +84,14 @@ public class MooseServer {
 
             if (Objects.equals(line, Constants.MSSG_MOOSE)) { // Correct message
                 // Confirm
-                outPW.println(Constants.MSSG_CONFIRM);
-                outPW.flush();
+                sendMssg(Constants.MSSG_CONFIRM);
                 System.out.println("Moose connected! Receiving actions...");
                 System.out.println("------------------------------------------");
 
                 isConnected = true;
+
+                // Send the participants ID
+                sendMssg(Constants.MSSG_PID + "_" + Experimenter.get().getPID());
 
                 // Pass the PublishSubject to the Bot for listening
 //                MooseBot.get().startBot(actionSubject);
@@ -99,9 +101,7 @@ public class MooseServer {
 
                 // Start listening to Experimenter
                 Experimenter.get().getExpSubject().subscribe(state -> {
-                    outPW.println(state);
-                    outPW.flush();
-                    System.out.println(state + " sent to the Moose");
+                    sendMssg(state);
                 });
 
             }
@@ -110,6 +110,13 @@ public class MooseServer {
             System.out.println("Problem in starting the server!" + ioException);
             ioException.printStackTrace();
         }
+    }
+
+    /**
+     * Close the server
+     */
+    public void close() {
+        sendMssg(Constants.NET_DISCONNECT);
     }
 
     /**
@@ -132,6 +139,20 @@ public class MooseServer {
                 } while(inBR!=null && isConnected);
             }
         }).subscribeOn(Schedulers.io());
+    }
+
+    /**
+     * Send messages to the Moose
+     * @param mssg Message
+     */
+    private void sendMssg(String mssg) {
+        if (outPW != null) {
+            outPW.println(mssg);
+            outPW.flush();
+            System.out.println(TAG + mssg + " sent");
+        } else {
+            System.out.println(TAG + "Out PrintWriter not open!");
+        }
     }
 
 }

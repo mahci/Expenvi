@@ -47,7 +47,7 @@ public class Mologger {
             self = new Mologger();
             // Create the logging directory
             Path parentPath = Paths.get("").toAbsolutePath().getParent();
-            LOGS_DIR = parentPath.toAbsolutePath().toString() + "/";
+            LOGS_DIR = parentPath.toAbsolutePath().toString() + "/Logs/";
         }
 
         return self;

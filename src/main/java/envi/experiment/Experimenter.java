@@ -26,7 +26,7 @@ public class Experimenter {
     private List<List<Integer>> expVarList = new ArrayList<>();
 
     // Experiment
-    private int participID = 1; // Participant's ID
+    private int participID = 1; // Participant's ID TODO: Convert to String?
     private int currExpNum = 1; // Currently always 1 (for each participant)
 
     // Blocks
@@ -93,14 +93,12 @@ public class Experimenter {
         }
 //        System.out.println("- Blocks created");
 
+        // Publish the start of the experiment
+        expSubject.onNext(Constants.MSSG_BEG_EXP + "_" + currExpNum);
+
         // Run the first block
         currBlockInd = 0;
         startBlock(currBlockInd);
-
-        // Publish the start of the experiment (to every subscriber)
-//        System.out.println("Should emit " + Constants.MSSG_BEGIN_LOG);
-        expSubject.onNext(Constants.MSSG_BEG_EXP);
-
     }
 
     /**
@@ -108,12 +106,18 @@ public class Experimenter {
      * @param blkInd Block index
      */
     private void startBlock(int blkInd) {
+        int blkNum = currBlockInd + 1;
+
         // Log the block start
         Mologger.get().logBlockStart(
                 participID,
                 currExpNum,
-                currBlockInd + 1,
+                blkNum,
                 LocalTime.now());
+
+        // Publish
+        expSubject.onNext(Constants.MSSG_BEG_BLK + "_" + blkNum);
+
         // Start the block
         currTrialNum = 1;
         blocks.get(blkInd).setCurrTrialInd(-1); // TODO: is it needed?
@@ -133,6 +137,10 @@ public class Experimenter {
             System.out.println("Next trial");
             // Log the end of the current trial
             Mologger.get().logTrialEnd();
+
+            // Publish
+            expSubject.onNext(Constants.MSSG_END_TRL);
+
             // Run the next trial
             currTrialNum++;
             runFittsTrial(ftr);
@@ -145,6 +153,11 @@ public class Experimenter {
                     currExpNum,
                     currBlockInd + 1,
                     LocalTime.now());
+
+            // Publish
+            expSubject.onNext(Constants.MSSG_END_BLK);
+
+            // Show the break dialog
             showBreak();
         }
     }
@@ -209,6 +222,14 @@ public class Experimenter {
                 }
             }
         }
+    }
+
+    /**
+     * Get the participant's ID
+     * @return Participant's ID
+     */
+    public int getPID() {
+        return participID;
     }
 
 }
