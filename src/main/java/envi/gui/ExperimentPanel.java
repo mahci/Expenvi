@@ -50,7 +50,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         // Subscribe to the actions Publisher from MooseServer
         MooseServer.get().actionSubject.subscribe(action -> {
-//            System.out.println(TAG + " <- " + action);
+            System.out.println(TAG + " <- " + action);
             switch (action) {
                 case Actions.ACT_CLICK:
                     vPressPrimary();

@@ -20,8 +20,8 @@ public class Experimenter {
     private static Experimenter self = null; // for singleton
 
     // Vars
-    private List<Integer> radList   = ImmutableList.of(10, 20, 40, 60);
-    private List<Integer> distList  = ImmutableList.of(100, 200, 400, 600);
+    private List<Integer> radList   = ImmutableList.of(10, 20);
+    private List<Integer> distList  = ImmutableList.of(100, 200);
     private List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
     private List<List<Integer>> expVarList = new ArrayList<>();
 

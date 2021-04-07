@@ -17,7 +17,7 @@ public class Mologger {
     private final String TAG = "[[Mologger]] ";
 
     // Naming
-    private static String LOGS_DIR = "/Users/mahmoud/Documents/Academics/PhD/Moose/Dev/Java/Logs/";
+    private static String LOGS_DIR;
     private static String LOG_FILE_PFX = "Log-";
     private static String PTC_FILE_PFX = "PTC";
     private static String EXP_FILE_PFX = "EXP";
@@ -43,7 +43,13 @@ public class Mologger {
      * @return self
      */
     public static Mologger get() {
-        if (self == null) self = new Mologger();
+        if (self == null) {
+            self = new Mologger();
+            // Create the logging directory
+            Path parentPath = Paths.get("").toAbsolutePath().getParent();
+            LOGS_DIR = parentPath.toAbsolutePath().toString() + "/";
+        }
+
         return self;
     }
 
@@ -59,7 +65,7 @@ public class Mologger {
         try {
             if (!Files.isDirectory(dir)) Files.createDirectory(dir); // Create the directory only if not existed
         } catch (IOException e) {
-            System.out.println(TAG + "Problem with creating the directory!");
+            System.out.println(TAG + "Problem in creating the directory!");
             e.printStackTrace();
         }
     }
@@ -72,8 +78,9 @@ public class Mologger {
      */
     public void logExpStart(int participID, int expNum, LocalDateTime dateTime) {
         // Create the info file for the experiment
+        System.out.println(LOGS_DIR);
         String expFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID + " - " +
+                PTC_FILE_PFX + participID + "-" +
                 EXP_FILE_PFX + expNum +
                 ".txt";
         try {
@@ -96,13 +103,13 @@ public class Mologger {
     public void logBlockStart(int participID, int expNum, int blockNum, LocalTime time) {
         // Experiment file path (for indicating the block starting time)
         String expFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID + " - " +
+                PTC_FILE_PFX + participID + "-" +
                 EXP_FILE_PFX + expNum +
                 ".txt";
         // Block file path
         String blkFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID +  " - " +
-                EXP_FILE_PFX + expNum +  " - " +
+                PTC_FILE_PFX + participID +  "-" +
+                EXP_FILE_PFX + expNum +  "-" +
                 BLK_FILE_PFX + blockNum +
                 ".txt";
         try {
@@ -129,7 +136,7 @@ public class Mologger {
     public void logBlockEnd(int participID, int expNum, int blockNum, LocalTime time) {
         // Experiment file path (for indicating the block end time)
         String expFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID + " - " +
+                PTC_FILE_PFX + participID + "-" +
                 EXP_FILE_PFX + expNum +
                 ".txt";
         try {

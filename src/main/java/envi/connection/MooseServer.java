@@ -92,14 +92,16 @@ public class MooseServer {
                 isConnected = true;
 
                 // Pass the PublishSubject to the Bot for listening
-                MooseBot.get().startBot(actionSubject);
+//                MooseBot.get().startBot(actionSubject);
+
                 // Start listening to incoming messages from the Moose
                 listenerObservable().subscribe();
+
                 // Start listening to Experimenter
                 Experimenter.get().getExpSubject().subscribe(state -> {
-                    System.out.println(state);
                     outPW.println(state);
                     outPW.flush();
+                    System.out.println(state + " sent to the Moose");
                 });
 
             }
@@ -122,11 +124,12 @@ public class MooseServer {
                 // Continously read lines from the Moose until get disconnected
                 String line;
                 do {
+                    System.out.println("Reading Moose commands...");
                     line = inBR.readLine();
-                    // publish the action
                     System.out.println(TAG + "Recieved: " + line);
+                    // publish the action
                     actionSubject.onNext(line);
-                } while(isConnected);
+                } while(inBR!=null && isConnected);
             }
         }).subscribeOn(Schedulers.io());
     }
