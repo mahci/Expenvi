@@ -39,21 +39,20 @@ public class FittsTrial extends Trial {
         this.tarDir = leftRight;
 
         // Set the limits for choosing the STACLE center position
-        int minX, minY, maxX, maxY;
-        minX = maxX = minY = maxY = 0; // Initial
+        int minX = 0, minY = 0, maxX = 0, maxY = 0;
         int maxRad = Math.max(tarRad, Config.STACLE_RAD); // Max radius between target or start
         if (leftRight == 0) { // Target on the left side
-            minX = Config.LR_MARGIN + (2 * tarRad) + tarDist + Config.STACLE_RAD;
-            maxX = winW - (Config.LR_MARGIN + Config.STACLE_RAD);
+            minX = Config.WIN_HOR_MARGIN + (2 * tarRad) + tarDist + Config.STACLE_RAD;
+            maxX = winW - (Config.WIN_HOR_MARGIN + Config.STACLE_RAD);
 
-            minY = Config.TB_MARGIN + maxRad;
-            maxY = winH - (Config.TB_MARGIN + maxRad);
+            minY = Config.WIN_VER_MARGIN + maxRad;
+            maxY = winH - (Config.WIN_VER_MARGIN + maxRad);
         } else if (leftRight == 1) { // Target on the right
-            minX = Config.LR_MARGIN + Config.STACLE_RAD;
-            maxX = winW - (Config.LR_MARGIN + 2*tarRad + tarDist + Config.STACLE_RAD);
+            minX = Config.WIN_HOR_MARGIN + Config.STACLE_RAD;
+            maxX = winW - (Config.WIN_HOR_MARGIN + 2*tarRad + tarDist + Config.STACLE_RAD);
 
-            minY = Config.TB_MARGIN + maxRad;
-            maxY = winH - (Config.TB_MARGIN + maxRad);
+            minY = Config.WIN_VER_MARGIN + maxRad;
+            maxY = winH - (Config.WIN_VER_MARGIN + maxRad);
         }
 
         // Determine a random position inside the boundaries

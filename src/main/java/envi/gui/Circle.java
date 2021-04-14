@@ -61,7 +61,6 @@ public class Circle {
 
     //-------- Getters
     public Color getColor() { return color; }
-    public int getRadius() { return radius; }
     public int getSide(){ return side; }
 
     /**

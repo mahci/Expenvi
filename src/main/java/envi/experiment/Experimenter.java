@@ -1,7 +1,7 @@
 package envi.experiment;
 
 import com.google.common.collect.ImmutableList;
-import envi.Constants;
+import envi.Utils;
 import envi.gui.Circle;
 import envi.Config;
 import envi.gui.ExperimentPanel;
@@ -20,8 +20,8 @@ public class Experimenter {
     private static Experimenter self = null; // for singleton
 
     // Vars
-    private List<Integer> radList   = ImmutableList.of(10, 20);
-    private List<Integer> distList  = ImmutableList.of(100, 200);
+    private List<Integer> radList   = new ArrayList<>();
+    private List<Integer> distList  = new ArrayList<>();
     private List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
     private List<List<Integer>> expVarList = new ArrayList<>();
 
@@ -56,6 +56,16 @@ public class Experimenter {
      */
     private Experimenter() {
         expSubject = PublishSubject.create();
+
+        // Save radii and distances in px values
+        for(int rad: Config.targetRadiiMM) {
+            radList.add(Utils.mm2px(rad));
+        }
+        System.out.println(radList);
+        for(int dist: Config.distancesMM) {
+            distList.add(Utils.mm2px(dist));
+        }
+        System.out.println(distList);
     }
 
     /**
@@ -87,14 +97,13 @@ public class Experimenter {
 
         // Generate blocks
         for (int bi = 0; bi < Config.N_BLOCKS_IN_EXPERIMENT; bi++) {
-            blocks.add(
-                    new Block(TRIAL_TYPE.FITTS)
+            blocks.add(new Block(TRIAL_TYPE.FITTS)
                             .setupFittsTrials(expVarList, windowSize.width, windowSize.height));
         }
 //        System.out.println("- Blocks created");
 
         // Publish the start of the experiment
-        expSubject.onNext(Constants.MSSG_BEG_EXP + "_" + currExpNum);
+        expSubject.onNext(Utils.MSSG_BEG_EXP + "_" + currExpNum);
 
         // Run the first block
         currBlockInd = 0;
@@ -116,7 +125,7 @@ public class Experimenter {
                 LocalTime.now());
 
         // Publish
-        expSubject.onNext(Constants.MSSG_BEG_BLK + "_" + blkNum);
+        expSubject.onNext(Utils.MSSG_BEG_BLK + "_" + blkNum);
 
         // Start the block
         currTrialNum = 1;
@@ -139,7 +148,7 @@ public class Experimenter {
             Mologger.get().logTrialEnd();
 
             // Publish
-            expSubject.onNext(Constants.MSSG_END_TRL);
+            expSubject.onNext(Utils.MSSG_END_TRL);
 
             // Run the next trial
             currTrialNum++;
@@ -155,7 +164,7 @@ public class Experimenter {
                     LocalTime.now());
 
             // Publish
-            expSubject.onNext(Constants.MSSG_END_BLK);
+            expSubject.onNext(Utils.MSSG_END_BLK);
 
             // Show the break dialog
             showBreak();
@@ -169,7 +178,7 @@ public class Experimenter {
     private void runFittsTrial(FittsTrial ftr) {
 
         // Create circles
-        Circle stacle = new Circle(ftr.getStaclePosition(), Config.STACLE_RAD);
+        Circle stacle = new Circle(ftr.getStaclePosition(), Config.STACLE_RAD_MM);
         Circle tarcle = new Circle(ftr.getTarclePosition(), ftr.getTarRad());
 
         // Create and send the panel to be drawn
@@ -186,11 +195,11 @@ public class Experimenter {
      * Show a break (between blocks)
      */
     public void showBreak() {
-        expSubject.onNext(Constants.MSSG_END_LOG);
+        expSubject.onNext(Utils.MSSG_END_LOG);
 
         int input = JOptionPane.showOptionDialog(
                 MainFrame.getFrame(),
-                Constants.DIMSSG_BLOCK_FINISH,
+                Utils.DIMSSG_BLOCK_FINISH,
                 "BLOCK FINISHED",
                 JOptionPane.PLAIN_MESSAGE,
                 JOptionPane.INFORMATION_MESSAGE,

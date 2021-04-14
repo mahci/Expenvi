@@ -1,7 +1,6 @@
 package envi.connection;
 
-import envi.Constants;
-import envi.action.*;
+import envi.Utils;
 import envi.experiment.Experimenter;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
@@ -70,7 +69,7 @@ public class MooseServer {
 
             // Open socket
             System.out.println("Starting server...");
-            serverSocket = new ServerSocket(Constants.CONN_PORT);
+            serverSocket = new ServerSocket(Utils.CONN_PORT);
             Socket socket = serverSocket.accept();
             System.out.println("Server started!");
 
@@ -82,16 +81,16 @@ public class MooseServer {
             String line = inBR.readLine();
 //            System.out.println("First Moose Message: " + line);
 
-            if (Objects.equals(line, Constants.MSSG_MOOSE)) { // Correct message
+            if (Objects.equals(line, Utils.MSSG_MOOSE)) { // Correct message
                 // Confirm
-                sendMssg(Constants.MSSG_CONFIRM);
+                sendMssg(Utils.MSSG_CONFIRM);
                 System.out.println("Moose connected! Receiving actions...");
                 System.out.println("------------------------------------------");
 
                 isConnected = true;
 
                 // Send the participants ID
-                sendMssg(Constants.MSSG_PID + "_" + Experimenter.get().getPID());
+                sendMssg(Utils.MSSG_PID + "_" + Experimenter.get().getPID());
 
                 // Pass the PublishSubject to the Bot for listening
 //                MooseBot.get().startBot(actionSubject);
@@ -116,7 +115,7 @@ public class MooseServer {
      * Close the server
      */
     public void close() {
-        sendMssg(Constants.NET_DISCONNECT);
+        sendMssg(Utils.NET_DISCONNECT);
     }
 
     /**

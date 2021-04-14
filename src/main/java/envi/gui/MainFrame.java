@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import envi.Config;
 import envi.connection.*;
 
 
@@ -60,28 +61,32 @@ public class MainFrame extends JFrame {
      * @param args
      */
     public static void main(String[] args) {
+
+        // Save the screens info (id is set in Config)
+        saveScreenInfo();
+
+        // Prepare the window and show the frame
         JFrame windowFrame = MainFrame.getFrame();
-//        JPanel mainPanel = mainForm.panel1;
 
-//        GraphicsDevice gd =
-//                GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-
-//        frame.setContentPane(mainPanel);
         windowFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-//        frame.setUndecorated(true);
-//        frame.setPreferredSize(new Dimension(300, 200));
         windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        windowFrame.setLocation(80, -1000);
-//        windowFrame.pack();
 
-//        gd.setFullScreenWindow(mainForm);
-        windowFrame.setVisible(true);
+        showFrame(windowFrame);
+
+        // Show config window
+        ConfigFrame cFrame = new ConfigFrame();
+        cFrame.pack();
+        cFrame.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        showDialog(cFrame);
+
+
+        // [TEST]
+//        System.out.println(Utils.mm2px(10));
 
         // Start the server
         MooseServer.get().start();
 
-        // Do on close
+        // Close the server on close
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
             @Override
@@ -91,6 +96,55 @@ public class MainFrame extends JFrame {
             }
         });
 
+    }
+
+    /**
+     * Show the frame on a specific monitor
+     * @param frame Frame to display
+     */
+    public static void showFrame(JFrame frame)
+    {
+        int scrW = Config.SCR_BOUNDS.width;
+        int scrH = Config.SCR_BOUNDS.height;
+
+        int frW = frame.getSize().width;
+        int frH = frame.getSize().height;
+
+        frame.setLocation(
+                ((scrW / 2) - (frW / 2)) + Config.SCR_BOUNDS.x,
+                ((scrH / 2) - (frH / 2)) + Config.SCR_BOUNDS.y
+        );
+        frame.setVisible(true);
+    }
+
+    /**
+     * Show the frame on a specific monitor
+     * @param dialog JDialog to show
+     */
+    public static void showDialog(JDialog dialog)
+    {
+        int scrW = Config.SCR_BOUNDS.width;
+        int scrH = Config.SCR_BOUNDS.height;
+
+        int frW = dialog.getSize().width;
+        int frH = dialog.getSize().height;
+
+        dialog.setLocation(
+                ((scrW / 2) - (frW / 2)) + Config.SCR_BOUNDS.x,
+                ((scrH / 2) - (frH / 2)) + Config.SCR_BOUNDS.y
+        );
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Save the screen bounds for future uses
+     */
+    public static void saveScreenInfo() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gd = ge.getScreenDevices();
+
+        Config.NUM_SCREENS = gd.length;
+        Config.SCR_BOUNDS = gd[Config.SCR_ID].getDefaultConfiguration().getBounds();
     }
 
 }

@@ -22,7 +22,7 @@ public class MooseBot {
 
     /**
      * Start observing actions from the PublishSubject and performing them
-     * @param actionSubject PublishSubject of actions (from Constants)
+     * @param actionSubject PublishSubject of actions (from Utils)
      */
     public void startBot(PublishSubject<String> actionSubject) {
         // Subscribe to the actionSubject to get the actions
