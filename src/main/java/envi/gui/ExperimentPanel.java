@@ -251,12 +251,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        vPressPrimary();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        vReleasePrimary();
     }
 
     @Override

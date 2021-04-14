@@ -36,7 +36,7 @@ public class Config {
     public static int FONT_SIZE = 14;
 
     // Experiment ====================================================
-    public static int STACLE_RAD_MM = 10; // Default
+    public static int STACLE_RAD_MM = 20; // Default
     public static int STACLE_RAD; // (px) Set programmatically
     public static List<Integer> targetRadiiMM = new ArrayList<Integer>() {{ // Defaults
        add(5);
