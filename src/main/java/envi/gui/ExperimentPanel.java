@@ -1,7 +1,7 @@
 package envi.gui;
 
-import envi.Config;
-import envi.Utils;
+import envi.tools.Config;
+import envi.tools.Utils;
 import envi.action.Actions;
 import envi.action.VouseEvent;
 import envi.connection.MooseServer;

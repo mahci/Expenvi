@@ -1,20 +1,18 @@
 package envi.gui;
 
-import envi.Config;
-import envi.Utils;
+import envi.tools.Config;
+import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class ConfigFrame extends JDialog {
+public class ConfigDialog extends JDialog {
 
     /**
      * Constructor
      */
-    public ConfigFrame() {
+    public ConfigDialog() {
         setTitle("Configuration");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -28,7 +26,7 @@ public class ConfigFrame extends JDialog {
 
         JTextField radiiField = new JTextField(15);
         radiiField.setText(
-                Config.targetRadiiMM
+                Config._targetRadiiMM
                 .toString().replaceAll("[\\[\\]]", ""));
 
         JLabel radiiInfo = new JLabel("Max = " + maxRadMM + " mm");
@@ -38,7 +36,7 @@ public class ConfigFrame extends JDialog {
 
         JTextField distField = new JTextField(15);
         distField.setText(
-                Config.distancesMM
+                Config._distancesMM
                 .toString().replaceAll("[\\[\\]]", ""));
 
         JLabel distInfo = new JLabel("Max = " + maxdistMM + " mm");
@@ -60,27 +58,27 @@ public class ConfigFrame extends JDialog {
         JLabel stacleRadLabel = new JLabel("Start-circle radius (mm) =");
         JSpinner stacleRadSpinner = new JSpinner();
         stacleRadSpinner.setPreferredSize(new Dimension(50, 20));
-        stacleRadSpinner.setValue(Config.STACLE_RAD_MM);
+        stacleRadSpinner.setValue(Config._stacleRadMM);
 
         JLabel numBlocksLabel = new JLabel("Number of blocks =");
         JSpinner numBlocksSpinner = new JSpinner();
         numBlocksSpinner.setPreferredSize(new Dimension(50, 20));
-        numBlocksSpinner.setValue(Config.N_BLOCKS_IN_EXPERIMENT);
+        numBlocksSpinner.setValue(Config._nBlocksInExperiment);
 
         JButton setConfigButton = new JButton("SET CONFIGURATION");
         setConfigButton.setPreferredSize(new Dimension(100, 40));
         setConfigButton.addActionListener(e -> {
             // Save all the configs -------
-            Config.targetRadiiMM = new ArrayList<>(Utils.intValues(radiiField.getText(), ","));
-            Config.distancesMM = new ArrayList<>(Utils.intValues(distField.getText(), ","));
+            Config._targetRadiiMM = new ArrayList<>(Utils.intValues(radiiField.getText(), ","));
+            Config._distancesMM = new ArrayList<>(Utils.intValues(distField.getText(), ","));
 
-            if (swipeRBtn.isSelected()) Config.LCLICK_ACTION = Config.GESTURE.SWIPE_LCLICK;
-            if (tapRBtn.isSelected()) Config.LCLICK_ACTION = Config.GESTURE.TAP_LCLICK;
-            Config.VIBRATE = vibChBox.isSelected();
+            if (swipeRBtn.isSelected()) Config._action = Config.GESTURE.SWIPE_LCLICK;
+            if (tapRBtn.isSelected()) Config._action = Config.GESTURE.TAP_LCLICK;
+            Config._vibrate = vibChBox.isSelected();
 
-            Config.STACLE_RAD_MM = (int) stacleRadSpinner.getValue();
-            Config.STACLE_RAD = Utils.mm2px(Config.STACLE_RAD_MM);
-            Config.N_BLOCKS_IN_EXPERIMENT = (int) numBlocksSpinner.getValue();
+            Config._stacleRadMM = (int) stacleRadSpinner.getValue();
+            Config._stacleRad = Utils.mm2px(Config._stacleRadMM);
+            Config._nBlocksInExperiment = (int) numBlocksSpinner.getValue();
 
             // Close the dialog
             setVisible(false);

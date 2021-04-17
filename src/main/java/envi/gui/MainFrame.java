@@ -1,51 +1,39 @@
 package envi.gui;
 
+import envi.tools.Config;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-
-import envi.Config;
-import envi.connection.*;
-
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 
-    private static MainFrame frame;
+    private static MainFrame self; // Singleton
 
-    private Container container;
-
-    private static Rectangle windowSize;
-
-    private ExperimentPanel drawingPanel;
-    private StartPanel startPanel;
-
-    private BufferedImage graphicsContext;
-
+    /**
+     * Constructor
+     */
     public MainFrame() {
-
-        container = getContentPane();
-
-        // Add the start panel
-        startPanel = new StartPanel();
-        container.add(startPanel, BorderLayout.CENTER);
-
-        this.setTitle("Experiment!");
-        this.pack();
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public static MainFrame getFrame() {
-        if (frame == null) frame = new MainFrame();
-        return frame;
+    public static MainFrame get() {
+        if (self == null) self = new MainFrame();
+        return self;
     }
 
     /***
      * Draw the passed panel
-     * @param jp JPanel to draw
+     * @param panel JPanel to draw
      */
-    public void drawPanel(JPanel jp) {
-        container.removeAll();
-        container.add(jp, BorderLayout.CENTER);
-        this.revalidate();
+    public void showPanel(JPanel panel) {
+        getContentPane().removeAll();
+        add(panel);
+//        pack();
+        display();
     }
 
     /***
@@ -53,76 +41,24 @@ public class MainFrame extends JFrame {
      * @param mssg Message to show
      */
     public void showMessageDialog(String mssg) {
-        JOptionPane.showMessageDialog(frame, mssg);
-    }
-
-    /***
-     * Main method
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        // Save the screens info (id is set in Config)
-        saveScreenInfo();
-
-        // Prepare the window and show the frame
-        JFrame windowFrame = MainFrame.getFrame();
-
-        windowFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        showFrame(windowFrame);
-
-        // Show config window
-        ConfigFrame cFrame = new ConfigFrame();
-        cFrame.pack();
-        cFrame.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-        showDialog(cFrame);
-
-
-        // [TEST]
-//        System.out.println(Utils.mm2px(10));
-
-        // Start the server
-        MooseServer.get().start();
-
-        // Close the server on close
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            @Override
-            public void run()
-            {
-                MooseServer.get().close();
-            }
-        });
-
-    }
-
-    /**
-     * Show the frame on a specific monitor
-     * @param frame Frame to display
-     */
-    public static void showFrame(JFrame frame)
-    {
-        int scrW = Config.SCR_BOUNDS.width;
-        int scrH = Config.SCR_BOUNDS.height;
-
-        int frW = frame.getSize().width;
-        int frH = frame.getSize().height;
-
-        frame.setLocation(
-                ((scrW / 2) - (frW / 2)) + Config.SCR_BOUNDS.x,
-                ((scrH / 2) - (frH / 2)) + Config.SCR_BOUNDS.y
-        );
-        frame.setVisible(true);
+        JOptionPane.showMessageDialog(this, mssg);
     }
 
     /**
      * Show the frame on a specific monitor
      * @param dialog JDialog to show
      */
-    public static void showDialog(JDialog dialog)
+    public void showDialog(JDialog dialog)
     {
+        dialog.pack();
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                showPanel(new StartPanel());
+            }
+        });
+
         int scrW = Config.SCR_BOUNDS.width;
         int scrH = Config.SCR_BOUNDS.height;
 
@@ -137,14 +73,21 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Save the screen bounds for future uses
+     * Show the frame on a specific monitor
      */
-    public static void saveScreenInfo() {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice[] gd = ge.getScreenDevices();
+    public void display()
+    {
+        int scrW = Config.SCR_BOUNDS.width;
+        int scrH = Config.SCR_BOUNDS.height;
 
-        Config.NUM_SCREENS = gd.length;
-        Config.SCR_BOUNDS = gd[Config.SCR_ID].getDefaultConfiguration().getBounds();
+        int frW = getSize().width;
+        int frH = getSize().height;
+
+        setLocation(
+                ((scrW / 2) - (frW / 2)) + Config.SCR_BOUNDS.x,
+                ((scrH / 2) - (frH / 2)) + Config.SCR_BOUNDS.y
+        );
+        setVisible(true);
     }
 
 }

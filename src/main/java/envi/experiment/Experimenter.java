@@ -1,11 +1,12 @@
 package envi.experiment;
 
 import com.google.common.collect.ImmutableList;
-import envi.Utils;
-import envi.gui.Circle;
-import envi.Config;
-import envi.gui.ExperimentPanel;
 import envi.gui.MainFrame;
+import envi.tools.Utils;
+import envi.gui.Circle;
+import envi.tools.Config;
+import envi.gui.ExperimentPanel;
+import envi.gui.Main;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
@@ -58,11 +59,11 @@ public class Experimenter {
         expSubject = PublishSubject.create();
 
         // Save radii and distances in px values
-        for(int rad: Config.targetRadiiMM) {
+        for(int rad: Config._targetRadiiMM) {
             radList.add(Utils.mm2px(rad));
         }
         System.out.println(radList);
-        for(int dist: Config.distancesMM) {
+        for(int dist: Config._distancesMM) {
             distList.add(Utils.mm2px(dist));
         }
         System.out.println(distList);
@@ -93,10 +94,10 @@ public class Experimenter {
         generateVarList();
 
         // Get the window size
-        Rectangle windowSize = MainFrame.getFrame().getBounds();
+        Rectangle windowSize = MainFrame.get().getBounds();
 
         // Generate blocks
-        for (int bi = 0; bi < Config.N_BLOCKS_IN_EXPERIMENT; bi++) {
+        for (int bi = 0; bi < Config._nBlocksInExperiment; bi++) {
             blocks.add(new Block(TRIAL_TYPE.FITTS)
                             .setupFittsTrials(expVarList, windowSize.width, windowSize.height));
         }
@@ -178,7 +179,7 @@ public class Experimenter {
     private void runFittsTrial(FittsTrial ftr) {
 
         // Create circles
-        Circle stacle = new Circle(ftr.getStaclePosition(), Config.STACLE_RAD_MM);
+        Circle stacle = new Circle(ftr.getStaclePosition(), Config._stacleRadMM);
         Circle tarcle = new Circle(ftr.getTarclePosition(), ftr.getTarRad());
 
         // Create and send the panel to be drawn
@@ -188,7 +189,7 @@ public class Experimenter {
         int blockNum = currBlockInd + 1;
         String blkStat = "Block: " + blockNum + " / " + blocks.size();
         expPanel.setStatTexts(blkStat, trlStat);
-        MainFrame.getFrame().drawPanel(expPanel);
+        MainFrame.get().showPanel(expPanel);
     }
 
     /**
@@ -196,26 +197,26 @@ public class Experimenter {
      */
     public void showBreak() {
         expSubject.onNext(Utils.MSSG_END_LOG);
-
-        int input = JOptionPane.showOptionDialog(
-                MainFrame.getFrame(),
-                Utils.DIMSSG_BLOCK_FINISH,
-                "BLOCK FINISHED",
-                JOptionPane.PLAIN_MESSAGE,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                null,
-                null);
-        if(input == JOptionPane.OK_OPTION) //TODO: Change to "Continue"
-        {
-            if (currBlockInd + 1 == blocks.size()) { // Blocks finished
-                System.out.println("All blocks finished");
-                System.exit(0);
-            } else { // Continue to the next block
-                currBlockInd++;
-                startBlock(currBlockInd);
-            }
-        }
+        // TODO: Put new break
+//        int input = JOptionPane.showOptionDialog(
+//                Main.getFrame(),
+//                Utils.DIMSSG_BLOCK_FINISH,
+//                "BLOCK FINISHED",
+//                JOptionPane.PLAIN_MESSAGE,
+//                JOptionPane.INFORMATION_MESSAGE,
+//                null,
+//                null,
+//                null);
+//        if(input == JOptionPane.OK_OPTION) //TODO: Change to "Continue"
+//        {
+//            if (currBlockInd + 1 == blocks.size()) { // Blocks finished
+//                System.out.println("All blocks finished");
+//                System.exit(0);
+//            } else { // Continue to the next block
+//                currBlockInd++;
+//                startBlock(currBlockInd);
+//            }
+//        }
     }
 
 

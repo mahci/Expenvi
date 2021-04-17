@@ -1,4 +1,4 @@
-package envi;
+package envi.tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class Utils {
      * Do the mm2px conversion for all the required px values
      */
     public static void setPxValues() {
-        Config.STACLE_RAD = mm2px(Config.STACLE_RAD_MM);
+        Config._stacleRad = mm2px(Config._stacleRadMM);
     }
 
     /**
@@ -74,6 +74,24 @@ public class Utils {
             }
         }
 
+        return result;
+    }
+
+    /**
+     * Get the string of gestures
+     * @param gesture Config.GESTURe
+     * @return String
+     */
+    public static String actionString(Config.GESTURE gesture) {
+        String result = "";
+        switch (gesture) {
+        case SWIPE_LCLICK:
+            result = "SWIPE";
+            break;
+        case TAP_LCLICK:
+            result = "TAP";
+            break;
+        }
         return result;
     }
 

@@ -1,6 +1,6 @@
 package envi.connection;
 
-import envi.Utils;
+import envi.tools.Utils;
 import envi.experiment.Experimenter;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;

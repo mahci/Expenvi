@@ -1,6 +1,6 @@
 package envi.experiment;
 
-import envi.Config;
+import envi.tools.Config;
 
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -40,16 +40,16 @@ public class FittsTrial extends Trial {
 
         // Set the limits for choosing the STACLE center position
         int minX = 0, minY = 0, maxX = 0, maxY = 0;
-        int maxRad = Math.max(tarRad, Config.STACLE_RAD); // Max radius between target or start
+        int maxRad = Math.max(tarRad, Config._stacleRad); // Max radius between target or start
         if (leftRight == 0) { // Target on the left side
-            minX = Config.WIN_HOR_MARGIN + (2 * tarRad) + tarDist + Config.STACLE_RAD;
-            maxX = winW - (Config.WIN_HOR_MARGIN + Config.STACLE_RAD);
+            minX = Config.WIN_HOR_MARGIN + (2 * tarRad) + tarDist + Config._stacleRad;
+            maxX = winW - (Config.WIN_HOR_MARGIN + Config._stacleRad);
 
             minY = Config.WIN_VER_MARGIN + maxRad;
             maxY = winH - (Config.WIN_VER_MARGIN + maxRad);
         } else if (leftRight == 1) { // Target on the right
-            minX = Config.WIN_HOR_MARGIN + Config.STACLE_RAD;
-            maxX = winW - (Config.WIN_HOR_MARGIN + 2*tarRad + tarDist + Config.STACLE_RAD);
+            minX = Config.WIN_HOR_MARGIN + Config._stacleRad;
+            maxX = winW - (Config.WIN_HOR_MARGIN + 2*tarRad + tarDist + Config._stacleRad);
 
             minY = Config.WIN_VER_MARGIN + maxRad;
             maxY = winH - (Config.WIN_VER_MARGIN + maxRad);
