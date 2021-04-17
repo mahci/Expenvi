@@ -52,7 +52,8 @@ public class StartPanel extends JPanel {
         configButton.setMinimumSize(new Dimension(300, 35));
         configButton.setAlignmentX(CENTER_ALIGNMENT);
         configButton.addActionListener(e -> {
-            MainFrame.get().showDialog(new ConfigDialog());
+//            MainFrame.get().showDialog(new ConfigDialog());
+            MainFrame.get().showDialog(new BreakDialog());
         });
 
         this.add(Box.createVerticalStrut(350)); // Top space
