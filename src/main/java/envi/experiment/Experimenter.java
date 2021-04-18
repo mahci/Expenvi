@@ -1,12 +1,9 @@
 package envi.experiment;
 
 import com.google.common.collect.ImmutableList;
-import envi.gui.MainFrame;
+import envi.gui.*;
 import envi.tools.Utils;
-import envi.gui.Circle;
 import envi.tools.Config;
-import envi.gui.ExperimentPanel;
-import envi.gui.Main;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
@@ -74,7 +71,7 @@ public class Experimenter {
      * @return exPublishSubject
      */
     public PublishSubject<String> getExpSubject() {
-        expSubject.subscribe(s -> System.out.println(s));
+        expSubject.subscribe(System.out::println);
         return expSubject;
     }
 
@@ -197,26 +194,19 @@ public class Experimenter {
      */
     public void showBreak() {
         expSubject.onNext(Utils.MSSG_END_LOG);
-        // TODO: Put new break
-//        int input = JOptionPane.showOptionDialog(
-//                Main.getFrame(),
-//                Utils.DIMSSG_BLOCK_FINISH,
-//                "BLOCK FINISHED",
-//                JOptionPane.PLAIN_MESSAGE,
-//                JOptionPane.INFORMATION_MESSAGE,
-//                null,
-//                null,
-//                null);
-//        if(input == JOptionPane.OK_OPTION) //TODO: Change to "Continue"
-//        {
-//            if (currBlockInd + 1 == blocks.size()) { // Blocks finished
-//                System.out.println("All blocks finished");
-//                System.exit(0);
-//            } else { // Continue to the next block
-//                currBlockInd++;
-//                startBlock(currBlockInd);
-//            }
-//        }
+
+        // Break dialog
+        MainFrame.get().showDialog(new BreakDialog());
+
+        // Are there more blocks?
+        if (currBlockInd + 1 == blocks.size()) { // Blocks finished
+            System.out.println("All blocks finished");
+            System.exit(0);
+        } else { // Continue to the next block
+            currBlockInd++;
+            startBlock(currBlockInd);
+        }
+
     }
 
 
