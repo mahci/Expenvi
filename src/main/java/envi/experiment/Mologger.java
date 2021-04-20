@@ -1,6 +1,8 @@
 package envi.experiment;
 
 import envi.action.VouseEvent;
+import envi.tools.Config;
+import envi.tools.Utils;
 
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -9,31 +11,59 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 public class Mologger {
 
-    // Tag (for debugging)
     private final String TAG = "[[Mologger]] ";
+    private final boolean toLog = false;
+    //==========================================
+    private static Mologger self; // Singleton
 
-    // Naming
-    private static String LOGS_DIR;
-    private static String LOG_FILE_PFX = "Log-";
     private static String PTC_FILE_PFX = "PTC";
     private static String EXP_FILE_PFX = "EXP";
     private static String BLK_FILE_PFX = "BLK";
 
-    private static Mologger self; // Singleton
-    private List<MouseEvent>[] logDB;
+    private String blkSep = "==============================================================";
+    private String trlSep = "--------------------------------------------------------------";
 
-    private PrintWriter logFile;
-    private PrintWriter metaLogFile;
+    // Experiment
+    private int participID;
+    private boolean enabled = false;
+
+    // Naming
+    private static String SPEC_LOGS_DIR;
+    private static String GEN_LOGS_DIR;
+    private static String ALL_LOGS_DIR;
+
+    private static String logDirPath;
+    private final String topLogDirPath;
+
+    // Paths to keep the current dirc
+    private String specLogDirPath;
+    private String genLogDirPath;
+    private String allLogDirPath;
+
     private PrintWriter blockLogFile;
+
+    private PrintWriter specBlockLogFile;
+    private PrintWriter genBlockLogFile;
+    private PrintWriter allBlockLogFile;
+
+    // Log level
+    public static enum LOG_LEVEL {
+        SPEC,
+        GEN,
+        ALL
+    }
 
     /***
      * Constructor
      */
     private Mologger() {
+        // Create the top logging directory
+        Path parentPath = Paths.get("").toAbsolutePath().getParent();
+        topLogDirPath = parentPath.toAbsolutePath().toString() + "/Expenvi-Logs/";
+        createDir(topLogDirPath);
 
     }
 
@@ -45,143 +75,198 @@ public class Mologger {
     public static Mologger get() {
         if (self == null) {
             self = new Mologger();
-            // Create the logging directory
-            Path parentPath = Paths.get("").toAbsolutePath().getParent();
-            LOGS_DIR = parentPath.toAbsolutePath().toString() + "/Logs/";
         }
-
         return self;
-    }
-
-    /**
-     * Create a directory for the participant
-     * @param participID Participant ID
-     */
-    public void logParticipStart(int participID) {
-        // Create a directory for the participant
-        String ptcDirPath = LOGS_DIR + PTC_FILE_PFX + participID;
-//        System.out.println(TAG + "Dir: " + ptcDirPath);
-        Path dir = Paths.get(ptcDirPath);
-        try {
-            if (!Files.isDirectory(dir)) Files.createDirectory(dir); // Create the directory only if not existed
-        } catch (IOException e) {
-            System.out.println(TAG + "Problem in creating the directory!");
-            e.printStackTrace();
-        }
     }
 
     /**
      * Log the start of an experiment
      * @param participID Participant ID
-     * @param expNum Experiment ID
      * @param dateTime Beginning data and time of the experiment
      */
-    public void logExpStart(int participID, int expNum, LocalDateTime dateTime) {
-        // Create the info file for the experiment
-        System.out.println(LOGS_DIR);
-        String expFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID + "-" +
-                EXP_FILE_PFX + expNum +
-                ".txt";
-        try {
-            PrintWriter expLogFile = new PrintWriter(new FileWriter(expFilePath));
-            expLogFile.println(dateTime); // Write the time on the first line
-            expLogFile.println("--------------------------------------------------");
-            expLogFile.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public int logExpStart(int participID, LocalDateTime dateTime) {
+        // Enable and set participant ID
+        this.participID = participID;
+        this.enabled = true;
+
+        // Create a directory for the participant (if not already existing)
+        String ptcDirPath = topLogDirPath + "/" + PTC_FILE_PFX + participID;
+        createDir(ptcDirPath);
+
+        // Create a directory for the experiment
+        String expDirPath = ptcDirPath + "/" + Config._interaction + "--" + dateTime;
+        createDir(expDirPath);
+
+        // Create dirs for three levels
+        specLogDirPath = expDirPath + "/SPEC/";
+        genLogDirPath = expDirPath + "/GEN/";
+        allLogDirPath = expDirPath + "/ALL/";
+
+        createDir(specLogDirPath);
+        createDir(genLogDirPath);
+        createDir(allLogDirPath);
+
+        return 0;
     }
 
     /**
      * Start logging a block
-     * @param participID Participant ID
-     * @param expNum Experiment number
      * @param blockNum Block number
      * @param time Beginning time of the block
+     * @return Status
      */
-    public void logBlockStart(int participID, int expNum, int blockNum, LocalTime time) {
-        // Experiment file path (for indicating the block starting time)
-        String expFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID + "-" +
-                EXP_FILE_PFX + expNum +
-                ".txt";
-        // Block file path
-        String blkFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID +  "-" +
-                EXP_FILE_PFX + expNum +  "-" +
-                BLK_FILE_PFX + blockNum +
-                ".txt";
-        try {
-            // Write the block start to the experiment file
-            PrintWriter expPW = new PrintWriter(new FileWriter(expFilePath, true));
-            expPW.println("Block " + blockNum + " -- start: " + time);
-            expPW.close();
+    public int logBlockStart(int blockNum, LocalTime time) {
 
-            // Create the block file
-            blockLogFile = new PrintWriter(new FileWriter(blkFilePath));
-            // Block file remains open...
+        // Create block files for all the levels
+        if (!enabled) return 1;
+
+        try {
+            specBlockLogFile = new PrintWriter(new FileWriter(
+                    specLogDirPath + BLK_FILE_PFX + blockNum + ".txt", true));
+            specBlockLogFile.println("Start: " + time);
+            specBlockLogFile.println(blkSep);
+
+            genBlockLogFile = new PrintWriter(new FileWriter(
+                    genLogDirPath + BLK_FILE_PFX + blockNum + ".txt", true));
+            genBlockLogFile.println("Start: " + time);
+            genBlockLogFile.println(blkSep);
+
+            allBlockLogFile = new PrintWriter(new FileWriter(
+                    allLogDirPath + BLK_FILE_PFX + blockNum + ".txt", true));
+            allBlockLogFile.println("Start: " + time);
+            allBlockLogFile.println(blkSep);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return 0;
+
+    }
+
+    /**
+     * Trial ended: add the trial separator
+     * @return Status
+     */
+    public int logTrialEnd() {
+        if (!enabled) return 1;
+
+        if (specBlockLogFile != null) specBlockLogFile.println(trlSep);
+        if (genBlockLogFile != null) genBlockLogFile.println(trlSep);
+        if (allBlockLogFile != null) allBlockLogFile.println(trlSep);
+        return 0;
     }
 
     /**
      * Close the block
-     * @param participID Participant ID
-     * @param expNum Experiment number
-     * @param blockNum Block number
      * @param time Block's end time
+     * @return Status
      */
-    public void logBlockEnd(int participID, int expNum, int blockNum, LocalTime time) {
-        // Experiment file path (for indicating the block end time)
-        String expFilePath = LOGS_DIR + PTC_FILE_PFX + participID + "/" +
-                PTC_FILE_PFX + participID + "-" +
-                EXP_FILE_PFX + expNum +
-                ".txt";
-        try {
-            // Write the block start to the experiment file
-            PrintWriter expPW = new PrintWriter(new FileWriter(expFilePath, true));
-            expPW.println("Block " + blockNum + " -- end: " + time);
-            expPW.close();
+    public int logBlockEnd(LocalTime time) {
+        if (!enabled) return 1;
 
-            // Close the block file
-            if (blockLogFile != null) blockLogFile.close();
-            else System.out.println("LBE: Block log file not created!");
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (specBlockLogFile != null) {
+            specBlockLogFile.println(blkSep);
+            specBlockLogFile.println("End: " + time);
+            specBlockLogFile.close();
         }
+        if (genBlockLogFile != null) {
+            genBlockLogFile.println(blkSep);
+            genBlockLogFile.println("End: " + time);
+            genBlockLogFile.close();
+        }
+        if (allBlockLogFile != null) {
+            allBlockLogFile.println(blkSep);
+            allBlockLogFile.println("End: " + time);
+            allBlockLogFile.close();
+        }
+        return 0;
     }
 
     /**
      * Log a MouseEvent
      * @param e MouseEvent
+     * @return Status
      */
-    public void log(MouseEvent e, LocalTime eTime) {
-        // Write the info to the file
-        if (blockLogFile != null) blockLogFile.println(e.paramString() + " -- " + eTime);
-        else System.out.println("LOG: Problem writing to block log file!");
+    public int log(MouseEvent e, LOG_LEVEL lvl, LocalTime time) {
+        if (!enabled) return 1;
+
+        switch (lvl) {
+        case SPEC:
+            if (specBlockLogFile != null) specBlockLogFile.println(e.paramString() + "--" + time);
+            else System.out.println(TAG + "No spec block log file found!");
+            break;
+        case GEN:
+            if (genBlockLogFile != null) genBlockLogFile.println(e.paramString() + "--" + time);
+            else System.out.println(TAG + "No gen block log file found!");
+            break;
+        case ALL:
+            if (allBlockLogFile != null) allBlockLogFile.println(e.paramString() + "--" + time);
+            else System.out.println(TAG + "No all trial log file found!");
+            break;
+        }
+        return 0;
     }
 
     /**
-     * Log a VouseEvent
+     * Log a VouseEvent on a level
      * @param ve VouseEvent
+     * @return Status
      */
-    public void log(VouseEvent ve) {
-        // Write the info to the file
-        if (blockLogFile != null) blockLogFile.println(ve);
-        else System.out.println(TAG + "Problem writing to block log file!");
+    public int log(VouseEvent ve, LOG_LEVEL lvl) {
+        if (!enabled) return 0;
+
+        switch (lvl) {
+        case SPEC:
+            if (specBlockLogFile != null) specBlockLogFile.println(ve);
+            else System.out.println(TAG + "No spec block log file found!");
+            break;
+        case GEN:
+            if (genBlockLogFile != null) genBlockLogFile.println(ve);
+            else System.out.println(TAG + "No gen block log file found!");
+            break;
+        case ALL:
+            if (allBlockLogFile != null) allBlockLogFile.println(ve);
+            else System.out.println(TAG + "No all trial log file found!");
+            break;
+        }
+        return 0;
+    }
+
+    /**
+     * Log on all levels
+     * @param ve VouseEvnet
+     * @return Status
+     */
+    public int log(VouseEvent ve) {
+        if (!enabled) return 1;
+
+        if (specBlockLogFile != null) specBlockLogFile.println(ve);
+        else System.out.println(TAG + "No spec block log file found!");
+
+        if (genBlockLogFile != null) genBlockLogFile.println(ve);
+        else System.out.println(TAG + "No gen block log file found!");
+
+        if (allBlockLogFile != null) allBlockLogFile.println(ve);
+        else System.out.println(TAG + "No all trial log file found!");
+
+        return 0;
     }
 
 
+
     /**
-     * Just adding a sep. between trials
+     * Create a directory
+     * @param path Directory path
      */
-    public void logTrialEnd() {
-        if (blockLogFile != null)
-            blockLogFile.println("----------------------------------------------------------------------");
-        else
-            System.out.println("LTE: Block log file not created!");
+    private void createDir(String path) {
+        Path dir = Paths.get(path);
+        try {
+            // Create the directory only if not existed
+            if (!Files.isDirectory(dir)) Files.createDirectory(dir);
+        } catch (IOException e) {
+            if (toLog) System.out.println(TAG + "Problem in creating dir: " + path);
+            e.printStackTrace();
+        }
     }
 
 }

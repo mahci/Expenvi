@@ -7,9 +7,9 @@ import envi.tools.Config;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 
@@ -90,10 +90,9 @@ public class Experimenter {
 
         // participant starts
         if (realExperiment) {
-            Mologger.get()
-                    .logParticipStart(participID);
-            Mologger.get()
-                    .logExpStart(participID, currExpNum, LocalDateTime.now());
+            Mologger.get().logExpStart(
+                    participID,
+                    LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
         }
 
         // Generate the combinations rad/dist/dir
@@ -123,18 +122,12 @@ public class Experimenter {
         int blkNum = currBlockInd + 1;
 
         // Log the block start
-        if (realExperiment) {
-            Mologger.get().logBlockStart(
-                    participID,
-                    currExpNum,
-                    blkNum,
-                    LocalTime.now());
-        }
+        Mologger.get().logBlockStart(blkNum, LocalTime.now());
 
         // Publish
         expSubject.onNext(Config.MSSG_BEG_BLK + "_" + blkNum);
 
-        // Start the block
+        // Run the block
         currTrialNum = 1;
         blocks.get(blkInd).setCurrTrialInd(-1); // TODO: is it needed?
         FittsTrial ftr = blocks.get(blkInd).getNextTrial(true);
@@ -152,7 +145,7 @@ public class Experimenter {
         if (ftr != null) {
             if (toLog) System.out.println(TAG + "Next trial");
             // Log the end of the current trial
-            if (realExperiment) Mologger.get().logTrialEnd();
+            Mologger.get().logTrialEnd();
 
             // Publish
             expSubject.onNext(Config.MSSG_END_TRL);
@@ -164,13 +157,7 @@ public class Experimenter {
         else { // Trials in the block finished
             if (toLog) System.out.println(TAG + "Trials finished");
             // Log the end of the block
-            if (realExperiment) {
-                Mologger.get().logBlockEnd(
-                        participID,
-                        currExpNum,
-                        currBlockInd + 1,
-                        LocalTime.now());
-            }
+            Mologger.get().logBlockEnd(LocalTime.now());
 
             // Publish
             expSubject.onNext(Config.MSSG_END_BLK);
@@ -181,7 +168,7 @@ public class Experimenter {
                 if (!realExperiment) { // Warm-up is finished
                     MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.EXPERIMENT));
                 } else { // Experiment is finished
-                    // TODO: Show a dialog/panel
+                    showEnd();
                 }
 //            System.exit(0);
             } else { // There are more blocks
@@ -197,9 +184,13 @@ public class Experimenter {
      */
     private void runFittsTrial(FittsTrial ftr) {
 
-        // Create circles
-        Circle stacle = new Circle(ftr.getStaclePosition(), Config._stacleRad);
-        Circle tarcle = new Circle(ftr.getTarclePosition(), ftr.getTarRad());
+        // Create circles (translate the display area to approprate location)
+        Circle stacle = new Circle(
+                Utils.dispToWin(ftr.getStaclePosition()),
+                Config._stacleRad);
+        Circle tarcle = new Circle(
+                Utils.dispToWin(ftr.getTarclePosition()),
+                ftr.getTarRad());
 
         // Create and send the panel to be drawn
         ExperimentPanel expPanel = new ExperimentPanel();
@@ -242,6 +233,22 @@ public class Experimenter {
                     expVarList.add(ImmutableList.of(rad, dist, dir));
                 }
             }
+        }
+    }
+
+    private void showEnd() {
+        int input = JOptionPane.showOptionDialog(
+                MainFrame.get(),
+                "Experiment FINISHED! Thank You!",
+                "THE END!",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                null,
+                null);
+        if(input == JOptionPane.OK_OPTION)
+        {
+            System.exit(0);
         }
     }
 

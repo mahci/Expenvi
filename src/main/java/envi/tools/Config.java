@@ -1,7 +1,5 @@
 package envi.tools;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,11 +71,12 @@ public class Config {
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
     // The gesture for clicks
-    public static enum GESTURE {
+    public static enum INTERACTION {
         SWIPE_LCLICK,
-        TAP_LCLICK
+        TAP_LCLICK,
+        MOUSE_LCLICK
     }
-    public static GESTURE _action = GESTURE.SWIPE_LCLICK;
+    public static INTERACTION _interaction = INTERACTION.MOUSE_LCLICK;
     public static boolean _vibrate = false; // Vibrate?
 
     // --- Practice
@@ -95,6 +94,10 @@ public class Config {
             "PLEASE CLICK INSIDE THE START CIRCLE";
     public static final String DIMSSG_BLOCK_FINISH =
             "Block finished! You can now take a break. Press OK when ready.";
+
+    // Logs
+
+
     // =============================================================================
 
 

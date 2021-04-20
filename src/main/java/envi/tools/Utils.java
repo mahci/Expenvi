@@ -1,7 +1,6 @@
 package envi.tools;
 
-import envi.gui.MainFrame;
-
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,19 +57,27 @@ public class Utils {
 
     /**
      * Get the string of gestures
-     * @param gesture Config.GESTURe
+     * @param interaction Config.GESTURe
      * @return String
      */
-    public static String actionString(Config.GESTURE gesture) {
+    public static String interactionString(Config.INTERACTION interaction) {
         String result = "";
-        switch (gesture) {
+        switch (interaction) {
         case SWIPE_LCLICK:
-            result = "SWIPE";
+            result = "SWIPE_LCLICK";
             break;
         case TAP_LCLICK:
-            result = "TAP";
+            result = "TAP_LCLICK";
+            break;
+        case MOUSE_LCLICK:
+            result = "MOUSE_LCLICK";
             break;
         }
         return result;
+    }
+
+    public static Point dispToWin(Point inPoint) {
+        inPoint.translate(Config.WIN_W_MARGIN, Config.WIN_H_MARGIN);
+        return inPoint;
     }
 }

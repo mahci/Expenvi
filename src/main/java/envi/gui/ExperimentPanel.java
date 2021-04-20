@@ -33,7 +33,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     // Experiment vars
     private boolean startClicked = false;
-    private int trialNum;
     private boolean pressedInsideStacle = false;
 
     // Publishing all the movements
@@ -149,21 +148,26 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Virtual press of the primary mouse button
      */
     public void vPressPrimary() {
-        System.out.println(TAG + "Primary PRESS");
         // Position of the curser
         Point crsPos = getCursorPosition();
 
         // Create the VouseEvent
         VouseEvent ve = new VouseEvent(Actions.ACT.PRESS, crsPos.x, crsPos.y, LocalTime.now());
 
-        if (startClicked) { // Going for the target
+        // Log the ve in all
+        Mologger.get().log(ve, Mologger.LOG_LEVEL.ALL);
+
+        // Check where pressed...
+        if (startClicked) { // Target pressing
             // Log the press
             if (Experimenter.get().realExperiment) Mologger.get().log(ve);
 
-        } else { // Start of the trial
+        } else { // Start pressing
             if (stacle.isInside(crsPos.x, crsPos.y)) {
-                System.out.println(TAG + "Pressed inside the Stacle");
                 pressedInsideStacle = true;
+
+                // Log in gen
+                Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
 
                 // change the color of the start circle
                 stacle.setColor(Config.COLOR_STACLE_CLK);
@@ -185,9 +189,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // Create the VouseEvent
         VouseEvent ve = new VouseEvent(Actions.ACT.RELEASE, crsPos.x, crsPos.y, LocalTime.now());
 
-        if (startClicked) { // The target is clicked
-            // Log the release
-            if (Experimenter.get().realExperiment) Mologger.get().log(ve);
+        // Log the ve in all
+        Mologger.get().log(ve, Mologger.LOG_LEVEL.ALL);
+
+        // Check where released...
+        if (startClicked) { // Released on the target is clicked => Trial finished
+            // Valid release => Log in gen and spec
+            Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
+            Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
             // Falsify the startClicked
             startClicked = false;
@@ -195,39 +204,27 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             // Report the result to the Experimenter
             boolean result = tarcle.isInside(crsPos.x, crsPos.y);
             Experimenter.get().trialDone(result);
-        } else { // First click of the trial
+
+        } else { // Released from the start
             if (pressedInsideStacle && stacle.isInside(crsPos.x, crsPos.y)) {
                 startClicked = true;
 
-                // Log the relase
-                if (Experimenter.get().realExperiment) Mologger.get().log(ve);
+                // Valid release => log in gen and spec
+                Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
+                Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
             } else { // Show error (NOT INSIDE) and change back the Stacle color
                 errText = Config.ERR_NOT_INSIDE;
                 stacle.setColor(Config.COLOR_STACLE_DEF);
+
+                // Invalid release => log in only gen
+                Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
             }
 
             repaint();
         }
     }
 
-    /**
-     * Cancel press
-     */
-    public void vCancelPress() {
-        // Create and log the VouseEvent
-        Point crsPos = getCursorPosition();
-        VouseEvent ve = new VouseEvent(Actions.ACT.CANCEL, crsPos.x, crsPos.y, LocalTime.now());
-        Mologger.get().log(ve);
-
-        // Falsify all flags and texts
-        startClicked = false;
-        pressedInsideStacle = false;
-        errText = "";
-
-        // Colors
-        stacle.setColor(Config.COLOR_STACLE_DEF);
-    }
 
     // -----------------------------------------------------------------------
 
@@ -275,9 +272,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (startClicked) {
-            if (Experimenter.get().realExperiment) Mologger.get().log(e, LocalTime.now());
-        }
+        // Log every move on all log
+        Mologger.get().log(e, Mologger.LOG_LEVEL.ALL, LocalTime.now());
+
     }
 
 }
