@@ -19,55 +19,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class Main extends JFrame {
 
     private final String TAG = "[[Main]] ";
-
-//    private static Main frame;
-//
-//    private Container container;
-//
-//    private static Rectangle windowSize;
-//
-//    private ExperimentPanel drawingPanel;
-//    private StartPanel startPanel;
-//
-//    private BufferedImage graphicsContext;
-
-    public Main() {
-
-//        frame = new Main();
-//        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-//        container = getContentPane();
-//
-//        // Add the start panel
-//        startPanel = new StartPanel();
-////        container.add(startPanel, BorderLayout.CENTER);
-//        this.add(startPanel);
-//
-//        this.setTitle("Experiment!");
-//        this.pack();
-    }
-
-//    public static Main getFrame() {
-//        if (frame == null) frame = new Main();
-//        return frame;
-//    }
-
-    /***
-     * Draw the passed panel
-     * @param jp JPanel to draw
-     */
-//    public void drawPanel(JPanel jp) {
-//        container.removeAll();
-//        container.add(jp, BorderLayout.CENTER);
-//        this.revalidate();
-//    }
-
-
+    //======================================
 
     /***
      * Main method
-     * @param args
+     * @param args Arguments
      */
     public static void main(String[] args) {
 
@@ -77,25 +33,9 @@ public class Main extends JFrame {
         // Set the pixel values based on
         Utils.setPxValues();
 
-        // Prepare the window and show the frame
-//        JFrame mainFrame = frame;
-////
-//        mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-//        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
-//        showFrame();
-
-        // Show config window
-//        ConfigDialog cfgDialog = new ConfigDialog();
-//        cfgDialog.pack();
-//        cfgDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-//        showDialog(cfgDialog);
-
+        // Show StartPanel
         MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.SHOW_CASE));
 
-        // [TEST]
-//        System.out.println(Utils.mm2px(10));
 
         // Start the server
 //        MooseServer.get().start();
@@ -110,9 +50,11 @@ public class Main extends JFrame {
             }
         });
 
-        // Testing time
-//        Practicer.get().startPractice();
-
+        // Show config.json window
+//        ConfigDialog cfgDialog = new ConfigDialog();
+//        cfgDialog.pack();
+//        cfgDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+//        showDialog(cfgDialog);
     }
 
     /**

@@ -136,6 +136,10 @@ public class StartPanel extends JPanel {
         startButton.requestFocusInWindow();
     }
 
+    /**
+     * Main painting method
+     * @param graphics Graphics
+     */
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         startButton.requestFocus();
