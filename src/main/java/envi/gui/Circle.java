@@ -13,21 +13,6 @@ public class Circle {
 
     Color color;
 
-    /***
-     * Constructor
-     * @param cx Center X
-     * @param cy Center Y
-     * @param r Radius
-     */
-    public Circle(int cx, int cy, int r) {
-        radius = r;
-        tlX = cx - r;
-        tlY = cy - r;
-        this.cx = cx;
-        this.cy = cy;
-        side = r * 2;
-    }
-
     /**
      * Constructor with center in Point type
      * @param cntPos Center position
@@ -40,6 +25,22 @@ public class Circle {
         cx = cntPos.x;
         cy = cntPos.y;
         side = r * 2;
+    }
+
+    /**
+     * Constructor
+     * @param cntPos Center position (Point)
+     * @param r Radius
+     * @param clr Color
+     */
+    public Circle(Point cntPos, int r, Color clr) {
+        radius = r;
+        tlX = cntPos.x - r;
+        tlY = cntPos.y - r;
+        cx = cntPos.x;
+        cy = cntPos.y;
+        side = r * 2;
+        color = clr;
     }
 
     /***

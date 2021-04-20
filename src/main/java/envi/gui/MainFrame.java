@@ -1,6 +1,7 @@
 package envi.gui;
 
 import envi.tools.Config;
+import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +19,7 @@ public class MainFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 //        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Utils.setPxValues();
     }
 
     public static MainFrame get() {
@@ -55,7 +57,7 @@ public class MainFrame extends JFrame {
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                showPanel(new StartPanel());
+//                showPanel(new StartPanel());
             }
         });
 

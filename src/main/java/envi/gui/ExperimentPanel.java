@@ -19,11 +19,11 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ExperimentPanel]] ";
 
-    // Two circles to draw
+    // Circles to draw
     private Circle stacle;
     private Circle tarcle;
 
-    // Text to draw
+    // Texts to draw
     private String blockStatText = "";
     private String trialStatText = "";
     private String errText = "";
@@ -104,7 +104,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         //-- Draw stat texts
         graphics2D.setColor(Config.COLOR_TEXT_NRM);
-        graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.FONT_SIZE));
+        graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
         graphics2D.drawString(blockStatText, winW - Config.TEXT_X, Config.TEXT_Y);
         graphics2D.drawString(trialStatText, winW - Config.TEXT_X, Config.TEXT_Y + 20);
 
@@ -112,7 +112,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if (!errText.isEmpty()) {
             int errTextX = winW / 2 - 200;
             graphics2D.setColor(Config.COLOR_TEXT_ERR);
-            graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.FONT_SIZE));
+            graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
             graphics2D.drawString(errText, errTextX, Config.ERROR_Y);
 
             errText = ""; // Clear the error
@@ -151,7 +151,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      */
     public void vPressPrimary() {
         System.out.println(TAG + "Primary PRESS");
-        // Postion of the curser
+        // Position of the curser
         Point crsPos = getCursorPosition();
 
         // Create the VouseEvent
@@ -169,7 +169,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 // change the color of the start circle
                 stacle.setColor(Config.COLOR_STACLE_CLK);
             } else { // Show error (NOT INSIDE)
-                errText = Utils.ERR_NOT_INSIDE;
+                errText = Config.ERR_NOT_INSIDE;
             }
 
             repaint();
@@ -204,7 +204,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 Mologger.get().log(ve);
 
             } else { // Show error (NOT INSIDE) and change back the Stacle color
-                errText = Utils.ERR_NOT_INSIDE;
+                errText = Config.ERR_NOT_INSIDE;
                 stacle.setColor(Config.COLOR_STACLE_DEF);
             }
 

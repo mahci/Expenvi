@@ -15,30 +15,33 @@ import java.util.List;
 
 public class Experimenter {
 
+    private String TAG = "[[Experimenter]] ";
+    private boolean toLog = false;
+    //==============================================================================
     private static Experimenter self = null; // for singleton
 
     // Vars
-    private List<Integer> radList   = new ArrayList<>();
-    private List<Integer> distList  = new ArrayList<>();
-    private List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
-    private List<List<Integer>> expVarList = new ArrayList<>();
+    private final List<Integer> radList   = new ArrayList<>();
+    private final List<Integer> distList  = new ArrayList<>();
+    private final List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
+    private final List<List<Integer>> expVarList = new ArrayList<>();
 
     // Experiment
-    private int participID = 1; // Participant's ID TODO: Convert to String?
-    private int currExpNum = 1; // Currently always 1 (for each participant)
+    private final int participID = 1; // Participant's ID TODO: Convert to String?
+    private final int currExpNum = 1; // Currently always 1 (for each participants
 
     // Blocks
-    private List<Block> blocks = new ArrayList<>();
+    private final List<Block> blocks = new ArrayList<>();
     private int currBlockInd = 0;
 
     // Trials
     private int currTrialNum;
 
-    // General vars
-    private int minX, maxX, minY, maxY;
-
     // For publishing the state of the experiment
-    private PublishSubject<String> expSubject;
+    private final PublishSubject<String> expSubject;
+
+    // Warm-up or real experiment?
+    private boolean realExperiment = false;
 
     /**
      * Get the instance
@@ -59,27 +62,18 @@ public class Experimenter {
         for(int rad: Config._targetRadiiMM) {
             radList.add(Utils.mm2px(rad));
         }
-        System.out.println(radList);
+        if (toLog) System.out.println(TAG + "Rad list: " + radList);
         for(int dist: Config._distancesMM) {
             distList.add(Utils.mm2px(dist));
         }
-        System.out.println(distList);
-    }
-
-    /**
-     * Get the PublishSubject to subscribe to
-     * @return exPublishSubject
-     */
-    public PublishSubject<String> getExpSubject() {
-        expSubject.subscribe(System.out::println);
-        return expSubject;
+        if (toLog) System.out.println(TAG + "Dist list: " + distList);
     }
 
     /***
      * Start the experiment
      */
     public void startExperiment() {
-        System.out.println("Experiment started");
+        System.out.println(TAG + "Experiment started");
 
         // participant starts
         Mologger.get().logParticipStart(participID);
@@ -101,7 +95,7 @@ public class Experimenter {
 //        System.out.println("- Blocks created");
 
         // Publish the start of the experiment
-        expSubject.onNext(Utils.MSSG_BEG_EXP + "_" + currExpNum);
+        expSubject.onNext(Config.MSSG_BEG_EXP + "_" + currExpNum);
 
         // Run the first block
         currBlockInd = 0;
@@ -123,7 +117,7 @@ public class Experimenter {
                 LocalTime.now());
 
         // Publish
-        expSubject.onNext(Utils.MSSG_BEG_BLK + "_" + blkNum);
+        expSubject.onNext(Config.MSSG_BEG_BLK + "_" + blkNum);
 
         // Start the block
         currTrialNum = 1;
@@ -146,7 +140,7 @@ public class Experimenter {
             Mologger.get().logTrialEnd();
 
             // Publish
-            expSubject.onNext(Utils.MSSG_END_TRL);
+            expSubject.onNext(Config.MSSG_END_TRL);
 
             // Run the next trial
             currTrialNum++;
@@ -162,7 +156,7 @@ public class Experimenter {
                     LocalTime.now());
 
             // Publish
-            expSubject.onNext(Utils.MSSG_END_BLK);
+            expSubject.onNext(Config.MSSG_END_BLK);
 
             // Show the break dialog
             showBreak();
@@ -193,7 +187,7 @@ public class Experimenter {
      * Show a break (between blocks)
      */
     public void showBreak() {
-        expSubject.onNext(Utils.MSSG_END_LOG);
+        expSubject.onNext(Config.MSSG_END_LOG);
 
         // Break dialog
         MainFrame.get().showDialog(new BreakDialog());
@@ -232,4 +226,12 @@ public class Experimenter {
         return participID;
     }
 
+    /**
+     * Get the PublishSubject to subscribe to
+     * @return exPublishSubject
+     */
+    public PublishSubject<String> getExpSubject() {
+        expSubject.subscribe(System.out::println);
+        return expSubject;
+    }
 }

@@ -1,5 +1,6 @@
 package envi.connection;
 
+import envi.tools.Config;
 import envi.tools.Utils;
 import envi.experiment.Experimenter;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -69,7 +70,7 @@ public class MooseServer {
 
             // Open socket
             System.out.println("Starting server...");
-            serverSocket = new ServerSocket(Utils.CONN_PORT);
+            serverSocket = new ServerSocket(Config.CONN_PORT);
             Socket socket = serverSocket.accept();
             System.out.println("Server started!");
 
@@ -81,16 +82,16 @@ public class MooseServer {
             String line = inBR.readLine();
 //            System.out.println("First Moose Message: " + line);
 
-            if (Objects.equals(line, Utils.MSSG_MOOSE)) { // Correct message
+            if (Objects.equals(line, Config.MSSG_MOOSE)) { // Correct message
                 // Confirm
-                sendMssg(Utils.MSSG_CONFIRM);
+                sendMssg(Config.MSSG_CONFIRM);
                 System.out.println("Moose connected! Receiving actions...");
                 System.out.println("------------------------------------------");
 
                 isConnected = true;
 
                 // Send the participants ID
-                sendMssg(Utils.MSSG_PID + "_" + Experimenter.get().getPID());
+                sendMssg(Config.MSSG_PID + "_" + Experimenter.get().getPID());
 
                 // Pass the PublishSubject to the Bot for listening
 //                MooseBot.get().startBot(actionSubject);
@@ -115,7 +116,7 @@ public class MooseServer {
      * Close the server
      */
     public void close() {
-        sendMssg(Utils.NET_DISCONNECT);
+        sendMssg(Config.NET_DISCONNECT);
     }
 
     /**

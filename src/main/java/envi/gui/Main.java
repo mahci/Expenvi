@@ -3,12 +3,21 @@ package envi.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
+import envi.experiment.Practicer;
 import envi.tools.Config;
 import envi.connection.*;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 
 public class Main extends JFrame {
+
+    private final String TAG = "[[Main]] ";
 
 //    private static Main frame;
 //
@@ -79,12 +88,13 @@ public class Main extends JFrame {
 //        cfgDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
 //        showDialog(cfgDialog);
 
-        MainFrame.get().showPanel(new StartPanel());
+        MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.SHOW_CASE));
+
         // [TEST]
 //        System.out.println(Utils.mm2px(10));
 
         // Start the server
-        MooseServer.get().start();
+//        MooseServer.get().start();
 
         // Close the server on close
         Runtime.getRuntime().addShutdownHook(new Thread()
@@ -95,6 +105,9 @@ public class Main extends JFrame {
                 MooseServer.get().close();
             }
         });
+
+        // Testing time
+//        Practicer.get().startPractice();
 
     }
 

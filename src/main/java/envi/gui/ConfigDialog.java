@@ -17,9 +17,9 @@ public class ConfigDialog extends JDialog {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Limit of radius is Win_Height - 2*Vertical_Margin
-        int maxRadMM = Utils.px2mm(Config.SCR_BOUNDS.height - (2 * Config.WIN_VER_MARGIN));
+        int maxRadMM = Utils.px2mm(Config.SCR_BOUNDS.height - (2 * Config.WIN_H_MARGIN));
         // Limit of distance is Win_Width - (2*Horizontal_Margin + STACLE_R + Max_Radii)
-        int maxdistMM = Utils.px2mm(Config.SCR_BOUNDS.height - (2 * Config.WIN_VER_MARGIN));
+        int maxdistMM = Utils.px2mm(Config.SCR_BOUNDS.height - (2 * Config.WIN_H_MARGIN));
 
         // Components ------------------------------------
         JLabel radiiLabel = new JLabel("Radii (mm):");
