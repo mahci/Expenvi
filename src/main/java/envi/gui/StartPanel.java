@@ -1,11 +1,14 @@
 package envi.gui;
 
+import envi.experiment.Experimenter;
 import envi.experiment.Practicer;
 import envi.tools.Config;
 import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 public class StartPanel extends JPanel {
 
@@ -15,8 +18,32 @@ public class StartPanel extends JPanel {
     private String warmUpHint = "Let's warm-up a bit. Press SPACE to go";
     private String warmUpBtnText = "Let's Go!";
 
-    private String experimentHint = "Now the real experiment. Press SPACE to start";
+    private String experimentHint = "Now the real experiment! Press SPACE to start";
     private String experimentBtnText = "Start Experiment";
+
+    private Action startShowCase = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            MainFrame.get().showPanel(new PracticePanel());
+        }
+    };
+
+    private Action startWarmUp = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Experimenter.get().startExperiment(false);
+        }
+    };
+
+    private Action startExperiment = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Experimenter.get().startExperiment(true);
+        }
+    };
+
+    JButton startButton = new JButton();
+    JLabel hintLabel = new JLabel();
 
     /**
      * Constructor
@@ -27,7 +54,6 @@ public class StartPanel extends JPanel {
         setMaximumSize(new Dimension(600, 500));
 
         // Create the generic button
-        JButton startButton = new JButton();
         startButton.setFont(new Font("Sans", Font.PLAIN, 14));
         startButton.setMaximumSize(new Dimension(250, 50));
         startButton.setAlignmentX(CENTER_ALIGNMENT);
@@ -40,25 +66,33 @@ public class StartPanel extends JPanel {
             labelText = showCaseHint;
             btnText = showCaseBtnText;
             startButton.setText(btnText);
-            startButton.addActionListener(e ->
-                    MainFrame.get().showPanel(new PracticePanel()));
+            startButton.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                    "SPACE");
+            startButton.getActionMap().put("SPACE", startShowCase);
             break;
         case WARM_UP:
             labelText = warmUpHint;
             btnText = warmUpBtnText;
-
+            startButton.setText(btnText);
+            startButton.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                    "SPACE");
+            startButton.getActionMap().put("SPACE", startWarmUp);
             break;
         case EXPERIMENT:
+            labelText = experimentHint;
+            btnText = experimentBtnText;
+            startButton.setText(btnText);
+            startButton.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                    "SPACE");
+            startButton.getActionMap().put("SPACE", startExperiment);
             break;
         }
 
-        // Start button
-
-//        startButton.addActionListener(e -> Experimenter.get().startExperiment());
-
-
         // Hint label
-        JLabel hintLabel = new JLabel(labelText);
+        hintLabel.setText(labelText);
         hintLabel.setAlignmentX(CENTER_ALIGNMENT);
         hintLabel.setFont(new Font("Sans", Font.PLAIN, 14));
 
@@ -98,6 +132,13 @@ public class StartPanel extends JPanel {
 //        this.add(actLabel);
 //        this.add(Box.createVerticalStrut(10)); // Space
 //        this.add(configButton);
+
+        startButton.requestFocusInWindow();
+    }
+
+    public void paintComponent(Graphics graphics) {
+        super.paintComponent(graphics);
+        startButton.requestFocus();
     }
 
 }

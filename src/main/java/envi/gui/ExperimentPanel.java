@@ -130,7 +130,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         stacle.setColor(Config.COLOR_STACLE_DEF);
         tarcle = c2;
         tarcle.setColor(Config.COLOR_TARCLE_DEF);
-//        System.out.println(TAG + "Stacle: " + stacle.paramsString());
     }
 
     /***
@@ -159,7 +158,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         if (startClicked) { // Going for the target
             // Log the press
-            Mologger.get().log(ve);
+            if (Experimenter.get().realExperiment) Mologger.get().log(ve);
 
         } else { // Start of the trial
             if (stacle.isInside(crsPos.x, crsPos.y)) {
@@ -188,7 +187,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         if (startClicked) { // The target is clicked
             // Log the release
-            Mologger.get().log(ve);
+            if (Experimenter.get().realExperiment) Mologger.get().log(ve);
 
             // Falsify the startClicked
             startClicked = false;
@@ -201,7 +200,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 startClicked = true;
 
                 // Log the relase
-                Mologger.get().log(ve);
+                if (Experimenter.get().realExperiment) Mologger.get().log(ve);
 
             } else { // Show error (NOT INSIDE) and change back the Stacle color
                 errText = Config.ERR_NOT_INSIDE;
@@ -277,7 +276,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         if (startClicked) {
-            Mologger.get().log(e, LocalTime.now());
+            if (Experimenter.get().realExperiment) Mologger.get().log(e, LocalTime.now());
         }
     }
 

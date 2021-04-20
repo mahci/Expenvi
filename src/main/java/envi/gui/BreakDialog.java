@@ -1,5 +1,7 @@
 package envi.gui;
 
+import envi.experiment.Experimenter;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -42,6 +44,7 @@ public class BreakDialog extends JDialog implements KeyListener {
         // Close on Ctrl + DEL
         if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_BACK_SLASH) {
             setVisible(false);
+            Experimenter.get().nextBlock();
         }
     }
 

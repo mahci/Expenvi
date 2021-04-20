@@ -16,9 +16,12 @@ import java.util.List;
 public class Experimenter {
 
     private String TAG = "[[Experimenter]] ";
-    private boolean toLog = false;
+    private boolean toLog = true;
     //==============================================================================
     private static Experimenter self = null; // for singleton
+
+    // Display
+    int winW, winH, dispW, dispH;
 
     // Vars
     private final List<Integer> radList   = new ArrayList<>();
@@ -40,8 +43,8 @@ public class Experimenter {
     // For publishing the state of the experiment
     private final PublishSubject<String> expSubject;
 
-    // Warm-up or real experiment?
-    private boolean realExperiment = false;
+    // Warm-up or real experiment? (Only log if real experiment)
+    public boolean realExperiment = false;
 
     /**
      * Get the instance
@@ -72,27 +75,37 @@ public class Experimenter {
     /***
      * Start the experiment
      */
-    public void startExperiment() {
-        System.out.println(TAG + "Experiment started");
+    public void startExperiment(boolean isRealExperiment) {
+        if (toLog) System.out.println(TAG + "Experiment started");
+
+        // Set the state
+        realExperiment = isRealExperiment;
+        if (toLog) System.out.println(TAG + "Real Exp? " + realExperiment);
+
+        // Set the display size
+        winW = MainFrame.get().getBounds().width;
+        winH = MainFrame.get().getBounds().height;
+        dispW = winW - (2 * Config.WIN_W_MARGIN);
+        dispH = winH - (2 * Config.WIN_H_MARGIN);
 
         // participant starts
-        Mologger.get().logParticipStart(participID);
-
-        // Log the start of the experiment
-        Mologger.get().logExpStart(participID, currExpNum, LocalDateTime.now());
+        if (realExperiment) {
+            Mologger.get()
+                    .logParticipStart(participID);
+            Mologger.get()
+                    .logExpStart(participID, currExpNum, LocalDateTime.now());
+        }
 
         // Generate the combinations rad/dist/dir
         generateVarList();
 
-        // Get the window size
-        Rectangle windowSize = MainFrame.get().getBounds();
-
         // Generate blocks
+        blocks.clear();
         for (int bi = 0; bi < Config._nBlocksInExperiment; bi++) {
             blocks.add(new Block(TRIAL_TYPE.FITTS)
-                            .setupFittsTrials(expVarList, windowSize.width, windowSize.height));
+                            .setupFittsTrials(expVarList, dispW, dispH));
         }
-//        System.out.println("- Blocks created");
+        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
 
         // Publish the start of the experiment
         expSubject.onNext(Config.MSSG_BEG_EXP + "_" + currExpNum);
@@ -110,11 +123,13 @@ public class Experimenter {
         int blkNum = currBlockInd + 1;
 
         // Log the block start
-        Mologger.get().logBlockStart(
-                participID,
-                currExpNum,
-                blkNum,
-                LocalTime.now());
+        if (realExperiment) {
+            Mologger.get().logBlockStart(
+                    participID,
+                    currExpNum,
+                    blkNum,
+                    LocalTime.now());
+        }
 
         // Publish
         expSubject.onNext(Config.MSSG_BEG_BLK + "_" + blkNum);
@@ -124,7 +139,7 @@ public class Experimenter {
         blocks.get(blkInd).setCurrTrialInd(-1); // TODO: is it needed?
         FittsTrial ftr = blocks.get(blkInd).getNextTrial(true);
         if (ftr != null) runFittsTrial(ftr);
-        else System.out.println("Problem in loading the trials! Block #" + blkInd);
+        else System.out.println(TAG + "Problem in loading the trials! Block #" + blkInd);
     }
 
     /**
@@ -135,9 +150,9 @@ public class Experimenter {
         // Go to the next trial
         FittsTrial ftr = blocks.get(currBlockInd).getNextTrial(wasSuccess);
         if (ftr != null) {
-            System.out.println("Next trial");
+            if (toLog) System.out.println(TAG + "Next trial");
             // Log the end of the current trial
-            Mologger.get().logTrialEnd();
+            if (realExperiment) Mologger.get().logTrialEnd();
 
             // Publish
             expSubject.onNext(Config.MSSG_END_TRL);
@@ -147,19 +162,32 @@ public class Experimenter {
             runFittsTrial(ftr);
         }
         else { // Trials in the block finished
-            System.out.println("Trials finished");
+            if (toLog) System.out.println(TAG + "Trials finished");
             // Log the end of the block
-            Mologger.get().logBlockEnd(
-                    participID,
-                    currExpNum,
-                    currBlockInd + 1,
-                    LocalTime.now());
+            if (realExperiment) {
+                Mologger.get().logBlockEnd(
+                        participID,
+                        currExpNum,
+                        currBlockInd + 1,
+                        LocalTime.now());
+            }
 
             // Publish
             expSubject.onNext(Config.MSSG_END_BLK);
 
-            // Show the break dialog
-            showBreak();
+            // Are there more blocks?
+            if (currBlockInd + 1 == blocks.size()) { // Blocks finished
+                if (toLog) System.out.println(TAG + "All blocks finished");
+                if (!realExperiment) { // Warm-up is finished
+                    MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.EXPERIMENT));
+                } else { // Experiment is finished
+                    // TODO: Show a dialog/panel
+                }
+//            System.exit(0);
+            } else { // There are more blocks
+                // Show the break dialog
+                showBreak();
+            }
         }
     }
 
@@ -170,7 +198,7 @@ public class Experimenter {
     private void runFittsTrial(FittsTrial ftr) {
 
         // Create circles
-        Circle stacle = new Circle(ftr.getStaclePosition(), Config._stacleRadMM);
+        Circle stacle = new Circle(ftr.getStaclePosition(), Config._stacleRad);
         Circle tarcle = new Circle(ftr.getTarclePosition(), ftr.getTarRad());
 
         // Create and send the panel to be drawn
@@ -180,6 +208,7 @@ public class Experimenter {
         int blockNum = currBlockInd + 1;
         String blkStat = "Block: " + blockNum + " / " + blocks.size();
         expPanel.setStatTexts(blkStat, trlStat);
+        if(toLog) System.out.println(TAG + "Num of Blocks = " + blocks.size());
         MainFrame.get().showPanel(expPanel);
     }
 
@@ -191,16 +220,14 @@ public class Experimenter {
 
         // Break dialog
         MainFrame.get().showDialog(new BreakDialog());
+    }
 
-        // Are there more blocks?
-        if (currBlockInd + 1 == blocks.size()) { // Blocks finished
-            System.out.println("All blocks finished");
-            System.exit(0);
-        } else { // Continue to the next block
-            currBlockInd++;
-            startBlock(currBlockInd);
-        }
-
+    /**
+     * Start the next block
+     */
+    public void nextBlock() {
+        currBlockInd++;
+        startBlock(currBlockInd);
     }
 
 

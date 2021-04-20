@@ -1,5 +1,7 @@
 package envi.tools;
 
+import envi.gui.MainFrame;
+
 import java.util.ArrayList;
 import java.util.List;
 

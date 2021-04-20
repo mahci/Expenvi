@@ -25,11 +25,11 @@ public class Block {
     /**
      * Set up the Fitt's trials in the list of trials
      * @param radDistDirList List of (radius, distance, direction)
-     * @param winW Width of the window
-     * @param winH Height of the window
+     * @param dispW Width of the display area
+     * @param dispH Height of the display area
      * @return Modified instance
      */
-    public Block setupFittsTrials(List<List<Integer>> radDistDirList, int winW, int winH) {
+    public Block setupFittsTrials(List<List<Integer>> radDistDirList, int dispW, int dispH) {
 
         Collections.shuffle(radDistDirList); // Shuffle the list to get random combinations
 
@@ -38,7 +38,7 @@ public class Block {
         // Create trials
         for (int t = 0; t < nTrials; t ++) {
             trials.add(new FittsTrial(
-                    winW, winH,
+                    dispW, dispH,
                     radDistDirList.get(t).get(0),
                     radDistDirList.get(t).get(1),
                     radDistDirList.get(t).get(2)));

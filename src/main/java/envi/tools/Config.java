@@ -20,11 +20,15 @@ public class Config {
     public static final int BENQ_DPI = 90;
     public static final int DPI = BENQ_DPI;
 
-    public static int WIN_W_MARGIN = 100;   // Left/right margin
-    public static int WIN_H_MARGIN = 50;   // Top bottom margin
     public static int NUM_SCREENS = 1; // Set programmatically
     public static int SCR_ID = 1; // Used in Main
     public static Rectangle SCR_BOUNDS; // Set programmatically (px)
+
+    public static int WIN_W_MARGIN = 100;   // Left/right margin
+    public static int WIN_H_MARGIN = 50;   // Top bottom margin
+
+    public static int _winW, _winH;
+    public static int _dispW, _dispH;
 
     // Text -----------------------------------------------
     public static int TEXT_X = 100; // From the right edge
@@ -54,21 +58,17 @@ public class Config {
     // -----------------------------------------------------
 
     // Experiment ==================================================================
-    public static int _stacleRadMM = 10; // Stacle radius (mm)
+    public static int _stacleRadMM = 8; // Stacle radius (mm)
     public static int _stacleRad; // Stacle radius (px) Set programmatically
     // Target radii (mm)
     public static List<Integer> _targetRadiiMM = new ArrayList<Integer>() {{
        add(5);
-       add(15);
-       add(20);
-       add(25);
+       add(10);
     }};
     // Distances (mm)
     public static List<Integer> _distancesMM = new ArrayList<Integer>() {{
         add(40);
         add(50);
-        add(60);
-        add(70);
     }};
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
@@ -83,7 +83,7 @@ public class Config {
     // --- Practice
     public static int _practiceTime = 10; // Practice time (min)
     public static int _minTarRadMM = 5; // Minimum traget radius (mm)
-    public static int DISP_H_RATIO_TAR_RAD = 4; // Maximum target radius = dispH / this
+    public static int DISP_H_RATIO_TAR_RAD = 2; // Maximum target radius = dispH / this
     public static enum PROCESS_STATE {
         SHOW_CASE,
         WARM_UP,

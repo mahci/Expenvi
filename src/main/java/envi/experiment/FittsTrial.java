@@ -14,6 +14,7 @@ public class FittsTrial extends Trial {
 
     private final String TAG = "[[FittsTrial]] ";
     private final boolean toLog = true;
+    //=======================================================
 
     // Positions of start and target circles (centers)
     private Point staclePosition = new Point();
@@ -33,10 +34,10 @@ public class FittsTrial extends Trial {
      * @param tarRad Target radius
      * @param tarDist Target distance from the center of the start circle
      * @param leftRight Target to the left/right of the start circle (left = 0 | rigth = 1)
-     * @param winW Width of the window
-     * @param winH Height of the window
+     * @param dispW Width of the dispaly area
+     * @param dispH Height of the display area
      */
-    public FittsTrial(int winW, int winH, int tarRad, int tarDist, int leftRight) {
+    public FittsTrial(int dispW, int dispH, int tarRad, int tarDist, int leftRight) {
 
         // Set the vars
         this.tarRad = tarRad;
@@ -44,7 +45,7 @@ public class FittsTrial extends Trial {
         this.tarDir = leftRight;
 
         // Set the postions
-        setPositions(winW, winH);
+        setPositions(dispW, dispH);
     }
 
     /**
@@ -53,9 +54,6 @@ public class FittsTrial extends Trial {
      * @param dispH Height of the display area
      */
     public FittsTrial(int dispW, int dispH) {
-        // Size of the display area
-//        int dispAreaW = winW - (2 * Config.WIN_W_MARGIN);
-//        int dispAreaH = winH - (2 * Config.WIN_H_MARGIN);
 
         //--- Random target radius
         int minTarRad = Utils.mm2px(Config._minTarRadMM);
@@ -70,7 +68,7 @@ public class FittsTrial extends Trial {
         int macDist = dispW - Config._stacleRad - this.tarRad;
 
         this.tarDist = ThreadLocalRandom.current().nextInt(minDist, macDist + 1);
-
+        if (toLog) System.out.println(TAG + String.format("tarDist = %d", tarDist));
         // Random direction
         if (new Random().nextBoolean()) this.tarDir = 1;
 
@@ -112,6 +110,8 @@ public class FittsTrial extends Trial {
             tarclePosition.x = staclePosition.x + tarDist;
         }
 
+        if (toLog) System.out.println(TAG + "Stacle position: " + staclePosition);
+        if (toLog) System.out.println(TAG + "Tarcle position: " + tarclePosition);
     }
 
     /**
@@ -144,5 +144,18 @@ public class FittsTrial extends Trial {
      */
     public Point getTarclePosition() { return tarclePosition; }
 
-
+    @Override
+    public String toString() {
+        return "FittsTrial{" +
+                "TAG='" + TAG + '\'' +
+                ", toLog=" + toLog +
+                ", staclePosition=" + staclePosition +
+                ", tarclePosition=" + tarclePosition +
+                ", tarRad=" + tarRad +
+                ", tarDist=" + tarDist +
+                ", tarDir=" + tarDir +
+                ", trialNum=" + trialNum +
+                ", blockNum=" + blockNum +
+                '}';
+    }
 }

@@ -10,6 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import envi.experiment.Practicer;
 import envi.tools.Config;
 import envi.connection.*;
+import envi.tools.Utils;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -72,6 +73,9 @@ public class Main extends JFrame {
 
         // Save the screens info (id is set in Config)
         saveScreenInfo();
+
+        // Set the pixel values based on
+        Utils.setPxValues();
 
         // Prepare the window and show the frame
 //        JFrame mainFrame = frame;
