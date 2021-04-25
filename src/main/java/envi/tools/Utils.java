@@ -3,6 +3,7 @@ package envi.tools;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Utils {
 
@@ -16,7 +17,7 @@ public class Utils {
      */
     public static int mm2px(int mm) {
 //        int DPI = java.awt.Toolkit.getDefaultToolkit().getScreenResolution();
-        return (int)((mm / MM_IN_INCH) * Config.DPI);
+        return (int)((mm / MM_IN_INCH) * Config._dpi);
     }
 
     /**
@@ -25,7 +26,7 @@ public class Utils {
      * @return Millimeters
      */
     public static int px2mm(int px) {
-        return (int)((px / Config.DPI) * MM_IN_INCH);
+        return (int)((px / Config._dpi) * MM_IN_INCH);
     }
 
     /**
@@ -76,8 +77,27 @@ public class Utils {
         return result;
     }
 
+    /**
+     * Display area coordinates --> Windows coordinates
+     * @param inPoint Point in display area
+     * @return Window's coordinates
+     */
     public static Point dispToWin(Point inPoint) {
-        inPoint.translate(Config.WIN_W_MARGIN, Config.WIN_H_MARGIN);
+        inPoint.translate(Config._winWidthMargin, Config._winHeightMargin);
         return inPoint;
+    }
+
+    /**
+     * Get the last part of the input String (split by SPACE)
+     * @param inStr Input String
+     * @return String last part
+     */
+    public static String lastPart(String inStr) {
+        if (!Objects.equals(inStr, "")) {
+            String[] parts = inStr.split(" ");
+            return parts[parts.length - 1];
+        } else {
+            return "";
+        }
     }
 }

@@ -85,8 +85,8 @@ public class Experimenter {
         // Set the display size
         winW = MainFrame.get().getBounds().width;
         winH = MainFrame.get().getBounds().height;
-        dispW = winW - (2 * Config.WIN_W_MARGIN);
-        dispH = winH - (2 * Config.WIN_H_MARGIN);
+        dispW = winW - (2 * Config._winWidthMargin);
+        dispH = winH - (2 * Config._winHeightMargin);
 
         // participant starts
         if (realExperiment) {

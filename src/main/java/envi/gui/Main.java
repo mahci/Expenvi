@@ -2,23 +2,16 @@ package envi.gui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 
-import envi.experiment.Practicer;
 import envi.tools.Config;
 import envi.connection.*;
 import envi.tools.Utils;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 
+public class Main {
 
-public class Main extends JFrame {
-
-    private final String TAG = "[[Main]] ";
+    private static final String TAG = "[[Main]] ";
+    private static final boolean toLog = true;
     //======================================
 
     /***
@@ -30,12 +23,11 @@ public class Main extends JFrame {
         // Save the screens info (id is set in Config)
         saveScreenInfo();
 
-        // Set the pixel values based on
-        Utils.setPxValues();
-
         // Show StartPanel
         MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.SHOW_CASE));
 
+        // Set the values
+        Utils.setPxValues();
 
         // Start the server
         MooseServer.get().start();
@@ -64,8 +56,8 @@ public class Main extends JFrame {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gd = ge.getScreenDevices();
 
-        Config.NUM_SCREENS = gd.length;
-        Config.SCR_BOUNDS = gd[Config.SCR_ID].getDefaultConfiguration().getBounds();
+        Config._nScr = gd.length;
+        Config._scrDims = gd[Config._scrId].getDefaultConfiguration().getBounds();
     }
 
 }

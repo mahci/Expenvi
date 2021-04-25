@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FittsTrial extends Trial {
 
     private final String TAG = "[[FittsTrial]] ";
-    private final boolean toLog = false;
+    private final boolean toLog = true;
     //=======================================================
 
     // Positions of start and target circles (centers)
@@ -57,7 +57,7 @@ public class FittsTrial extends Trial {
 
         //--- Random target radius
         int minTarRad = Utils.mm2px(Config._minTarRadMM);
-        int maxTarRad = dispH / Config.DISP_H_RATIO_TAR_RAD;
+        int maxTarRad = dispH / Config._dispHRatioToMaxRad;
         if (toLog) System.out.println(TAG +
             String.format("minTarRad = %d, max = %d", minTarRad, maxTarRad));
 

@@ -1,11 +1,9 @@
 package envi.connection;
 
 import envi.tools.Config;
-import envi.tools.Utils;
 import envi.experiment.Experimenter;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -66,7 +64,7 @@ public class MooseServer {
         try {
             // Open socket
             if (toLog) System.out.println(TAG + "Starting server...");
-            serverSocket = new ServerSocket(Config.CONN_PORT);
+            serverSocket = new ServerSocket(Config._netPort);
             if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
             Socket socket = serverSocket.accept();
             if (toLog) System.out.println(TAG + "Connection accepted!");

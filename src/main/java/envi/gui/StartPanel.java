@@ -51,8 +51,8 @@ public class StartPanel extends JPanel {
      */
     public StartPanel(Config.PROCESS_STATE state) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(600, 500));
-        setMaximumSize(new Dimension(600, 500));
+//        setPreferredSize(new Dimension(600, 500));
+//        setMaximumSize(new Dimension(600, 500));
 
         // Create the generic button
         startButton.setFont(new Font("Sans", Font.PLAIN, 14));

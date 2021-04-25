@@ -1,7 +1,6 @@
 package envi.gui;
 
 import envi.tools.Config;
-import envi.tools.Utils;
 import envi.action.Actions;
 import envi.action.VouseEvent;
 import envi.connection.MooseServer;
@@ -111,7 +110,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
 
-        graphics2D.setColor(Config.COLOR_TEXT_START);
+        graphics2D.setColor(Config._starcleTextColor);
         graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, 14));
         graphics2D.drawString("S", stacle.cx - 3, stacle.cy + 5);
 
@@ -121,7 +120,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
 
         //-- Draw stat texts
-        graphics2D.setColor(Config.COLOR_TEXT_NRM);
+        graphics2D.setColor(Config._normalTextColor);
         graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
         graphics2D.drawString(blockStatText, winW - Config.TEXT_X, Config.TEXT_Y);
         graphics2D.drawString(trialStatText, winW - Config.TEXT_X, Config.TEXT_Y + 20);
@@ -129,7 +128,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // -- Show error
         if (!errText.isEmpty()) {
             int errTextX = winW / 2 - 200;
-            graphics2D.setColor(Config.COLOR_TEXT_ERR);
+            graphics2D.setColor(Config._errorTextColor);
             graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
             graphics2D.drawString(errText, errTextX, Config.ERROR_Y);
 
@@ -147,9 +146,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      */
     public void setCircles(Circle c1, Circle c2) {
         stacle = c1;
-        stacle.setColor(Config.COLOR_STACLE_DEF);
+        stacle.setColor(Config._starcleDefColor);
         tarcle = c2;
-        tarcle.setColor(Config.COLOR_TARCLE_DEF);
+        tarcle.setColor(Config._tarcleDefColor);
     }
 
     /***
@@ -191,7 +190,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
 
                 // change the color of the start circle
-                stacle.setColor(Config.COLOR_STACLE_CLK);
+                stacle.setColor(Config._starcleClickedColor);
             } else { // Show error (NOT INSIDE)
                 errText = Config.ERR_NOT_INSIDE;
             }
@@ -236,7 +235,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
             } else { // Show error (NOT INSIDE) and change back the Stacle color
                 errText = Config.ERR_NOT_INSIDE;
-                stacle.setColor(Config.COLOR_STACLE_DEF);
+                stacle.setColor(Config._starcleDefColor);
 
                 // Invalid release => log in only gen
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);

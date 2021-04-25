@@ -1,0 +1,26 @@
+----- Display -----
+Monitor Number = 1
+DPI = 90
+Width Margin (px) = 100
+Height Margin (px) = 50
+----- Network -----
+Port = 8000
+----- Colors -----
+Normal Text = #0000FF
+Error Text = #FF0000
+Title Text = #A9A9A9
+Start Circle Default = #3DCF38
+Start Circle Clicked = #3D6E3B
+Strart Circle Text = #000000
+Target Circle Default = #E05C2F
+----- Show Case -----
+Minimum Target Radius (mm) = 5
+Window's Height / Max Target Radius = 6
+----- Experiment -----
+Start Radius (mm) = 8
+Number of Blocks = 2
+Target Radii (mm) = 5,7,9
+Target Distances (mm) = 20,40,60
+Interaction = SWIPE_LCLICK
+Vibrate = false
+

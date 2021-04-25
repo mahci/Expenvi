@@ -1,7 +1,6 @@
 package envi.gui;
 
 import envi.tools.Config;
-import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +17,6 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
 
     public static MainFrame get() {
@@ -52,17 +50,23 @@ public class MainFrame extends JFrame {
             }
         });
 
-        int scrW = Config.SCR_BOUNDS.width;
-        int scrH = Config.SCR_BOUNDS.height;
+        int scrW = Config._scrDims.width;
+        int scrH = Config._scrDims.height;
 
         int frW = dialog.getSize().width;
         int frH = dialog.getSize().height;
 
         dialog.setLocation(
-                ((scrW / 2) - (frW / 2)) + Config.SCR_BOUNDS.x,
-                ((scrH / 2) - (frH / 2)) + Config.SCR_BOUNDS.y
+                ((scrW / 2) - (frW / 2)) + Config._scrDims.x,
+                ((scrH / 2) - (frH / 2)) + Config._scrDims.y
         );
         dialog.setVisible(true);
+    }
+
+    public void showMessageDialog(String mssg) {
+        JOptionPane.showMessageDialog(
+                this,
+                mssg);
     }
 
     /**
@@ -70,15 +74,15 @@ public class MainFrame extends JFrame {
      */
     public void display()
     {
-        int scrW = Config.SCR_BOUNDS.width;
-        int scrH = Config.SCR_BOUNDS.height;
+        int scrW = Config._scrDims.width;
+        int scrH = Config._scrDims.height;
 
         int frW = getSize().width;
         int frH = getSize().height;
 
         setLocation(
-                ((scrW / 2) - (frW / 2)) + Config.SCR_BOUNDS.x,
-                ((scrH / 2) - (frH / 2)) + Config.SCR_BOUNDS.y
+                ((scrW / 2) - (frW / 2)) + Config._scrDims.x,
+                ((scrH / 2) - (frH / 2)) + Config._scrDims.y
         );
         setVisible(true);
     }

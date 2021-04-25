@@ -1,31 +1,45 @@
 package envi.tools;
 
+import envi.gui.MainFrame;
+
+import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 import java.util.List;
 
 public class Config {
 
+    private static final String TAG = "[[Config]] ";
+    private static final boolean toLog = false;
+
+    // Config file path
+    public static final String CONFIG_FILE_PATH = "config.txt";
+
     // Colors
-    public static Color COLOR_TEXT_NRM      = Color.BLUE;
-    public static Color COLOR_TEXT_ERR      = Color.RED;
-    public static Color COLOR_TEXT_START    = Color.DARK_GRAY;
-    public static Color COLOR_STACLE_DEF    = Color.decode("#3dcf38");
-    public static Color COLOR_STACLE_CLK    = Color.decode("#3d6e3b");
-    public static Color COLOR_TARCLE_DEF    = Color.decode("#e05c2f");
+    public static Color _normalTextColor        = Color.BLUE;
+    public static Color _errorTextColor         = Color.RED;
+    public static Color _titleTextColor         = Color.DARK_GRAY;
+    public static Color _starcleDefColor        = Color.decode("#3dcf38");
+    public static Color _starcleClickedColor    = Color.decode("#3d6e3b");
+    public static Color _starcleTextColor       = Color.black;
+    public static Color _tarcleDefColor         = Color.decode("#e05c2f");
 
     // Display
     public static final int BENQ_DPI = 90;
     public static final int MacCinDisp_DPI = 109;
 
-    public static final int DPI = MacCinDisp_DPI;
+    public static int _dpi = MacCinDisp_DPI;
 
-    public static int NUM_SCREENS = 1; // Set programmatically
-    public static int SCR_ID = 1; // Used in Main
-    public static Rectangle SCR_BOUNDS; // Set programmatically (px)
+    public static int _nScr = 1; // Set programmatically
+    public static int _scrId = 1; // Used in Main
+    public static Rectangle _scrDims; // Screen dimenstions (px)
 
-    public static int WIN_W_MARGIN = 100;   // Left/right margin
-    public static int WIN_H_MARGIN = 50;   // Top bottom margin
+    public static int _winWidthMargin = 100;   // Left/right margin (px)
+    public static int _winHeightMargin = 50;   // Top bottom margin (px)
+
+    public static int _dispAreaH, _dispAreaW; // px
 
     // Text -----------------------------------------------
     public static int TEXT_X = 100; // From the right edge
@@ -51,7 +65,7 @@ public class Config {
     // -----------------------------------------------------
 
     // Network ---------------------------------------------
-    public static final int CONN_PORT = 8000;
+    public static int _netPort = 8000;
     public static final String NET_DISCONNECT   = "DISCONNECT";
     // -----------------------------------------------------
 
@@ -82,10 +96,10 @@ public class Config {
     public static INTERACTION _interaction = INTERACTION.MOUSE_LCLICK;
     public static boolean _vibrate = false; // Vibrate?
 
-    // --- Practice
-    public static int _practiceTime = 10; // Practice time (min)
+    // --- Show Case
+//    public static int _practiceTime = 10; // Practice time (min)
     public static int _minTarRadMM = 5; // Minimum traget radius (mm)
-    public static int DISP_H_RATIO_TAR_RAD = 6; // Maximum target radius = dispH / this (for random)
+    public static int _dispHRatioToMaxRad = 6; // Maximum target radius = dispH / this (for random)
     public static enum PROCESS_STATE {
         SHOW_CASE,
         WARM_UP,
@@ -101,9 +115,114 @@ public class Config {
     // Logs
 
 
-    // =============================================================================
+    // Methods ================================================================
+    public static void readConfigFromFile() {
+        try {
+            Scanner fileScan = new Scanner(new File(CONFIG_FILE_PATH));
+
+            //===== Read display values
+            fileScan.nextLine(); // skip title
+
+            _scrId = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            _dpi = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            _winWidthMargin = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            _winHeightMargin = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+
+            // Additional info
+            _dispAreaW = MainFrame.get().getWidth() - 2 * _winWidthMargin;
+            _dispAreaH = MainFrame.get().getHeight() - 2 * _winHeightMargin;
+            if (toLog) System.out.println(TAG + "winW = " + MainFrame.get().getWidth());
+            if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
+            int maxRadMM = Utils.px2mm(_dispAreaH / 2);
+            if (toLog) System.out.println(TAG + "maxRadMM = " + maxRadMM);
+            //===== Read network values
+            fileScan.nextLine(); // skip title
+
+            _netPort = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+
+            //===== Read color values
+            fileScan.nextLine(); // skip title
+
+            _normalTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+            _errorTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+            _titleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+            _starcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+            _starcleClickedColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+            _starcleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+            _tarcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+
+            //===== Read show case values
+            fileScan.nextLine(); // skip title
+
+            _minTarRadMM = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            _dispHRatioToMaxRad = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+
+            //===== Read experiment values
+            fileScan.nextLine(); // skip title
+
+            // Stacle radius
+            int radius = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            if (radius >= maxRadMM) {
+                MainFrame.get().showMessageDialog(
+                        "Start radius can't be more than " + maxRadMM + " mm");
+            } else {
+                _stacleRadMM = radius;
+            }
+            _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+
+            // Target radii
+            Scanner scanner = new Scanner(Utils.lastPart(fileScan.nextLine()));
+            while (scanner.hasNextInt()) {
+                radius = scanner.nextInt();
+                // Radius should not be less than half the height display area
+                if (radius >= maxRadMM) {
+                    MainFrame.get().showMessageDialog(
+                            "Target radius can't be more than " + maxRadMM + " mm");
+                } else {
+                    _targetRadiiMM.add(radius);
+                }
+            }
+
+            // Target distances
+            int maxDist = Utils.px2mm(_dispAreaW) - Collections.max(_targetRadiiMM) - _stacleRadMM;
+            scanner = new Scanner(Utils.lastPart(fileScan.nextLine()));
+            while (scanner.hasNextInt()) {
+                int dist = scanner.nextInt();
+                if (dist >= maxDist) {
+                    MainFrame.get().showMessageDialog(
+                            "Distance can't be more than " + maxDist + " mm");
+                } else {
+                    _distancesMM.add(dist);
+                }
+
+            }
+            // Next...
+            _interaction = INTERACTION.valueOf(Utils.lastPart(fileScan.nextLine()));
+            _vibrate = Boolean.parseBoolean(Utils.lastPart(fileScan.nextLine()));
 
 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Print the config
+        if (toLog) {
+            System.out.println(TAG + "_minTarRadMM = " + _minTarRadMM);
+            System.out.println(TAG + "_dispHRatioToMaxRad = " + _dispHRatioToMaxRad);
+            System.out.println(TAG + "_stacleRadMM = " + _stacleRadMM);
+            System.out.println(TAG + "_nBlocksInExperiment = " + _nBlocksInExperiment);
+            System.out.println(TAG + "_targetRadiiMM = " + _targetRadiiMM);
+            System.out.println(TAG + "_distancesMM = " + _distancesMM);
+            System.out.println(TAG + "_interaction = " + _interaction);
+            System.out.println(TAG + "_vibrate = " + _vibrate);
+            System.out.println(TAG + "_scrId = " + _scrId);
+            System.out.println(TAG + "_dpi = " + _dpi);
+            System.out.println(TAG + "_winWMargin = " + _winWidthMargin);
+            System.out.println(TAG + "_winHMargin = " + _winHeightMargin);
+            System.out.println(TAG + "_netPort = " + _netPort);
+        }
+
+    }
 
 
 }

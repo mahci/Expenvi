@@ -1,12 +1,8 @@
 package envi.gui;
 
 import envi.action.Actions;
-import envi.action.VouseEvent;
 import envi.connection.MooseServer;
-import envi.experiment.Experimenter;
 import envi.experiment.FittsTrial;
-import envi.experiment.Mologger;
-import envi.experiment.Practicer;
 import envi.tools.Config;
 import envi.tools.Utils;
 
@@ -15,10 +11,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.sql.SQLOutput;
-import java.time.LocalTime;
 
 public class PracticePanel extends JPanel implements MouseInputListener {
 
@@ -62,12 +55,15 @@ public class PracticePanel extends JPanel implements MouseInputListener {
      */
     public PracticePanel() {
 
-        // Set params
-        winW = MainFrame.get().getBounds().width;
-        winH = MainFrame.get().getBounds().height;
+        // Get values from file
+        Config.readConfigFromFile();
 
-        dispW = winW - (2 * Config.WIN_W_MARGIN);
-        dispH = winH - (2 * Config.WIN_H_MARGIN);
+        // Set params
+        winW = MainFrame.get().getWidth();
+        winH = MainFrame.get().getHeight();
+
+        dispW = winW - (2 * Config._winWidthMargin);
+        dispH = winH - (2 * Config._winHeightMargin);
 
         // Set listeners and binding
         addMouseListener(this);
@@ -100,23 +96,23 @@ public class PracticePanel extends JPanel implements MouseInputListener {
         });
 
         // Start the trials
-        nextTrial();
+        setNextTrial();
     }
 
     /**
-     * Go to the next trial
+     * Set the next trial (drawing is done by repaint())
      */
-    public void nextTrial() {
+    public void setNextTrial() {
         // Get a random trial
         trial = new FittsTrial(dispW, dispH);
 
-        // Create circles from the trial
-        stacle = new Circle(trial.getStaclePosition(),
+        // Create circles from the trial (translate to window coordinates)
+        stacle = new Circle(Utils.dispToWin(trial.getStaclePosition()),
                 Config._stacleRad,
-                Config.COLOR_STACLE_DEF);
-        tarcle = new Circle(trial.getTarclePosition(),
+                Config._starcleDefColor);
+        tarcle = new Circle(Utils.dispToWin(trial.getTarclePosition()),
                 trial.getTarRad(),
-                Config.COLOR_TARCLE_DEF);
+                Config._tarcleDefColor);
 
         if (toLog) System.out.println(TAG + "stacle rad = " + stacle.radius);
     }
@@ -142,7 +138,7 @@ public class PracticePanel extends JPanel implements MouseInputListener {
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
 
-        graphics2D.setColor(Config.COLOR_TEXT_START);
+        graphics2D.setColor(Config._starcleTextColor);
         graphics2D.setFont(Config.S_FONT);
         graphics2D.drawString("S", stacle.cx - 3, stacle.cy + 5);
 
@@ -152,7 +148,7 @@ public class PracticePanel extends JPanel implements MouseInputListener {
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
 
         //-- Draw stat text
-        graphics2D.setColor(Config.COLOR_TEXT_NRM);
+        graphics2D.setColor(Config._normalTextColor);
         graphics2D.setFont(Config.EXP_INFO_FONT);
         graphics2D.drawString(String.valueOf(trialNum), winW - Config.TEXT_X, Config.TEXT_Y);
 
@@ -171,7 +167,7 @@ public class PracticePanel extends JPanel implements MouseInputListener {
         if (!stacleClicked) { // Pressing the start
             if (stacle.isInside(crsPos.x, crsPos.y)) {
                 pressedInsideStacle = true;
-                stacle.setColor(Config.COLOR_STACLE_CLK);
+                stacle.setColor(Config._starcleClickedColor);
             } else { // NOT INSIDE!
 //                errText = Utils.ERR_NOT_INSIDE;
             }
@@ -189,17 +185,17 @@ public class PracticePanel extends JPanel implements MouseInputListener {
 
         if (stacleClicked) { // Target Second release
             stacleClicked = false;
-            stacle.setColor(Config.COLOR_STACLE_DEF);
+            stacle.setColor(Config._starcleDefColor);
 
             // Next trial
             trialNum++;
-            nextTrial();
+            setNextTrial();
         } else { // Start release
             if (pressedInsideStacle && stacle.isInside(crsPos.x, crsPos.y)) {
                 stacleClicked = true;
             } else { // NOT INSIDE!
 //                errText = Utils.ERR_NOT_INSIDE;
-                stacle.setColor(Config.COLOR_STACLE_DEF);
+                stacle.setColor(Config._starcleDefColor);
             }
         }
 
