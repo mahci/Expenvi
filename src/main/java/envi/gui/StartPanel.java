@@ -4,6 +4,7 @@ import envi.experiment.Experimenter;
 import envi.experiment.Practicer;
 import envi.tools.Config;
 import envi.tools.Utils;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,8 +56,9 @@ public class StartPanel extends JPanel {
 
         // Create the generic button
         startButton.setFont(new Font("Sans", Font.PLAIN, 14));
-        startButton.setMaximumSize(new Dimension(250, 50));
+        startButton.setMaximumSize(new Dimension(350, 50));
         startButton.setAlignmentX(CENTER_ALIGNMENT);
+        startButton.setFocusPainted(false);
 
         // Check state for different texts
         String labelText = "";
@@ -65,7 +67,8 @@ public class StartPanel extends JPanel {
         case SHOW_CASE:
             labelText = showCaseHint;
             btnText = showCaseBtnText;
-            startButton.setText(btnText);
+//            startButton.setText(btnText);
+
             startButton.getInputMap().put(
                     KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
                     "SPACE");
