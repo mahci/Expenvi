@@ -12,12 +12,16 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 
 public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ExperimentPanel]] ";
+    private final boolean toLog = true;
+    //------------------------------------------------
 
     // Circles to draw
     private Circle stacle;
@@ -38,12 +42,25 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     // Publishing all the movements
     private static PublishSubject<MouseEvent> mouseSubject;
 
+    // [JFT] For faster testing the trials
+    private final Action nextTrial = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(toLog) System.out.println(TAG + "SPACE Performed");
+            Experimenter.get().trialDone(true);
+        }
+    };
+
     /***
      * Constructor
      */
     public ExperimentPanel() {
         addMouseListener(this);
         addMouseMotionListener(this);
+        getInputMap().put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                "SPACE");
+        getActionMap().put("SPACE", nextTrial);
 
         mouseSubject = PublishSubject.create();
 
@@ -67,6 +84,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                     break;
             }
         });
+
+        requestFocusInWindow();
     }
 
     /***
@@ -116,6 +135,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
             errText = ""; // Clear the error
         }
+
+        requestFocus();
 
     }
 

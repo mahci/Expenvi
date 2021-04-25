@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FittsTrial extends Trial {
 
     private final String TAG = "[[FittsTrial]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     //=======================================================
 
     // Positions of start and target circles (centers)
@@ -78,7 +78,7 @@ public class FittsTrial extends Trial {
 
     /**
      * Set the positions of the circles based on other parameters (already set)
-     * The position of STACLE is randomly chosen
+     * The position of *STACLE* is randomly chosen
      */
     private void setPositions(int dispW, int dispH) {
         if (toLog) System.out.println(TAG + String.format("disp W = %d, H = %d", dispW, dispH));
@@ -86,6 +86,7 @@ public class FittsTrial extends Trial {
         int minX, minY, maxX, maxY;
         int maxRad = Math.max(tarRad, Config._stacleRad); // Max radius between target or start
         if (toLog) System.out.println(TAG + String.format("maxRad = %d", maxRad));
+
         // Y is independant of the left/right
         minY = maxRad;
         maxY = dispH - maxRad;

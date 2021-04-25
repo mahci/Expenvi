@@ -38,7 +38,7 @@ public class Main extends JFrame {
 
 
         // Start the server
-//        MooseServer.get().start();
+        MooseServer.get().start();
 
         // Close the server on close
         Runtime.getRuntime().addShutdownHook(new Thread()

@@ -107,7 +107,9 @@ public class Experimenter {
         if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
 
         // Publish the start of the experiment
-        expSubject.onNext(Config.MSSG_BEG_EXP + "_" + currExpNum);
+        if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) {
+            expSubject.onNext(Config.MSSG_BEG_EXP + "_" + Config._interaction + "--" + LocalDateTime.now());
+        }
 
         // Run the first block
         currBlockInd = 0;
@@ -168,6 +170,9 @@ public class Experimenter {
                 if (!realExperiment) { // Warm-up is finished
                     MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.EXPERIMENT));
                 } else { // Experiment is finished
+                    // Publish
+                    expSubject.onNext(Config.MSSG_END_EXP);
+
                     showEnd();
                 }
 //            System.exit(0);
@@ -184,22 +189,27 @@ public class Experimenter {
      */
     private void runFittsTrial(FittsTrial ftr) {
 
-        // Create circles (translate the display area to approprate location)
+        // Create circles (translate the display area to appropriate location)
         Circle stacle = new Circle(
                 Utils.dispToWin(ftr.getStaclePosition()),
                 Config._stacleRad);
         Circle tarcle = new Circle(
                 Utils.dispToWin(ftr.getTarclePosition()),
                 ftr.getTarRad());
+        if(toLog) System.out.println(TAG + "Stacle: " + stacle);
+        if(toLog) System.out.println(TAG + "Tarcle: " + tarcle);
 
-        // Create and send the panel to be drawn
+        //-- Create and send the panel to be drawn
         ExperimentPanel expPanel = new ExperimentPanel();
         expPanel.setCircles(stacle, tarcle);
+
+        // Set texts
         String trlStat = "Trial: " + currTrialNum;
         int blockNum = currBlockInd + 1;
         String blkStat = "Block: " + blockNum + " / " + blocks.size();
         expPanel.setStatTexts(blkStat, trlStat);
-        if(toLog) System.out.println(TAG + "Num of Blocks = " + blocks.size());
+
+        // Send to be shown!
         MainFrame.get().showPanel(expPanel);
     }
 

@@ -20,7 +20,8 @@ import java.util.Objects;
 public class MooseServer {
 
     private String TAG = "[[MooseServer]] ";
-
+    private boolean toLog = true;
+    //============================================
     private static MooseServer self; // for singleton
 
     private ServerSocket serverSocket;
@@ -46,18 +47,15 @@ public class MooseServer {
      */
     private MooseServer() {
         actionSubject = PublishSubject.create();
-        listenerObserver = Observable.fromAction(new Action() {
 
-            @Override
-            public void run() throws Throwable {
-                // Continously read lines from the Moose until get disconnected
-                String line;
-                do {
-                    line = inBR.readLine();
-                    // publish the action
-                    actionSubject.onNext(line);
-                } while(isConnected);
-            }
+        listenerObserver = Observable.fromAction(() -> {
+            // Continously read lines from the Moose until get disconnected
+            String line;
+            do {
+                line = inBR.readLine();
+                // publish the action
+                actionSubject.onNext(line);
+            } while(isConnected);
         });
     }
 
@@ -65,14 +63,13 @@ public class MooseServer {
      * Start the server
      */
     public void start() {
-
         try {
-
             // Open socket
-            System.out.println("Starting server...");
+            if (toLog) System.out.println(TAG + "Starting server...");
             serverSocket = new ServerSocket(Config.CONN_PORT);
+            if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
             Socket socket = serverSocket.accept();
-            System.out.println("Server started!");
+            if (toLog) System.out.println(TAG + "Connection accepted!");
 
             // Create streams
             inBR = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -80,13 +77,15 @@ public class MooseServer {
 
             // Get connection request from the Moose
             String line = inBR.readLine();
-//            System.out.println("First Moose Message: " + line);
+            if(toLog) System.out.println(TAG + "First Moose message: " + line);
 
             if (Objects.equals(line, Config.MSSG_MOOSE)) { // Correct message
                 // Confirm
                 sendMssg(Config.MSSG_CONFIRM);
-                System.out.println("Moose connected! Receiving actions...");
-                System.out.println("------------------------------------------");
+                if (toLog) {
+                    System.out.println(TAG + "Moose connected! Receiving actions...");
+                    System.out.println("------------------------------------------");
+                }
 
                 isConnected = true;
 
@@ -99,9 +98,9 @@ public class MooseServer {
                 // Start listening to incoming messages from the Moose
                 listenerObservable().subscribe();
 
-                // Start listening to Experimenter
+                // If interactino is not the Mouse, send actions to the Moose
                 Experimenter.get().getExpSubject().subscribe(state -> {
-                    sendMssg(state);
+                    if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) sendMssg(state);
                 });
 
             }
@@ -124,20 +123,19 @@ public class MooseServer {
      * @return An Observable that publishes the received action
      */
     private @NonNull Observable<Object> listenerObservable() {
-        return Observable.fromAction(new Action() {
-
-            @Override
-            public void run() throws Throwable {
-                // Continously read lines from the Moose until get disconnected
-                String line;
-                do {
-                    System.out.println("Reading Moose commands...");
-                    line = inBR.readLine();
-                    System.out.println(TAG + "Recieved: " + line);
+        return Observable.fromAction(() -> {
+            // Continously read lines from the Moose until get disconnected
+            String line;
+            do {
+                if (toLog) System.out.println(TAG + "Getting Moose commands...");
+                line = inBR.readLine();
+                if (line != null) {
                     // publish the action
                     actionSubject.onNext(line);
-                } while(inBR!=null && isConnected);
-            }
+
+                    if (toLog) System.out.println(TAG + line + " recieved");
+                }
+            } while(inBR != null && isConnected);
         }).subscribeOn(Schedulers.io());
     }
 
@@ -149,9 +147,9 @@ public class MooseServer {
         if (outPW != null) {
             outPW.println(mssg);
             outPW.flush();
-            System.out.println(TAG + mssg + " sent");
+            if (toLog) System.out.println(TAG + mssg + " sent");
         } else {
-            System.out.println(TAG + "Out PrintWriter not open!");
+            System.out.println(TAG + "Output PrintWriter not available!");
         }
     }
 

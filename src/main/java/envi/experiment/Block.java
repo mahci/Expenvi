@@ -1,5 +1,6 @@
 package envi.experiment;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,10 @@ import java.util.concurrent.ThreadLocalRandom;
  * The class for the a block of trials
  */
 public class Block {
+
+    private String TAG = "[[Block]] ";
+    private boolean toLog = true;
+    //==================================================
 
     private ArrayList<FittsTrial> trials = new ArrayList<>(); // List of trials
     private TRIAL_TYPE trialsType;
@@ -69,28 +74,32 @@ public class Block {
      */
     public void trialFail(int trialInd) {
         int fi = trialInd - 1;
+        FittsTrial failedTrial = trials.get(fi);
 
-        // Get a new index for the failed trial
-        int minNewInd = fi + 1;
-        int maxNewInd = trials.size();
-        int newInd = ThreadLocalRandom.current().nextInt(minNewInd, maxNewInd);
+        // Get the rest of the elments (if trial is the last one, should return empty)
+        ArrayList<FittsTrial> restList = new ArrayList<>(trials.subList(fi + 1, trials.size()));
 
-        // Change places
-        ArrayList<FittsTrial> newList = new ArrayList<>();
-        int i = 0;
-        for (i = 0; i < fi; i ++) { // Copy previous trials
-            newList.add(trials.get(i));
-        }
-        for (i = fi; i < newInd; i ++) { // Shift next trials (including newInd from old list)
-            newList.add(i, trials.get(i + 1));
-        }
-        newList.add(newInd, trials.get(fi)); // Set the failed trial
-        for (i = newInd + 1; i < trials.size(); i ++) {
-            newList.add(trials.get(i));
-        }
+        // Clear the rest of the trials and put in the new made list
+        trials.subList(fi + 1, trials.size()).clear();
+        trials.addAll(fi + 1, shuffleIn(restList, failedTrial));
+    }
 
-        // Replace the list
-        trials = newList;
+    /**
+     * Shuffle a Trial into a list
+     * @param list Input List
+     * @param inTrl Trial to insert
+     * @return The list with added new trial [If input list is null, return an empty list]
+     */
+    private ArrayList<FittsTrial> shuffleIn(ArrayList<FittsTrial> list, FittsTrial inTrl) {
+        if (list != null) {
+            // If list is empty, no random index, just 0
+            int rndInd = list.isEmpty() ? 0 : ThreadLocalRandom.current().nextInt(0, list.size());
+            list.add(rndInd, inTrl);
+
+            return list;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     /**

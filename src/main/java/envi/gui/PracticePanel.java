@@ -23,7 +23,7 @@ import java.time.LocalTime;
 public class PracticePanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[PracticePanel]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     //===================================================
 
     // Two circles to draw
@@ -165,7 +165,6 @@ public class PracticePanel extends JPanel implements MouseInputListener {
      * Virtual press of the primary mouse button
      */
     public void vPressPrimary() {
-        System.out.println(TAG + "Primary PRESS");
         // Position of the curser
         Point crsPos = getCursorPosition();
 

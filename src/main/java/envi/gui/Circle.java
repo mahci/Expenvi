@@ -72,4 +72,16 @@ public class Circle {
         return String.format("Center= %d,%d - Radius= %d", cx, cy, radius);
     }
 
+    @Override
+    public String toString() {
+        return "Circle {" +
+                "radius= " + radius +
+                ", tlX= " + tlX +
+                ", tlY= " + tlY +
+                ", side= " + side +
+                ", cx= " + cx +
+                ", cy= " + cy +
+                ", color= " + color +
+                '}';
+    }
 }
