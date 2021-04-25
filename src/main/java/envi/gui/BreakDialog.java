@@ -15,6 +15,7 @@ public class BreakDialog extends JDialog implements KeyListener {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(600, 300));
 //        setMaximumSize(new Dimension(600, 500));
+        setUndecorated(true);
 
         //-----------------------------------------
         JPanel panel = new JPanel();
