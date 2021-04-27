@@ -16,7 +16,7 @@ import java.util.List;
 public class Experimenter {
 
     private String TAG = "[[Experimenter]] ";
-    private boolean toLog = true;
+    private boolean toLog = false;
     //==============================================================================
     private static Experimenter self = null; // for singleton
 
@@ -31,7 +31,6 @@ public class Experimenter {
 
     // Experiment
     private final int participID = 1; // Participant's ID TODO: Convert to String?
-    private final int currExpNum = 1; // Currently always 1 (for each participants
 
     // Blocks
     private final List<Block> blocks = new ArrayList<>();
@@ -108,7 +107,8 @@ public class Experimenter {
 
         // Publish the start of the experiment
         if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) {
-            expSubject.onNext(Config.MSSG_BEG_EXP + "_" + Config._interaction + "--" + LocalDateTime.now());
+            LocalDateTime startTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+            expSubject.onNext(Config.MSSG_BEG_EXP + "_" + Config._interaction + "--" + startTime);
         }
 
         // Run the first block
@@ -171,7 +171,7 @@ public class Experimenter {
                     MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.EXPERIMENT));
                 } else { // Experiment is finished
                     // Publish
-                    expSubject.onNext(Config.MSSG_END_EXP);
+                    expSubject.onNext(Config.MSSG_END_EXP + "_" + "-");
 
                     showEnd();
                 }
@@ -217,7 +217,7 @@ public class Experimenter {
      * Show a break (between blocks)
      */
     public void showBreak() {
-        expSubject.onNext(Config.MSSG_END_LOG);
+        expSubject.onNext(Config.MSSG_END_LOG + "_" + "-");
 
         // Break dialog
         MainFrame.get().showDialog(new BreakDialog());

@@ -93,7 +93,7 @@ public class Config {
         TAP_LCLICK,
         MOUSE_LCLICK
     }
-    public static INTERACTION _interaction = INTERACTION.MOUSE_LCLICK;
+    public static INTERACTION _interaction = INTERACTION.SWIPE_LCLICK;
     public static boolean _vibrate = false; // Vibrate?
 
     // --- Show Case

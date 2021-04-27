@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FittsTrial extends Trial {
 
     private final String TAG = "[[FittsTrial]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     //=======================================================
 
     // Positions of start and target circles (centers)

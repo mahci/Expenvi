@@ -13,30 +13,30 @@ import java.awt.event.KeyEvent;
 
 public class StartPanel extends JPanel {
 
-    private String showCaseHint = "Welcome to the Moose! Press SPACE to start";
-    private String showCaseBtnText = "Show Me How It Works";
+    private final String showCaseHint = "Welcome to the Moose! Press SPACE to start";
+    private final String showCaseBtnText = "Show Me How It Works";
 
-    private String warmUpHint = "Let's warm-up a bit. Press SPACE to go";
-    private String warmUpBtnText = "Let's Go!";
+    private final String warmUpHint = "Let's warm-up a bit. Press SPACE to go";
+    private final String warmUpBtnText = "Let's Go!";
 
-    private String experimentHint = "Now the real experiment! Press SPACE to start";
-    private String experimentBtnText = "Start Experiment";
+    private final String experimentHint = "Now the real experiment! Press SPACE to start";
+    private final String experimentBtnText = "Start Experiment";
 
-    private Action startShowCase = new AbstractAction() {
+    private final Action startShowCase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             MainFrame.get().showPanel(new PracticePanel());
         }
     };
 
-    private Action startWarmUp = new AbstractAction() {
+    private final Action startWarmUp = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             Experimenter.get().startExperiment(false);
         }
     };
 
-    private Action startExperiment = new AbstractAction() {
+    private final Action startExperiment = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
             Experimenter.get().startExperiment(true);
@@ -99,42 +99,12 @@ public class StartPanel extends JPanel {
         hintLabel.setAlignmentX(CENTER_ALIGNMENT);
         hintLabel.setFont(new Font("Sans", Font.PLAIN, 14));
 
-        // Config info
-//        JLabel radiiLabel = new JLabel("Target Radii: " + Config._targetRadiiMM + " mm");
-//        radiiLabel.setFont(new Font("Sans", Font.PLAIN, 12));
-//        radiiLabel.setAlignmentX(CENTER_ALIGNMENT);
-//
-//        JLabel distLabel = new JLabel("Target Distances: " + Config._distancesMM + " mm");
-//        distLabel.setFont(new Font("Sans", Font.PLAIN, 12));
-//        distLabel.setAlignmentX(CENTER_ALIGNMENT);
-//
-//        JLabel actLabel = new JLabel("Action: " +
-//                Utils.actionString(Config._action) + " | " +
-//                "Vibrate: " + Config._vibrate);
-//        actLabel.setFont(new Font("Sans", Font.PLAIN, 12));
-//        actLabel.setAlignmentX(CENTER_ALIGNMENT);
-//
-//        // Config button
-//        JButton configButton = new JButton("Change configuration");
-//        configButton.setFont(new Font("Sans", Font.PLAIN, 12));
-//        configButton.setMinimumSize(new Dimension(300, 35));
-//        configButton.setAlignmentX(CENTER_ALIGNMENT);
-//        configButton.addActionListener(e -> {
-//            MainFrame.get().showDialog(new ConfigDialog());
-//        });
-
+        // Adding the components
         this.add(Box.createVerticalStrut(350)); // Top space
         this.add(hintLabel);
         this.add(Box.createVerticalStrut(20)); // Space
         this.add(startButton);
         this.add(Box.createVerticalStrut(100)); // Space
-//        this.add(radiiLabel);
-//        this.add(Box.createVerticalStrut(10)); // Space
-//        this.add(distLabel);
-//        this.add(Box.createVerticalStrut(10)); // Space
-//        this.add(actLabel);
-//        this.add(Box.createVerticalStrut(10)); // Space
-//        this.add(configButton);
 
         startButton.requestFocusInWindow();
     }

@@ -65,55 +65,59 @@ public class MooseServer {
             // Open socket
             if (toLog) System.out.println(TAG + "Starting server...");
             serverSocket = new ServerSocket(Config._netPort);
-            if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
-            Socket socket = serverSocket.accept();
-            if (toLog) System.out.println(TAG + "Connection accepted!");
+            while (true) { // Keep the socket opened (while the programm is running)
+                if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
+                Socket socket = serverSocket.accept();
+                if (toLog) System.out.println(TAG + "Connection accepted!");
 
-            // Create streams
-            inBR = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            outPW = new PrintWriter(socket.getOutputStream());
+                // Create streams
+                inBR = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                outPW = new PrintWriter(socket.getOutputStream());
 
-            // Get connection request from the Moose
-            String line = inBR.readLine();
-            if(toLog) System.out.println(TAG + "First Moose message: " + line);
+                // Get connection request from the Moose
+                String line = inBR.readLine();
+                if(toLog) System.out.println(TAG + "First Moose message: " + line);
 
-            if (Objects.equals(line, Config.MSSG_MOOSE)) { // Correct message
-                // Confirm
-                sendMssg(Config.MSSG_CONFIRM);
-                if (toLog) {
-                    System.out.println(TAG + "Moose connected! Receiving actions...");
-                    System.out.println("------------------------------------------");
+                if (Objects.equals(line, Config.MSSG_MOOSE)) { // Correct message
+                    // Confirm
+                    sendMssg(Config.MSSG_CONFIRM);
+                    if (toLog) {
+                        System.out.println(TAG + "Moose connected! Receiving actions...");
+                        System.out.println("------------------------------------------");
+                    }
+
+                    isConnected = true;
+
+                    // Send the participants ID
+                    sendMssg(Config.MSSG_PID + "_" + Experimenter.get().getPID());
+
+                    // Start listening to incoming messages from the Moose
+                    listenerObservable().subscribe();
+
+                    // If interactino is not the Mouse, send actions to the Moose
+                    Experimenter.get().getExpSubject().subscribe(state -> {
+                        if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) sendMssg(state);
+                    });
+
                 }
-
-                isConnected = true;
-
-                // Send the participants ID
-                sendMssg(Config.MSSG_PID + "_" + Experimenter.get().getPID());
-
-                // Pass the PublishSubject to the Bot for listening
-//                MooseBot.get().startBot(actionSubject);
-
-                // Start listening to incoming messages from the Moose
-                listenerObservable().subscribe();
-
-                // If interactino is not the Mouse, send actions to the Moose
-                Experimenter.get().getExpSubject().subscribe(state -> {
-                    if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) sendMssg(state);
-                });
-
             }
 
-        } catch (IOException ioException) {
-            System.out.println("Problem in starting the server!" + ioException);
-            ioException.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Problem in starting the server: " + e);
+//            e.printStackTrace();
         }
     }
 
     /**
-     * Close the server
+     * Disconnect and close the socket (called when closing the application)
      */
     public void close() {
-        sendMssg(Config.NET_DISCONNECT);
+//        sendMssg(Config.NET_DISCONNECT + "_" + "-");
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
