@@ -63,6 +63,9 @@ public class Experimenter {
     private Experimenter() {
         expSubject = PublishSubject.create();
 
+        // set the config from file
+        Config.setFromFile();
+
         // Save radii and distances in px values
         for(int rad: Config._targetRadiiMM) {
             radList.add(Utils.mm2px(rad));

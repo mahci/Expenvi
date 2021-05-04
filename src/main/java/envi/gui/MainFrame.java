@@ -15,10 +15,15 @@ public class MainFrame extends JFrame {
      * Constructor
      */
     public MainFrame() {
+        // Set the properties of the frame
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    /**
+     * Get the instance
+     * @return JFrame
+     */
     public static MainFrame get() {
         if (self == null) self = new MainFrame();
         return self;
@@ -63,6 +68,10 @@ public class MainFrame extends JFrame {
         dialog.setVisible(true);
     }
 
+    /**
+     * Show a message dialog
+     * @param mssg Message to show
+     */
     public void showMessageDialog(String mssg) {
         JOptionPane.showMessageDialog(
                 this,
@@ -70,7 +79,7 @@ public class MainFrame extends JFrame {
     }
 
     /**
-     * Show the frame on a specific monitor
+     * Display a panel
      */
     public void display()
     {

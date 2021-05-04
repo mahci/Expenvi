@@ -112,11 +112,10 @@ public class Config {
     public static final String DIMSSG_BLOCK_FINISH =
             "Block finished! You can now take a break. Press OK when ready.";
 
-    // Logs
 
 
     // Methods ================================================================
-    public static void readConfigFromFile() {
+    public static void setFromFile() {
         try {
             Scanner fileScan = new Scanner(new File(CONFIG_FILE_PATH));
 
@@ -167,6 +166,7 @@ public class Config {
                         "Start radius can't be more than " + maxRadMM + " mm");
             } else {
                 _stacleRadMM = radius;
+                _stacleRad = Utils.mm2px(_stacleRadMM);
             }
             _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 

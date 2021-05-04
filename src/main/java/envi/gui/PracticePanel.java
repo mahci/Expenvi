@@ -56,7 +56,7 @@ public class PracticePanel extends JPanel implements MouseInputListener {
     public PracticePanel() {
 
         // Get values from file
-        Config.readConfigFromFile();
+        Config.setFromFile();
 
         // Set params
         winW = MainFrame.get().getWidth();
@@ -194,7 +194,6 @@ public class PracticePanel extends JPanel implements MouseInputListener {
             if (pressedInsideStacle && stacle.isInside(crsPos.x, crsPos.y)) {
                 stacleClicked = true;
             } else { // NOT INSIDE!
-//                errText = Utils.ERR_NOT_INSIDE;
                 stacle.setColor(Config._starcleDefColor);
             }
         }

@@ -11,8 +11,8 @@ Error Text = #FF0000
 Title Text = #A9A9A9
 Start Circle Default = #3DCF38
 Start Circle Clicked = #3D6E3B
-Strart Circle Text = #000000
-Target Circle Default = #E05C2F
+Start Circle Text = #000000
+Target Circle Default = #1E90FF
 ----- Show Case -----
 Minimum Target Radius (mm) = 5
 Window's Height / Max Target Radius = 6

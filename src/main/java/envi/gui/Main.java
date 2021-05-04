@@ -26,9 +26,6 @@ public class Main {
         // Show StartPanel
         MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.SHOW_CASE));
 
-        // Set the values
-        Utils.setPxValues();
-
         // Start the server
         MooseServer.get().start();
 

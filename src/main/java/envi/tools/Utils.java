@@ -20,7 +20,6 @@ public class Utils {
      * @return Pixels
      */
     public static int mm2px(int mm) {
-//        int DPI = java.awt.Toolkit.getDefaultToolkit().getScreenResolution();
         return (int)((mm / MM_IN_INCH) * Config._dpi);
     }
 
@@ -31,13 +30,6 @@ public class Utils {
      */
     public static int px2mm(int px) {
         return (int)((px / Config._dpi) * MM_IN_INCH);
-    }
-
-    /**
-     * Do the mm2px conversion for all the required px values
-     */
-    public static void setPxValues() {
-        Config._stacleRad = mm2px(Config._stacleRadMM);
     }
 
     /**

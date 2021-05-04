@@ -13,19 +13,20 @@ import java.awt.event.KeyEvent;
 
 public class StartPanel extends JPanel {
 
+    // Text labels for each phase
     private final String showCaseHint = "Welcome to the Moose! Press SPACE to start";
-    private final String showCaseBtnText = "Show Me How It Works";
-
     private final String warmUpHint = "Let's warm-up a bit. Press SPACE to go";
-    private final String warmUpBtnText = "Let's Go!";
-
     private final String experimentHint = "Now the real experiment! Press SPACE to start";
-    private final String experimentBtnText = "Start Experiment";
 
+    // Components
+    JButton startButton = new JButton();
+    JLabel hintLabel = new JLabel();
+
+    // Actions to perform on click of the button
     private final Action startShowCase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainFrame.get().showPanel(new PracticePanel());
+            Practicer.get().startPractice();
         }
     };
 
@@ -43,16 +44,12 @@ public class StartPanel extends JPanel {
         }
     };
 
-    JButton startButton = new JButton();
-    JLabel hintLabel = new JLabel();
 
     /**
      * Constructor
      */
     public StartPanel(Config.PROCESS_STATE state) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-//        setPreferredSize(new Dimension(600, 500));
-//        setMaximumSize(new Dimension(600, 500));
 
         // Create the generic button
         startButton.setFont(new Font("Sans", Font.PLAIN, 14));
@@ -62,36 +59,28 @@ public class StartPanel extends JPanel {
 
         // Check state for different texts
         String labelText = "";
-        String btnText = "";
-        switch(state) {
-        case SHOW_CASE:
-            labelText = showCaseHint;
-            btnText = showCaseBtnText;
-//            startButton.setText(btnText);
-
-            startButton.getInputMap().put(
-                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                    "SPACE");
-            startButton.getActionMap().put("SPACE", startExperiment);
-            break;
-        case WARM_UP:
-            labelText = warmUpHint;
-            btnText = warmUpBtnText;
-//            startButton.setText(btnText);
-            startButton.getInputMap().put(
-                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                    "SPACE");
-            startButton.getActionMap().put("SPACE", startWarmUp);
-            break;
-        case EXPERIMENT:
-            labelText = experimentHint;
-            btnText = experimentBtnText;
-//            startButton.setText(btnText);
-            startButton.getInputMap().put(
-                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                    "SPACE");
-            startButton.getActionMap().put("SPACE", startExperiment);
-            break;
+        switch (state) {
+            case SHOW_CASE -> {
+                labelText = showCaseHint;
+                startButton.getInputMap().put(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                        "SPACE");
+                startButton.getActionMap().put("SPACE", startShowCase);
+            }
+            case WARM_UP -> {
+                labelText = warmUpHint;
+                startButton.getInputMap().put(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                        "SPACE");
+                startButton.getActionMap().put("SPACE", startWarmUp);
+            }
+            case EXPERIMENT -> {
+                labelText = experimentHint;
+                startButton.getInputMap().put(
+                        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                        "SPACE");
+                startButton.getActionMap().put("SPACE", startExperiment);
+            }
         }
 
         // Hint label
