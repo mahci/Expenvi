@@ -1,7 +1,11 @@
 package envi.tools;
 
 import java.awt.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -99,5 +103,13 @@ public class Utils {
         } else {
             return "";
         }
+    }
+
+    /**
+     * Get the time in millis
+     * @return Long timestamp
+     */
+    public static long now() {
+        return Calendar.getInstance().getTimeInMillis();
     }
 }

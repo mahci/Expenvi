@@ -252,7 +252,33 @@ public class Mologger {
         return 0;
     }
 
+    /**
+     * Log a timing
+     * @param time Long time :)
+     * @param title What time is it?
+     * @param lvl Log level
+     * @return Status
+     */
+    public int log(long time, String title, LOG_LEVEL lvl) {
+        if (!enabled) return 1;
 
+        switch (lvl) {
+        case SPEC -> {
+            if (specBlockLogFile != null) specBlockLogFile.println(title + ": " + time);
+            else System.out.println(TAG + "No spec block log file found!");
+        }
+        case GEN -> {
+            if (genBlockLogFile != null) genBlockLogFile.println(title + ": " + time);
+            else System.out.println(TAG + "No gen block log file found!");
+        }
+        case ALL -> {
+            if (allBlockLogFile != null) allBlockLogFile.println(title + ": " + time);
+            else System.out.println(TAG + "No all trial log file found!");
+        }
+        }
+
+        return 0;
+    }
 
     /**
      * Create a directory

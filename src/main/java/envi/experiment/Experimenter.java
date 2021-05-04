@@ -45,6 +45,9 @@ public class Experimenter {
     // Warm-up or real experiment? (Only log if real experiment)
     public boolean realExperiment = false;
 
+    // Timers
+    private long homingStart = 0;
+
     /**
      * Get the instance
      * @return the singleton instance
@@ -277,5 +280,21 @@ public class Experimenter {
     public PublishSubject<String> getExpSubject() {
         expSubject.subscribe(System.out::println);
         return expSubject;
+    }
+
+    /**
+     * Set the homing start time
+     * @param t Long time
+     */
+    public void setHomingStart(long t) {
+        homingStart = t;
+    }
+
+    /**
+     * Get the homing start time
+     * @return Long time
+     */
+    public long getHomingStart() {
+        return homingStart;
     }
 }

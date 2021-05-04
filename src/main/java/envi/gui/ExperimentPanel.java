@@ -6,6 +6,7 @@ import envi.action.VouseEvent;
 import envi.connection.MooseServer;
 import envi.experiment.Experimenter;
 import envi.experiment.Mologger;
+import envi.tools.Utils;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
@@ -295,6 +296,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // Log every move on all log
         Mologger.get().log(e, Mologger.LOG_LEVEL.ALL, LocalTime.now());
 
+        // If homing on the mouse, log the homing time
+        if (Experimenter.get().getHomingStart() > 0) {
+            long homingTime = Utils.now() - Experimenter.get().getHomingStart();
+            Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
+            Experimenter.get().setHomingStart(0); // Reset the time
+        }
     }
 
 }

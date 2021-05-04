@@ -1,6 +1,7 @@
 package envi.gui;
 
 import envi.experiment.Experimenter;
+import envi.tools.Utils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -46,6 +47,8 @@ public class BreakDialog extends JDialog implements KeyListener {
         if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_BACK_SLASH) {
             setVisible(false);
             Experimenter.get().nextBlock();
+            // Set the start of homing
+            Experimenter.get().setHomingStart(Utils.now());
         }
     }
 
