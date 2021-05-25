@@ -1,9 +1,6 @@
 package envi.tools;
 
 import java.awt.*;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -55,12 +52,12 @@ public class Utils {
 
     /**
      * Get the string of gestures
-     * @param interaction Config.GESTURe
+     * @param TECHNIQUE Config.GESTURe
      * @return String
      */
-    public static String interactionString(Config.INTERACTION interaction) {
+    public static String interactionString(Config.TECHNIQUE TECHNIQUE) {
         String result = "";
-        switch (interaction) {
+        switch (TECHNIQUE) {
         case SWIPE_LCLICK:
             result = "SWIPE_LCLICK";
             break;

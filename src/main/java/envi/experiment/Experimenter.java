@@ -3,6 +3,7 @@ package envi.experiment;
 import com.google.common.collect.ImmutableList;
 import envi.gui.*;
 import envi.tools.Pair;
+import envi.tools.Strs;
 import envi.tools.Utils;
 import envi.tools.Config;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -68,7 +69,7 @@ public class Experimenter {
         expSubject = PublishSubject.create();
 
         // set the config from file
-        Config.setFromFile();
+//        Config.setFromFile();
 
         // Save radii and distances in px values
         for(int rad: Config._targetRadiiMM) {
@@ -157,9 +158,9 @@ public class Experimenter {
 //        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
 
         // Publish the start of the experiment
-        if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) {
+        if (Config._technique != Config.TECHNIQUE.MOUSE_LCLICK) {
             LocalDateTime startTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-            expSubject.onNext(Config.MSSG_BEG_EXP + "_" + Config._interaction + "--" + startTime);
+            expSubject.onNext(Strs.MSSG_BEG_EXP + "-" + Config._technique + "--" + startTime);
         }
 
         // Run the first block
@@ -178,7 +179,7 @@ public class Experimenter {
         Mologger.get().logBlockStart(blkNum, LocalTime.now());
 
         // Publish
-        expSubject.onNext(Config.MSSG_BEG_BLK + "_" + blkNum);
+        expSubject.onNext(Strs.MSSG_BEG_BLK + "-" + blkNum);
 
         // Run the block
         currTrialNum = 1;
@@ -201,7 +202,7 @@ public class Experimenter {
             Mologger.get().logTrialEnd();
 
             // Publish
-            expSubject.onNext(Config.MSSG_END_TRL);
+            expSubject.onNext(Strs.MSSG_END_TRL);
 
             // Run the next trial
             currTrialNum++;
@@ -213,7 +214,7 @@ public class Experimenter {
             Mologger.get().logBlockEnd(LocalTime.now());
 
             // Publish
-            expSubject.onNext(Config.MSSG_END_BLK);
+            expSubject.onNext(Strs.MSSG_END_BLK);
 
             // Are there more blocks?
             if (currBlockInd + 1 == blocks.size()) { // Blocks finished
@@ -222,7 +223,7 @@ public class Experimenter {
                     MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.EXPERIMENT));
                 } else { // Experiment is finished
                     // Publish
-                    expSubject.onNext(Config.MSSG_END_EXP + "_" + "-");
+                    expSubject.onNext(Strs.MSSG_END_EXP + "-" + "_");
 
                     showEndDialog();
                 }
@@ -268,7 +269,7 @@ public class Experimenter {
      * Show a break (between blocks)
      */
     public void showBreak() {
-        expSubject.onNext(Config.MSSG_END_LOG + "_" + "-");
+        expSubject.onNext(Strs.MSSG_END_LOG + "-" + "_");
 
         // Break dialog
         MainFrame.get().showDialog(new BreakDialog());

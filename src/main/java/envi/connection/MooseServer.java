@@ -2,6 +2,7 @@ package envi.connection;
 
 import envi.tools.Config;
 import envi.experiment.Experimenter;
+import envi.tools.Strs;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -81,9 +82,9 @@ public class MooseServer {
                 String line = inBR.readLine();
                 if(toLog) System.out.println(TAG + "First Moose message: " + line);
 
-                if (Objects.equals(line, Config.MSSG_MOOSE)) { // Correct message
-                    // Confirm
-                    sendMssg(Config.MSSG_CONFIRM);
+                if (Objects.equals(line, Strs.MSSG_MOOSE)) { // Correct message
+                    // Send the techniqe (as confirmation)
+                    sendMssg(Strs.MSSG_CONFIRM);
                     if (toLog) {
                         System.out.println(TAG + "Moose connected! Receiving actions...");
                         System.out.println("------------------------------------------");
@@ -92,14 +93,14 @@ public class MooseServer {
                     isConnected = true;
 
                     // Send the participants ID
-                    sendMssg(Config.MSSG_PID + "_" + Experimenter.get().getPID());
+                    sendMssg(Strs.MSSG_PID + "-" + Experimenter.get().getPID());
 
                     // Start listening to incoming messages from the Moose
                     listenerObservable().subscribe();
 
                     // If interactino is not the Mouse, send actions to the Moose
                     Experimenter.get().getExpSubject().subscribe(state -> {
-                        if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) sendMssg(state);
+                        if (Config._technique != Config.TECHNIQUE.MOUSE_LCLICK) sendMssg(state);
                     });
 
                 }
@@ -148,7 +149,7 @@ public class MooseServer {
      * Send messages to the Moose
      * @param mssg Message
      */
-    private void sendMssg(String mssg) {
+    public void sendMssg(String mssg) {
         if (outPW != null) {
             outPW.println(mssg);
             outPW.flush();

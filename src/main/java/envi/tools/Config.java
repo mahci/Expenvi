@@ -1,8 +1,8 @@
 package envi.tools;
 
+import envi.connection.MooseServer;
 import envi.gui.MainFrame;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,6 +15,8 @@ public class Config {
     private static final String TAG = "[[Config]] ";
     private static final boolean toLog = true;
     // -------------------------------------------------------------------------------
+    // Network
+    public static int _netPort = 8000;
 
     // Config file path
     public static final String CONFIG_FILE_PATH = "config.txt";
@@ -52,24 +54,6 @@ public class Config {
     public static Font EXP_INFO_FONT = new Font(FONT_STYLE, Font.PLAIN, EXP_INFO_FONT_SIZE);
     public static Font S_FONT = new Font(FONT_STYLE, Font.PLAIN, EXP_INFO_FONT_SIZE);
 
-    // Messages --------------------------------------------
-    public static final String MSSG_MOOSE       = "MOOSE";
-    public static final String MSSG_CONFIRM     = "CONFIRM";
-    public static final String MSSG_PID         = "PID";
-    public static final String MSSG_BEG_EXP     = "BEGEXP";
-    public static final String MSSG_END_EXP     = "ENDEXP";
-    public static final String MSSG_BEG_BLK     = "BEGBLK";
-    public static final String MSSG_END_BLK     = "ENDBLK";
-    public static final String MSSG_END_TRL     = "ENDTRL";
-    public static final String MSSG_BEGIN_LOG   = "BEGLOG";
-    public static final String MSSG_END_LOG     = "ENDLOG";
-    public static final String MSSG_ACK         = "ACK";
-    // -----------------------------------------------------
-
-    // Network ---------------------------------------------
-    public static int _netPort = 8000;
-    public static final String NET_DISCONNECT   = "DISCONNECT";
-    // -----------------------------------------------------
 
     // Experiment ==================================================================
     public static int _stacleRadMM = 8; // Stacle radius (mm)
@@ -81,12 +65,12 @@ public class Config {
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
     // The gesture for clicks
-    public static enum INTERACTION {
+    public enum TECHNIQUE {
         SWIPE_LCLICK,
         TAP_LCLICK,
         MOUSE_LCLICK
     }
-    public static INTERACTION _interaction = INTERACTION.SWIPE_LCLICK;
+    public static TECHNIQUE _technique = TECHNIQUE.SWIPE_LCLICK;
     public static boolean _vibrate = false; // Vibrate?
 
     // --- Show Case
@@ -190,9 +174,11 @@ public class Config {
             }
 
             // Next...
-            _interaction = INTERACTION.valueOf(Utils.lastPart(fileScan.nextLine()));
+            _technique = TECHNIQUE.valueOf(Utils.lastPart(fileScan.nextLine()));
             _vibrate = Boolean.parseBoolean(Utils.lastPart(fileScan.nextLine()));
 
+            // Send the technique to the Moose
+            MooseServer.get().sendMssg(Strs.MSSG_TECHNIQUE + "-" + _technique);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -206,7 +192,7 @@ public class Config {
             System.out.println(TAG + "_nBlocksInExperiment = " + _nBlocksInExperiment);
             System.out.println(TAG + "_targetRadiiMM = " + _targetRadiiMM);
             System.out.println(TAG + "_distancesMM = " + _distancesMM);
-            System.out.println(TAG + "_interaction = " + _interaction);
+            System.out.println(TAG + "_TECHNIQUE = " + _technique);
             System.out.println(TAG + "_vibrate = " + _vibrate);
             System.out.println(TAG + "_scrId = " + _scrId);
             System.out.println(TAG + "_dpi = " + _dpi);

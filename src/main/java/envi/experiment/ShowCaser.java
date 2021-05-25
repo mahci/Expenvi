@@ -35,7 +35,7 @@ public class ShowCaser {
      * Start the practice
      */
     public void startShowCase() {
-        if (toLog) System.out.println(TAG + "Practice started");
+        if (toLog) System.out.println(TAG + "Show case started");
 
         // Set the config
         Config.setFromFile();

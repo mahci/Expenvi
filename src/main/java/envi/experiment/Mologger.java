@@ -2,7 +2,6 @@ package envi.experiment;
 
 import envi.action.VouseEvent;
 import envi.tools.Config;
-import envi.tools.Utils;
 
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -97,7 +96,7 @@ public class Mologger {
         createDir(ptcDirPath);
 
         // Create a directory for the experiment
-        String expDirPath = ptcDirPath + "/" + Config._interaction + "--" + dateTime;
+        String expDirPath = ptcDirPath + "/" + Config._technique + "--" + dateTime;
         createDir(expDirPath);
 
         // Create dirs for three levels
