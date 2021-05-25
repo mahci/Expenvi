@@ -16,7 +16,8 @@ public class Mologger {
 
     private final String TAG = "[[Mologger]] ";
     private final boolean toLog = false;
-    //==========================================
+    // -------------------------------------------------------------------------------
+
     private static Mologger self; // Singleton
 
     private static String PTC_FILE_PFX = "PTC";
@@ -56,7 +57,9 @@ public class Mologger {
         ALL
     }
 
-    /***
+    // ===============================================================================
+
+    /**
      * Constructor
      */
     private Mologger() {
@@ -68,7 +71,7 @@ public class Mologger {
     }
 
 
-    /***
+    /**
      * Singleton get instance
      * @return self
      */

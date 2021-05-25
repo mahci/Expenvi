@@ -1,9 +1,7 @@
 package envi.experiment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /***
@@ -13,11 +11,13 @@ public class Block {
 
     private String TAG = "[[Block]] ";
     private boolean toLog = true;
-    //==================================================
+    // -------------------------------------------------------------------------------
 
     private ArrayList<FittsTrial> trials = new ArrayList<>(); // List of trials
     private TRIAL_TYPE trialsType;
     private int currTrialInd;
+
+    // ===============================================================================
 
     /**
      * Constructor
@@ -45,31 +45,6 @@ public class Block {
     }
 
     /**
-     * Set up the Fitt's trials in the list of trials
-     * @param radDistDirList List of (radius, distance, direction)
-     * @param dispW Width of the display area
-     * @param dispH Height of the display area
-     * @return Modified instance
-     */
-    public Block setupFittsTrials(List<List<Integer>> radDistDirList, int dispW, int dispH) {
-
-        Collections.shuffle(radDistDirList); // Shuffle the list to get random combinations
-
-        int nTrials = radDistDirList.size(); // Number of trials is all the permutations
-
-        // Create trials
-        for (int t = 0; t < nTrials; t ++) {
-            trials.add(new FittsTrial(
-                    dispW, dispH,
-                    radDistDirList.get(t).get(0),
-                    radDistDirList.get(t).get(1),
-                    radDistDirList.get(t).get(2)));
-        }
-
-        return this;
-    }
-
-    /**
      * Output the next trial
      * @param wasSuccess Was the previous trial successful?
      * @return The next trial
@@ -79,7 +54,7 @@ public class Block {
         if (wasSuccess) { // Success => normal return
             if (currTrialInd == trials.size()) return null;
         } else { // Fail => do the procedure
-            trialFail(currTrialInd);
+            trialMiss(currTrialInd);
         }
 
         return trials.get(currTrialInd); // Should always be a trial!
@@ -89,7 +64,7 @@ public class Block {
      * Trial of @trialInd was failed => shuffle it to another future palce
      * @param trialInd Index of the trial (from 1)
      */
-    public void trialFail(int trialInd) {
+    public void trialMiss(int trialInd) {
         int fi = trialInd - 1;
         FittsTrial failedTrial = trials.get(fi);
 
@@ -124,7 +99,6 @@ public class Block {
      * @param ctind Current trial index
      */
     public void setCurrTrialInd(int ctind) { currTrialInd = ctind; }
-
 
     /**
      * For testing

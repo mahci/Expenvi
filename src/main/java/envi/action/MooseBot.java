@@ -7,12 +7,14 @@ import java.awt.event.InputEvent;
 
 public class MooseBot {
 
-    private String TAG = "MooseBot";
+    private String TAG = "[[MooseBot]] ";
+    private boolean toLog = false;
+    // -------------------------------------------------------------------------------
 
     private static MooseBot self; // for singleton
-
     private Robot bot;
 
+    // ===============================================================================
     /**
      * Constructor
      */

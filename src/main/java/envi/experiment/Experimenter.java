@@ -315,7 +315,9 @@ public class Experimenter {
         }
     }
 
-    //region Getters & Setters
+    // -------------------------------------------------------------------------------
+
+    //region [Getters & Setters]
     /**
      * Set the homing start time
      * @param t Long time

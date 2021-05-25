@@ -8,8 +8,10 @@ public class Actions {
     public static final String ACT_RELEASE_PRI  = "RELEASE_PRI";
     public static final String ACT_RELEASE_SEC  = "RELEASE_SEC";
 
+    // ===============================================================================
+
     // Actions done by a mouse
-    public static enum ACT {
+    public enum ACT {
         PRESS,
         RELEASE,
         CLICK,
@@ -17,7 +19,7 @@ public class Actions {
     }
 
     // Mouse buttons
-    public static enum MOUSE_BTN {
+    public enum MOUSE_BTN {
         PRIMARY,
         SECONDARY
     }

@@ -21,7 +21,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ExperimentPanel]] ";
     private final boolean toLog = true;
-    //------------------------------------------------
+    // -------------------------------------------------------------------------------
 
     // Circles to draw
     private Circle stacle;
@@ -50,6 +50,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             Experimenter.get().trialDone(true);
         }
     };
+
+    // ===============================================================================
 
     /***
      * Constructor
@@ -162,7 +164,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         trialStatText = trlTxt;
     }
 
-    // -----------------------------------------------------------------------
+    // -------------------------------------------------------------------------------
     //region [virtual acitons]
 
     /**
@@ -248,7 +250,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     //endregion
 
-    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------
     /**
      * Get the cursor poistion (relative to the frame)
      * @return Point (x,y) position of the cursor
@@ -259,8 +261,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         return crsPos;
     }
 
-
-    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------
     //region [Overrides]
     @Override
     public void mouseClicked(MouseEvent e) {

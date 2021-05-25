@@ -13,11 +13,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-public class PracticePanel extends JPanel implements MouseInputListener {
+public class ShowCasePanel extends JPanel implements MouseInputListener {
 
-    private final String TAG = "[[PracticePanel]] ";
+    private final String TAG = "[[ShowCasePanel]] ";
     private final boolean toLog = false;
-    //===================================================
+
+    // -------------------------------------------------------------------------------
 
     // Two circles to draw
     private Circle stacle;
@@ -25,12 +26,8 @@ public class PracticePanel extends JPanel implements MouseInputListener {
 
     // Texts to draw
     private int trialNum = 1;
-    private String hintText = "Click was not inside. Please try again.";
 
-    // Graphics
-    private Graphics2D graphics2D;
-
-    // Practice vars
+    // ShowCase vars
     private int winW, winH; // Window
     private int dispW, dispH; // Display area
     private boolean stacleClicked = false;
@@ -40,6 +37,7 @@ public class PracticePanel extends JPanel implements MouseInputListener {
     // Keys
     private final String SPACE = "SPACE";
 
+    // Next phase action
     private Action nextPhase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -48,12 +46,12 @@ public class PracticePanel extends JPanel implements MouseInputListener {
         }
     };
 
-    // Setting & Drawing  ==========================================================
+    // ===============================================================================
 
     /**
      * Constructor
      */
-    public PracticePanel() {
+    public ShowCasePanel() {
 
         // Get values from file
         Config.setFromFile();
@@ -156,7 +154,8 @@ public class PracticePanel extends JPanel implements MouseInputListener {
     }
 
 
-    // Actions  ====================================================================
+    // ===============================================================================
+    //region [Actions]
     /**
      * Virtual press of the primary mouse button
      */
@@ -168,8 +167,6 @@ public class PracticePanel extends JPanel implements MouseInputListener {
             if (stacle.isInside(crsPos.x, crsPos.y)) {
                 pressedInsideStacle = true;
                 stacle.setColor(Config._starcleClickedColor);
-            } else { // NOT INSIDE!
-//                errText = Utils.ERR_NOT_INSIDE;
             }
         }
 
@@ -211,8 +208,11 @@ public class PracticePanel extends JPanel implements MouseInputListener {
         return crsPos;
     }
 
+    //endregion
 
-    // MouseListener Methods =======================================================
+    // ===============================================================================
+    //region [Overrides]
+
     @Override
     public void mouseClicked(MouseEvent e) { }
 
@@ -238,5 +238,7 @@ public class PracticePanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mouseMoved(MouseEvent e) { }
+
+    //endregion
 
 }

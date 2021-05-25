@@ -11,8 +11,9 @@ import java.util.Objects;
 
 public class Utils {
 
-    // Methods =============================================
     private static final double MM_IN_INCH = 25.4;
+
+    // ===============================================================================
 
     /**
      * Convert mm to pixels

@@ -15,7 +15,7 @@ public class FittsTrial extends Trial {
 
     private final String TAG = "[[FittsTrial]] ";
     private final boolean toLog = false;
-    //=======================================================
+    // -------------------------------------------------------------------------------
 
     // Positions of start and target circles (centers)
     private Point staclePosition = new Point();
@@ -26,9 +26,7 @@ public class FittsTrial extends Trial {
     private int tarDist;
     private int tarDir;
 
-    // Index
-    private int trialNum;
-    private int blockNum;
+    // ===============================================================================
 
     /**
      * Create a trial
@@ -103,7 +101,7 @@ public class FittsTrial extends Trial {
         int maxRad = Math.max(tarRad, Config._stacleRad); // Max radius between target or start
         if (toLog) System.out.println(TAG + String.format("maxRad = %d", maxRad));
 
-        // Y is independant of the left/right
+        // Y (independant of the left/right)
         minY = maxRad;
         maxY = dispH - maxRad;
         if (toLog) System.out.println(TAG + String.format("Y - min = %d, max = %d", minY, maxY));
@@ -161,6 +159,10 @@ public class FittsTrial extends Trial {
      */
     public Point getTarclePosition() { return tarclePosition; }
 
+    /**
+     * Get the string of the FittsTrial
+     * @return String of the parameters
+     */
     @Override
     public String toString() {
         return "FittsTrial{" +
@@ -171,8 +173,6 @@ public class FittsTrial extends Trial {
                 ", tarRad=" + tarRad +
                 ", tarDist=" + tarDist +
                 ", tarDir=" + tarDir +
-                ", trialNum=" + trialNum +
-                ", blockNum=" + blockNum +
                 '}';
     }
 }

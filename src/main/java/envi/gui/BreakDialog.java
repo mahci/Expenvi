@@ -41,6 +41,7 @@ public class BreakDialog extends JDialog implements KeyListener {
         addKeyListener(this);
     }
 
+    //region [Overrides]
     @Override
     public synchronized void keyPressed(KeyEvent e) {
         // Close on Ctrl + DEL
@@ -61,4 +62,5 @@ public class BreakDialog extends JDialog implements KeyListener {
     public void keyTyped(KeyEvent e) {
         // Not used
     }
+    //endregion
 }

@@ -14,6 +14,7 @@ public class Config {
 
     private static final String TAG = "[[Config]] ";
     private static final boolean toLog = true;
+    // -------------------------------------------------------------------------------
 
     // Config file path
     public static final String CONFIG_FILE_PATH = "config.txt";
@@ -105,8 +106,12 @@ public class Config {
             "Block finished! You can now take a break. Press OK when ready.";
 
 
+    // ===============================================================================
+    //region [Methods]
 
-    // Methods ================================================================
+    /**
+     * Read and set the config from file
+     */
     public static void setFromFile() {
         try {
             Scanner fileScan = new Scanner(new File(CONFIG_FILE_PATH));
@@ -212,5 +217,5 @@ public class Config {
 
     }
 
-
+    //endregion
 }

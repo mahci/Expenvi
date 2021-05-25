@@ -1,10 +1,8 @@
 package envi.gui;
 
 import envi.experiment.Experimenter;
-import envi.experiment.Practicer;
+import envi.experiment.ShowCaser;
 import envi.tools.Config;
-import envi.tools.Utils;
-import org.checkerframework.checker.units.qual.C;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,11 +20,13 @@ public class StartPanel extends JPanel {
     JButton startButton = new JButton();
     JLabel hintLabel = new JLabel();
 
+    // -------------------------------------------------------------------------------
     // Actions to perform on click of the button
+
     private final Action startShowCase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Practicer.get().startPractice();
+            ShowCaser.get().startShowCase();
         }
     };
 
@@ -44,7 +44,7 @@ public class StartPanel extends JPanel {
         }
     };
 
-
+    // ===============================================================================
     /**
      * Constructor
      */

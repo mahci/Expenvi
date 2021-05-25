@@ -8,6 +8,8 @@ public class VouseEvent {
     private int x, y;
     private LocalTime time;
 
+    // ===============================================================================
+
     /**
      * Constructor
      * @param action Action type

@@ -19,7 +19,8 @@ public class MooseServer {
 
     private String TAG = "[[MooseServer]] ";
     private boolean toLog = true;
-    //============================================
+    // -------------------------------------------------------------------------------
+
     private static MooseServer self; // for singleton
 
     private ServerSocket serverSocket;
@@ -31,9 +32,11 @@ public class MooseServer {
 
     private @NonNull Observable<String> listenerObserver;
 
+    // ===============================================================================
+
     /**
      * Get instance
-     * @return
+     * @return Singleton instance
      */
     public static MooseServer get() {
         if (self == null) self = new MooseServer();
