@@ -6,6 +6,7 @@ package envi.tools;
 public class Strs {
 
     // Messages --------------------------------------------
+    //region [Messages]
     public static final String MSSG_MOOSE       = "MOOSE";
     public static final String MSSG_CONFIRM     = "CONFIRM";
     public static final String MSSG_TECHNIQUE   = "TECHNIQUE";
@@ -18,5 +19,12 @@ public class Strs {
     public static final String MSSG_BEGIN_LOG   = "BEGLOG";
     public static final String MSSG_END_LOG     = "ENDLOG";
     public static final String MSSG_ACK         = "ACK";
+    //endregion
     // -----------------------------------------------------
+
+    //region [Dialogs]
+    public static final String DLG_BREAK_LABEL  = "Time for a break!";
+    public static final String DLG_BREAK_TEXT   =
+            "<html>When ready, press <B>Orange + Blue</B> keys to start the next block</html>";
+    //endregion
 }

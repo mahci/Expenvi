@@ -1,6 +1,7 @@
 package envi.gui;
 
 import envi.experiment.Experimenter;
+import envi.tools.Strs;
 import envi.tools.Utils;
 
 import javax.swing.*;
@@ -15,19 +16,18 @@ public class BreakDialog extends JDialog implements KeyListener {
         setTitle("Break!");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(600, 300));
-//        setMaximumSize(new Dimension(600, 500));
         setUndecorated(true);
 
         //-----------------------------------------
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JLabel textLabel = new JLabel("Take a break!");
+        JLabel textLabel = new JLabel(Strs.DLG_BREAK_LABEL);
         textLabel.setAlignmentX(CENTER_ALIGNMENT);
         textLabel.setFont(new Font("Sans", Font.PLAIN, 20));
 
         JLabel instLabel = new JLabel(
-                "<html>When ready, press <B>SHIFT + \\</B> to start the next block</html>",
+                Strs.DLG_BREAK_TEXT,
                 JLabel.CENTER);
         instLabel.setAlignmentX(CENTER_ALIGNMENT);
         instLabel.setFont(new Font("Sans", Font.PLAIN, 14));
