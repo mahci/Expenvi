@@ -8,11 +8,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Config {
 
     private static final String TAG = "[[Config]] ";
-    private static final boolean toLog = false;
+    private static final boolean toLog = true;
 
     // Config file path
     public static final String CONFIG_FILE_PATH = "config.txt";
@@ -73,18 +74,9 @@ public class Config {
     public static int _stacleRadMM = 8; // Stacle radius (mm)
     public static int _stacleRad; // Stacle radius (px) Set programmatically
     // Target radii (mm)
-    public static List<Integer> _targetRadiiMM = new ArrayList<Integer>() {{
-       add(5);
-       add(7);
-       add(9);
-    }};
+    public static List<Integer> _targetRadiiMM = new ArrayList<Integer>();
     // Distances (mm)
-    public static List<Integer> _distancesMM = new ArrayList<Integer>() {{
-        add(20);
-        add(40);
-        add(60);
-        add(80);
-    }};
+    public static List<Integer> _distancesMM = new ArrayList<Integer>();
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
     // The gesture for clicks
@@ -124,16 +116,16 @@ public class Config {
 
             _scrId = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
             _dpi = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            _winWidthMargin = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            _winHeightMargin = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-
+            _winWidthMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
+            _winHeightMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
+            if (toLog) System.out.println(TAG + "wM = " + _winWidthMargin);
             // Additional info
             _dispAreaW = MainFrame.get().getWidth() - 2 * _winWidthMargin;
             _dispAreaH = MainFrame.get().getHeight() - 2 * _winHeightMargin;
-            if (toLog) System.out.println(TAG + "winW = " + MainFrame.get().getWidth());
+            if (toLog) System.out.println(TAG + "winW = " + Utils.px2mm(MainFrame.get().getWidth()));
+            if (toLog) System.out.println(TAG + "_dispAreaW = " + _dispAreaW);
             if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
             int maxRadMM = Utils.px2mm(_dispAreaH / 2);
-            if (toLog) System.out.println(TAG + "maxRadMM = " + maxRadMM);
             //===== Read network values
             fileScan.nextLine(); // skip title
 
@@ -149,53 +141,49 @@ public class Config {
             _starcleClickedColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
             _starcleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
             _tarcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-
+            if (toLog) System.out.println(TAG + "Colors set!");
             //===== Read show case values
             fileScan.nextLine(); // skip title
 
             _minTarRadMM = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
             _dispHRatioToMaxRad = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-
+            if (toLog) System.out.println(TAG + "Show case config set!");
             //===== Read experiment values
             fileScan.nextLine(); // skip title
 
             // Stacle radius
-            int radius = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            if (radius >= maxRadMM) {
+            int stRad = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            if (stRad >= maxRadMM) {
                 MainFrame.get().showMessageDialog(
                         "Start radius can't be more than " + maxRadMM + " mm");
             } else {
-                _stacleRadMM = radius;
+                _stacleRadMM = stRad;
                 _stacleRad = Utils.mm2px(_stacleRadMM);
             }
+            if (toLog) System.out.println(TAG + "Start R (mm) = " + _stacleRadMM);
             _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
             // Target radii
-            Scanner scanner = new Scanner(Utils.lastPart(fileScan.nextLine()));
-            while (scanner.hasNextInt()) {
-                radius = scanner.nextInt();
-                // Radius should not be less than half the height display area
-                if (radius >= maxRadMM) {
-                    MainFrame.get().showMessageDialog(
-                            "Target radius can't be more than " + maxRadMM + " mm");
-                } else {
-                    _targetRadiiMM.add(radius);
-                }
-            }
+            _targetRadiiMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
+                    .split(","))
+                    .map(String::trim)
+                    .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 
             // Target distances
+            if (toLog) System.out.println(TAG + "Target Rs = " + _targetRadiiMM);
             int maxDist = Utils.px2mm(_dispAreaW) - Collections.max(_targetRadiiMM) - _stacleRadMM;
-            scanner = new Scanner(Utils.lastPart(fileScan.nextLine()));
-            while (scanner.hasNextInt()) {
-                int dist = scanner.nextInt();
-                if (dist >= maxDist) {
-                    MainFrame.get().showMessageDialog(
-                            "Distance can't be more than " + maxDist + " mm");
-                } else {
-                    _distancesMM.add(dist);
-                }
+            if (toLog) System.out.println(TAG + "max Target R = " + Collections.max(_targetRadiiMM));
+            if (toLog) System.out.println(TAG + "dispAreaW mm = " + Utils.px2mm(_dispAreaW));
+            _distancesMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
+                    .split(","))
+                    .map(String::trim)
+                    .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 
+            if (Collections.max(_distancesMM) > maxDist) {
+                MainFrame.get().showMessageDialog(
+                        "Distance can't be more than " + maxDist + " mm");
             }
+
             // Next...
             _interaction = INTERACTION.valueOf(Utils.lastPart(fileScan.nextLine()));
             _vibrate = Boolean.parseBoolean(Utils.lastPart(fileScan.nextLine()));

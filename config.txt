@@ -1,8 +1,8 @@
 ----- Display -----
 Monitor Number = 1
-DPI = 90
-Width Margin (px) = 100
-Height Margin (px) = 50
+DPI = 109
+Width Margin (mm) = 10
+Height Margin (mm) = 10
 ----- Network -----
 Port = 8000
 ----- Colors -----
@@ -19,8 +19,8 @@ Window's Height / Max Target Radius = 6
 ----- Experiment -----
 Start Radius (mm) = 8
 Number of Blocks = 2
-Target Radii (mm) = 5,7,9
-Target Distances (mm) = 20,40,60
+Target Radii (mm) = 2,5,10,20
+Target Distances (mm) = 125,250,500
 Interaction = MOUSE_LCLICK
 Vibrate = false
 

@@ -1,6 +1,7 @@
 package envi.experiment;
 
 import envi.tools.Config;
+import envi.tools.Pair;
 import envi.tools.Utils;
 
 import java.awt.*;
@@ -28,6 +29,21 @@ public class FittsTrial extends Trial {
     // Index
     private int trialNum;
     private int blockNum;
+
+    /**
+     * Create a trial
+     * @param radDist Pair of rad,dist
+     * @param leftRight Left or right
+     */
+    public FittsTrial(Pair<Integer, Integer> radDist, int leftRight) {
+        // Set the vars
+        tarRad = radDist.first;
+        tarDist = radDist.second;
+        tarDir = leftRight;
+
+        // Set the postions
+        setPositions(Config._dispAreaW, Config._dispAreaH);
+    }
 
     /**
      * Create a trial

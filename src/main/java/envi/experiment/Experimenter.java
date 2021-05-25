@@ -2,6 +2,7 @@ package envi.experiment;
 
 import com.google.common.collect.ImmutableList;
 import envi.gui.*;
+import envi.tools.Pair;
 import envi.tools.Utils;
 import envi.tools.Config;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -17,15 +18,16 @@ public class Experimenter {
 
     private String TAG = "[[Experimenter]] ";
     private boolean toLog = false;
-    //==============================================================================
+
     private static Experimenter self = null; // for singleton
+    //==============================================================================
 
     // Display
     int winW, winH, dispW, dispH;
 
     // Vars
-    private final List<Integer> radList   = new ArrayList<>();
-    private final List<Integer> distList  = new ArrayList<>();
+    private final List<Integer> radList   = new ArrayList<>(); // list of radii in px
+    private final List<Integer> distList  = new ArrayList<>(); // list of dists in px
     private final List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
     private final List<List<Integer>> expVarList = new ArrayList<>();
 
@@ -47,6 +49,8 @@ public class Experimenter {
 
     // Timers
     private long homingStart = 0;
+
+    //==============================================================================
 
     /**
      * Get the instance
@@ -77,7 +81,47 @@ public class Experimenter {
         if (toLog) System.out.println(TAG + "Dist list: " + distList);
     }
 
-    /***
+    /**
+     * Generate the list of blocks of the trials
+     */
+    private void generateBlocks() {
+        // Create all combinations
+        List<Pair<Integer, Integer>> allRadDists = new ArrayList<>();
+        for (int rad: radList) {
+            for (int dist: distList) {
+                allRadDists.add(new Pair<>(rad, dist));
+            }
+        }
+
+        // Create the 4 pairs of blocks (P1, P2, P3, P4)
+        blocks.clear();
+        for(int pi = 1; pi <= 4; pi++) {
+            Collections.shuffle(allRadDists); // Shuffle the combinations
+
+            // Init blocks
+            Block b1 = new Block(TRIAL_TYPE.FITTS);
+            Block b2 = new Block(TRIAL_TYPE.FITTS);
+
+            // Even ind x R => B1 | Even ind x L => B2
+            // Odd ind x R => B2 | Odd ind x L => B1
+            for(int ti = 0; ti < allRadDists.size(); ti++) {
+                if (ti % 2 == 0) { // Even
+                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 1));
+                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 0));
+                } else { // Odd
+                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 1));
+                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 0));
+                }
+            }
+
+            // Add the blocks to the list of blocks
+            blocks.add(b1.shuffle());
+            blocks.add(b2.shuffle());
+
+        }
+    }
+
+    /**
      * Start the experiment
      */
     public void startExperiment(boolean isRealExperiment) {
@@ -104,12 +148,13 @@ public class Experimenter {
         generateVarList();
 
         // Generate blocks
-        blocks.clear();
-        for (int bi = 0; bi < Config._nBlocksInExperiment; bi++) {
-            blocks.add(new Block(TRIAL_TYPE.FITTS)
-                            .setupFittsTrials(expVarList, dispW, dispH));
-        }
-        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
+        generateBlocks();
+//        blocks.clear();
+//        for (int bi = 0; bi < Config._nBlocksInExperiment; bi++) {
+//            blocks.add(new Block(TRIAL_TYPE.FITTS)
+//                            .setupFittsTrials(expVarList, dispW, dispH));
+//        }
+//        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
 
         // Publish the start of the experiment
         if (Config._interaction != Config.INTERACTION.MOUSE_LCLICK) {
@@ -179,7 +224,7 @@ public class Experimenter {
                     // Publish
                     expSubject.onNext(Config.MSSG_END_EXP + "_" + "-");
 
-                    showEnd();
+                    showEndDialog();
                 }
 //            System.exit(0);
             } else { // There are more blocks
@@ -237,7 +282,6 @@ public class Experimenter {
         startBlock(currBlockInd);
     }
 
-
     /**
      * Generate all the combinations of radii, distances, directions
      */
@@ -252,12 +296,15 @@ public class Experimenter {
         }
     }
 
-    private void showEnd() {
+    /**
+     * Show the end dialog
+     */
+    private void showEndDialog() {
         int input = JOptionPane.showOptionDialog(
                 MainFrame.get(),
                 "Experiment FINISHED! Thank You!",
                 "THE END!",
-                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
                 null,
                 null,
@@ -268,12 +315,13 @@ public class Experimenter {
         }
     }
 
+    //region Getters & Setters
     /**
-     * Get the participant's ID
-     * @return Participant's ID
+     * Set the homing start time
+     * @param t Long time
      */
-    public int getPID() {
-        return participID;
+    public void setHomingStart(long t) {
+        homingStart = t;
     }
 
     /**
@@ -286,11 +334,11 @@ public class Experimenter {
     }
 
     /**
-     * Set the homing start time
-     * @param t Long time
+     * Get the participant's ID
+     * @return Participant's ID
      */
-    public void setHomingStart(long t) {
-        homingStart = t;
+    public int getPID() {
+        return participID;
     }
 
     /**
@@ -300,4 +348,6 @@ public class Experimenter {
     public long getHomingStart() {
         return homingStart;
     }
+    //endregion
+
 }

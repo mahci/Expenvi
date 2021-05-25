@@ -163,7 +163,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     }
 
     // -----------------------------------------------------------------------
-    // Virtual actions
+    //region [virtual acitons]
 
     /**
      * Virtual press of the primary mouse button
@@ -246,9 +246,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         }
     }
 
+    //endregion
 
-    // -----------------------------------------------------------------------
-
+    // -------------------------------------------------------------------------
     /**
      * Get the cursor poistion (relative to the frame)
      * @return Point (x,y) position of the cursor
@@ -260,7 +260,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     }
 
 
-    // Overrides ===============================================================
+    // -------------------------------------------------------------------------
+    //region [Overrides]
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -303,5 +304,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             Experimenter.get().setHomingStart(0); // Reset the time
         }
     }
+
+    //endregion
 
 }

@@ -28,6 +28,23 @@ public class Block {
     }
 
     /**
+     * Add a trial to the list
+     * @param ft FittsTrial
+     */
+    public void addTrial(FittsTrial ft) {
+        trials.add(ft);
+    }
+
+    /**
+     * Shuffle the trials
+     * @return self
+     */
+    public Block shuffle() {
+        Collections.shuffle(trials);
+        return this;
+    }
+
+    /**
      * Set up the Fitt's trials in the list of trials
      * @param radDistDirList List of (radius, distance, direction)
      * @param dispW Width of the display area
