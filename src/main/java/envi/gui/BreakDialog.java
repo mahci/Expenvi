@@ -5,7 +5,6 @@ import envi.tools.Strs;
 import envi.tools.Utils;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -22,7 +21,7 @@ public class BreakDialog extends JDialog implements KeyListener {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        JLabel textLabel = new JLabel(Strs.DLG_BREAK_LABEL);
+        JLabel textLabel = new JLabel(Strs.DLG_BREAK_TITLE);
         textLabel.setAlignmentX(CENTER_ALIGNMENT);
         textLabel.setFont(new Font("Sans", Font.PLAIN, 20));
 

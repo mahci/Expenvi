@@ -225,12 +225,12 @@ public class Experimenter {
                     // Publish
                     expSubject.onNext(Strs.MSSG_END_EXP + "-" + "_");
 
-                    showEndDialog();
+                    endDialog();
                 }
 //            System.exit(0);
             } else { // There are more blocks
                 // Show the break dialog
-                showBreak();
+                breakDialog();
             }
         }
     }
@@ -268,7 +268,7 @@ public class Experimenter {
     /**
      * Show a break (between blocks)
      */
-    public void showBreak() {
+    public void breakDialog() {
         expSubject.onNext(Strs.MSSG_END_LOG + "-" + "_");
 
         // Break dialog
@@ -300,11 +300,11 @@ public class Experimenter {
     /**
      * Show the end dialog
      */
-    private void showEndDialog() {
+    private void endDialog() {
         int input = JOptionPane.showOptionDialog(
                 MainFrame.get(),
-                "Experiment FINISHED! Thank You!",
-                "THE END!",
+                Strs.DLG_END_TEXT,
+                Strs.DLG_END_TITLE,
                 JOptionPane.DEFAULT_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
                 null,

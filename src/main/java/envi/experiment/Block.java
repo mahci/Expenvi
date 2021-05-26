@@ -51,13 +51,14 @@ public class Block {
      */
     public FittsTrial getNextTrial(boolean wasSuccess) {
         currTrialInd++;
-        if (wasSuccess) { // Success => normal return
-            if (currTrialInd == trials.size()) return null;
-        } else { // Fail => do the procedure
-            trialMiss(currTrialInd);
-        }
 
-        return trials.get(currTrialInd); // Should always be a trial!
+        // [REPLACED]
+        // Success => normal return
+        // Fail => do the procedure
+        //            trialMiss(currTrialInd);
+
+        if (currTrialInd < trials.size()) return trials.get(currTrialInd);
+        else return null; // Should always be a trial!
     }
 
     /**
