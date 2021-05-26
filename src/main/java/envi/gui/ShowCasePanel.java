@@ -148,7 +148,8 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
         //-- Draw stat text
         graphics2D.setColor(Config._normalTextColor);
         graphics2D.setFont(Config.EXP_INFO_FONT);
-        graphics2D.drawString(String.valueOf(trialNum), winW - Config.TEXT_X, Config.TEXT_Y);
+        graphics2D.drawString(String.valueOf(trialNum),
+                winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
 
         requestFocus();
     }

@@ -6,6 +6,7 @@ import envi.action.VouseEvent;
 import envi.connection.MooseServer;
 import envi.experiment.Experimenter;
 import envi.experiment.Mologger;
+import envi.tools.Strs;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -127,7 +128,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
         graphics2D.drawString(blockStatText + " --- " + trialStatText,
                 winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
-//        graphics2D.drawString(trialStatText, winW - Config.TEXT_X, Config.TEXT_Y + 20);
 
         // -- Show error
         if (!errText.isEmpty()) {
@@ -163,6 +163,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         trialStatText = trlTxt;
     }
 
+    public void error(boolean show) {
+    }
     // -------------------------------------------------------------------------------
     //region [virtual acitons]
 
@@ -187,7 +189,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if (startClicked) { // Target pressing
             // Log the press
             if (Experimenter.get().realExperiment) Mologger.get().log(ve);
-
         } else { // Start pressing
             if (stacle.isInside(crsPos.x, crsPos.y)) {
                 pressedInsideStacle = true;
@@ -197,8 +198,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
                 // change the color of the start circle
                 stacle.setColor(Config._starcleClickedColor);
-            } else { // Show error (NOT INSIDE)
-                errText = Config.ERR_NOT_INSIDE;
             }
 
             repaint();
@@ -240,7 +239,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
             } else { // Show error (NOT INSIDE) and change back the Stacle color
-                errText = Config.ERR_NOT_INSIDE;
+                errText = Strs.ERR_NOT_INSIDE;
                 stacle.setColor(Config._starcleDefColor);
 
                 // Invalid release => log in only gen
@@ -306,6 +305,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             long homingTime = Utils.now() - Experimenter.get().getHomingStart();
             Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
             Experimenter.get().setHomingStart(0); // Reset the time
+        }
+
+        // If error is shown, clear it
+        if (!errText.isEmpty()) {
+            errText = "";
+            repaint();
         }
     }
 

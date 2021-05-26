@@ -39,8 +39,8 @@ public class Config {
     public static int _scrId = 1; // Used in Main
     public static Rectangle _scrDims; // Screen dimenstions (px)
 
-    public static int WIN_W_MARGIN = 10; // Width margin (mm)
-    public static int WIN_H_MARGIN = 20; // Width margin (mm)
+    public static int WIN_W_MARGIN = 70; // Width margin (mm)
+    public static int WIN_H_MARGIN = 30; // Width margin (mm)
     public static int _winWidthMargin = Utils.mm2px(WIN_W_MARGIN);   // Left/right margin (px)
     public static int _winHeightMargin = Utils.mm2px(WIN_H_MARGIN);   // Top bottom margin (px)
 
@@ -85,10 +85,7 @@ public class Config {
     }
 
     // --- ERRORS and TEXTs
-    public static final String ERR_NOT_INSIDE   =
-            "PLEASE CLICK INSIDE THE START CIRCLE";
-    public static final String DIMSSG_BLOCK_FINISH =
-            "Block finished! You can now take a break. Press OK when ready.";
+
 
 
     // ===============================================================================
