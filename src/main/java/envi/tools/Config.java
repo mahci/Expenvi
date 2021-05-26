@@ -174,8 +174,13 @@ public class Config {
 //                        "Distance can't be more than " + maxDist + " mm");
 //            }
 
-            // Next...
-            _technique = TECHNIQUE.valueOf(Utils.lastPart(fileScan.nextLine()));
+            // Technique
+            try {
+                _technique = TECHNIQUE.valueOf(Utils.lastPart(fileScan.nextLine()));
+            } catch (IllegalArgumentException iaException) {
+                _technique = TECHNIQUE.TAP_LCLICK;
+            }
+
             _vibrate = Boolean.parseBoolean(Utils.lastPart(fileScan.nextLine()));
 
             // Send the technique to the Moose
