@@ -14,7 +14,7 @@ Start Radius (mm) = 8
 Number of Blocks = 2
 Target Radii (mm) = 2,5,10,20
 Target Distances (mm) = 100,200,400
-Interaction = MOUSE_LCLICK
+Interaction = TAP_LCLICK
 Vibrate = false
 
 Target Distances (mm) = 125,250,500

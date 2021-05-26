@@ -135,8 +135,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             graphics2D.setColor(Config._errorTextColor);
             graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
             graphics2D.drawString(errText, errTextX, Config.ERROR_Y);
-
-            errText = ""; // Clear the error
         }
 
         requestFocus();
@@ -172,6 +170,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Virtual press of the primary mouse button
      */
     public void vPressPrimary() {
+
+        // Ckear the error
+        errText = "";
+
         // Position of the curser
         Point crsPos = getCursorPosition();
 

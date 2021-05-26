@@ -47,7 +47,7 @@ public class Config {
     public static int _dispAreaH, _dispAreaW; // px
 
     // Text -----------------------------------------------
-    public static int TEXT_X = 50; // (mm) From the right edge
+    public static int TEXT_X = 55; // (mm) From the right edge
     public static int TEXT_Y = 10; // (mm) From the top
     public static int ERROR_Y = 50; // (X is calculated dynamically from middle of the screen)
     public static String FONT_STYLE = "Sans-serif";
@@ -115,7 +115,7 @@ public class Config {
             if (toLog) System.out.println(TAG + "winW = " + Utils.px2mm(MainFrame.get().getWidth()));
             if (toLog) System.out.println(TAG + "_dispAreaW = " + _dispAreaW);
             if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
-            int maxRadMM = Utils.px2mm(_dispAreaH / 2);
+            int maxRadMM = Utils.px2mm(_dispAreaH / 4);
             //===== Read network values
 //            fileScan.nextLine(); // skip title
 //
@@ -169,10 +169,10 @@ public class Config {
                     .map(String::trim)
                     .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 
-            if (Collections.max(_distancesMM) > maxDist) {
-                MainFrame.get().showMessageDialog(
-                        "Distance can't be more than " + maxDist + " mm");
-            }
+//            if (Collections.max(_distancesMM) > maxDist) {
+//                MainFrame.get().showMessageDialog(
+//                        "Distance can't be more than " + maxDist + " mm");
+//            }
 
             // Next...
             _technique = TECHNIQUE.valueOf(Utils.lastPart(fileScan.nextLine()));
