@@ -1,7 +1,13 @@
 package envi.experiment;
 
+import envi.tools.Config;
+import envi.tools.Pair;
+import envi.tools.Utils;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /***
@@ -17,6 +23,9 @@ public class Block {
     private TRIAL_TYPE trialsType;
     private int currTrialInd;
 
+    private List<FittsTuple> combinations = new ArrayList<>(); // List of all the combination
+    private List<SubBlock> subBlocks = new ArrayList<>(); // List of sub-blocks
+
     // ===============================================================================
 
     /**
@@ -25,6 +34,65 @@ public class Block {
      */
     public Block(TRIAL_TYPE trialsType) {
         this.trialsType = trialsType;
+    }
+
+    /**
+     * Create a block with the sets of
+     */
+    public Block(List<FittsTuple> combinations, int nSubBlocks) {
+
+        List<FittsTuple> cmbList = new ArrayList<FittsTuple>(combinations);
+
+        // Randomly put the combinations in trials into 3 sub-blocks
+        if (nSubBlocks == 3) {
+            Collections.shuffle(cmbList);
+
+            int third = cmbList.size() / 3;
+
+            if(toLog) System.out.println(TAG + third);
+            subBlocks.add(new SubBlock(cmbList.subList(0, third)));
+            subBlocks.add(new SubBlock(cmbList.subList(third, 2 * third)));
+            subBlocks.add(new SubBlock(cmbList.subList(2 * third, cmbList.size())));
+        }
+
+        // Each L or R gets into one sub-block
+        if (nSubBlocks == 2) {
+            // Create and add two sub-blocks
+            subBlocks.add(new SubBlock());
+            subBlocks.add(new SubBlock());
+
+            // Get a random permutation of {0, 1, ..., 11}
+            List<Integer> indexes = Utils.randPerm(cmbList.size() / 2);
+
+            // Randomly put L or R in Sb1 or SB2
+            for (int ind : indexes) {
+                List<Integer> dirs = Utils.randPerm(2);
+                subBlocks.get(dirs.get(0)).addTrial(cmbList.get(ind * 2));
+                subBlocks.get(dirs.get(1)).addTrial(cmbList.get(ind * 2 + 1));
+            }
+        }
+
+    }
+
+    /**
+     * Initialize everything
+     */
+    public void init() {
+        trials = new ArrayList<>();
+        combinations = new ArrayList<>();
+        subBlocks = new ArrayList<>();
+    }
+
+    /**
+     * Get total number of sub-blocks
+     * @return
+     */
+    public int getNSubBlocks() {
+        return subBlocks.size();
+    }
+
+    public boolean hasNext(int sbNum) {
+        return subBlocks.size() - sbNum > 0;
     }
 
     /**
@@ -59,6 +127,22 @@ public class Block {
 
         if (currTrialInd < trials.size()) return trials.get(currTrialInd);
         else return null; // Should always be a trial!
+    }
+
+    public SubBlock getSubBlock(int sbNum) {
+        if (sbNum <= subBlocks.size()) return subBlocks.get(sbNum - 1);
+        else return null;
+    }
+
+    /**
+     * Get a trial from index
+     * @param trInd Trial index
+     * @return FittsTrial
+     */
+    public FittsTrial getTrial(int trInd) {
+        System.out.println("Number of trials = " + trials.size());
+        if (trInd < trials.size()) return trials.get(trInd);
+        else return null;
     }
 
     /**
@@ -100,21 +184,5 @@ public class Block {
      * @param ctind Current trial index
      */
     public void setCurrTrialInd(int ctind) { currTrialInd = ctind; }
-
-    /**
-     * For testing
-     */
-    public void printTrialsVars() {
-        System.out.println("Trials ----------------------------");
-        for (int tr = 0; tr < trials.size(); tr++) {
-            System.out.println("Trial #" + tr + " :");
-            System.out.println("Rad/Dist/Dir -> " +
-                    trials.get(tr).getTarRad() + " / " +
-                    trials.get(tr).getTarDist() + " / " +
-                    trials.get(tr).getTarDir());
-            System.out.println("----------------------------");
-        }
-    }
-
 
 }

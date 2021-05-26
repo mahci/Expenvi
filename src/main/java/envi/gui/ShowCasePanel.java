@@ -4,6 +4,7 @@ import envi.action.Actions;
 import envi.connection.MooseServer;
 import envi.experiment.FittsTrial;
 import envi.tools.Config;
+import envi.tools.Pref;
 import envi.tools.Utils;
 
 import javax.swing.*;
@@ -102,15 +103,15 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
      */
     public void setNextTrial() {
         // Get a random trial
-        trial = new FittsTrial(dispW, dispH);
-
-        // Create circles from the trial (translate to window coordinates)
-        stacle = new Circle(Utils.dispToWin(trial.getStaclePosition()),
-                Config._stacleRad,
-                Config._starcleDefColor);
-        tarcle = new Circle(Utils.dispToWin(trial.getTarclePosition()),
-                trial.getTarRad(),
-                Config._tarcleDefColor);
+//        trial = new FittsTrial(dispW, dispH);
+//
+//        // Create circles from the trial (translate to window coordinates)
+//        stacle = new Circle(Utils.dispToWin(trial.getStaclePosition()),
+//                Config._stacleRad,
+//                Config._stacleDefColor);
+//        tarcle = new Circle(Utils.dispToWin(trial.getTarclePosition()),
+//                trial.getTarRad(),
+//                Config._tarcleDefColor);
 
         if (toLog) System.out.println(TAG + "stacle rad = " + stacle.radius);
     }
@@ -136,8 +137,8 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
 
-        graphics2D.setColor(Config._starcleTextColor);
-        graphics2D.setFont(Config.S_FONT);
+        graphics2D.setColor(Config._stacleTextColor);
+        graphics2D.setFont(Pref.STAT_FONT);
         graphics2D.drawString("S", stacle.cx - 3, stacle.cy + 5);
 
         //  Target circle
@@ -147,8 +148,9 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
 
         //-- Draw stat text
         graphics2D.setColor(Config._normalTextColor);
-        graphics2D.setFont(Config.EXP_INFO_FONT);
-        graphics2D.drawString(String.valueOf(trialNum), winW - Config.TEXT_X, Config.TEXT_Y);
+//        graphics2D.setFont(Config.EXP_INFO_FONT);
+        graphics2D.drawString(String.valueOf(trialNum),
+                winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
 
         requestFocus();
     }
@@ -166,7 +168,7 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
         if (!stacleClicked) { // Pressing the start
             if (stacle.isInside(crsPos.x, crsPos.y)) {
                 pressedInsideStacle = true;
-                stacle.setColor(Config._starcleClickedColor);
+                stacle.setColor(Config._stacleClickedColor);
             }
         }
 
@@ -182,7 +184,7 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
 
         if (stacleClicked) { // Target Second release
             stacleClicked = false;
-            stacle.setColor(Config._starcleDefColor);
+            stacle.setColor(Config._stacleDefColor);
 
             // Next trial
             trialNum++;
@@ -191,7 +193,7 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
             if (pressedInsideStacle && stacle.isInside(crsPos.x, crsPos.y)) {
                 stacleClicked = true;
             } else { // NOT INSIDE!
-                stacle.setColor(Config._starcleDefColor);
+                stacle.setColor(Config._stacleDefColor);
             }
         }
 

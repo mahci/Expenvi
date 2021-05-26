@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class Config {
 
     private static final String TAG = "[[Config]] ";
-    private static final boolean toLog = true;
+    private static final boolean toLog = false;
     // -------------------------------------------------------------------------------
     // Network
     public static int _netPort = 8000;
@@ -22,13 +22,16 @@ public class Config {
     public static final String CONFIG_FILE_PATH = "config.txt";
 
     // Colors
-    public static Color _normalTextColor        = Color.BLUE;
+    public static Color _normalTextColor        = Color.BLACK;
     public static Color _errorTextColor         = Color.RED;
     public static Color _titleTextColor         = Color.DARK_GRAY;
-    public static Color _starcleDefColor        = Color.decode("#3dcf38");
-    public static Color _starcleClickedColor    = Color.decode("#3d6e3b");
-    public static Color _starcleTextColor       = Color.black;
+
+    public static Color _stacleDefColor         = Color.decode("#3dcf38");
+    public static Color _stacleClickedColor     = Color.decode("#3d6e3b");
+    public static Color _stacleTextColor        = Color.black;
+
     public static Color _tarcleDefColor         = Color.decode("#e05c2f");
+
 
     // Display
     public static final int BENQ_DPI = 90;
@@ -39,8 +42,8 @@ public class Config {
     public static int _scrId = 1; // Used in Main
     public static Rectangle _scrDims; // Screen dimenstions (px)
 
-    public static int WIN_W_MARGIN = 10; // Width margin (mm)
-    public static int WIN_H_MARGIN = 20; // Width margin (mm)
+    public static int WIN_W_MARGIN = 70; // Width margin (mm)
+    public static int WIN_H_MARGIN = 30; // Width margin (mm)
     public static int _winWidthMargin = Utils.mm2px(WIN_W_MARGIN);   // Left/right margin (px)
     public static int _winHeightMargin = Utils.mm2px(WIN_H_MARGIN);   // Top bottom margin (px)
 
@@ -50,10 +53,6 @@ public class Config {
     public static int TEXT_X = 55; // (mm) From the right edge
     public static int TEXT_Y = 10; // (mm) From the top
     public static int ERROR_Y = 50; // (X is calculated dynamically from middle of the screen)
-    public static String FONT_STYLE = "Sans-serif";
-    public static int EXP_INFO_FONT_SIZE = 14;
-    public static Font EXP_INFO_FONT = new Font(FONT_STYLE, Font.PLAIN, EXP_INFO_FONT_SIZE);
-    public static Font S_FONT = new Font(FONT_STYLE, Font.PLAIN, EXP_INFO_FONT_SIZE);
 
 
     // Experiment ==================================================================
@@ -71,7 +70,7 @@ public class Config {
         TAP_LCLICK,
         MOUSE_LCLICK
     }
-    public static TECHNIQUE _technique = TECHNIQUE.SWIPE_LCLICK;
+    public static TECHNIQUE _technique = TECHNIQUE.MOUSE_LCLICK;
     public static boolean _vibrate = false; // Vibrate?
 
     // --- Show Case
@@ -85,10 +84,7 @@ public class Config {
     }
 
     // --- ERRORS and TEXTs
-    public static final String ERR_NOT_INSIDE   =
-            "PLEASE CLICK INSIDE THE START CIRCLE";
-    public static final String DIMSSG_BLOCK_FINISH =
-            "Block finished! You can now take a break. Press OK when ready.";
+
 
 
     // ===============================================================================
@@ -102,36 +98,23 @@ public class Config {
             Scanner fileScan = new Scanner(new File(CONFIG_FILE_PATH));
 
             //===== Read display values
-//            fileScan.nextLine(); // skip title
 
-//            _scrId = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-//            _dpi = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-//            _winWidthMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
-//            _winHeightMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
-//            if (toLog) System.out.println(TAG + "wM = " + _winWidthMargin);
-            // Additional info
-            _dispAreaW = MainFrame.get().getWidth() - 2 * _winWidthMargin;
-            _dispAreaH = MainFrame.get().getHeight() - 2 * _winHeightMargin;
-            if (toLog) System.out.println(TAG + "winW = " + Utils.px2mm(MainFrame.get().getWidth()));
-            if (toLog) System.out.println(TAG + "_dispAreaW = " + _dispAreaW);
-            if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
-            int maxRadMM = Utils.px2mm(_dispAreaH / 4);
             //===== Read network values
 //            fileScan.nextLine(); // skip title
 //
 //            _netPort = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
             //===== Read color values
-            fileScan.nextLine(); // skip title
-
-            _normalTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            _errorTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            _titleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            _starcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            _starcleClickedColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            _starcleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            _tarcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-            if (toLog) System.out.println(TAG + "Colors set!");
+//            fileScan.nextLine(); // skip title
+//
+//            _normalTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            _errorTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            _titleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            _stacleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            _stacleClickedColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            _stacleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            _tarcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
+//            if (toLog) System.out.println(TAG + "Colors set!");
             //===== Read show case values
             fileScan.nextLine(); // skip title
 
@@ -143,13 +126,8 @@ public class Config {
 
             // Stacle radius
             int stRad = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            if (stRad >= maxRadMM) {
-                MainFrame.get().showMessageDialog(
-                        "Start radius can't be more than " + maxRadMM + " mm");
-            } else {
-                _stacleRadMM = stRad;
-                _stacleRad = Utils.mm2px(_stacleRadMM);
-            }
+            _stacleRadMM = stRad;
+
             if (toLog) System.out.println(TAG + "Start R (mm) = " + _stacleRadMM);
             _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
@@ -161,18 +139,12 @@ public class Config {
 
             // Target distances
             if (toLog) System.out.println(TAG + "Target Rs = " + _targetRadiiMM);
-            int maxDist = Utils.px2mm(_dispAreaW) - Collections.max(_targetRadiiMM) - _stacleRadMM;
-            if (toLog) System.out.println(TAG + "max Target R = " + Collections.max(_targetRadiiMM));
-            if (toLog) System.out.println(TAG + "dispAreaW mm = " + Utils.px2mm(_dispAreaW));
+
             _distancesMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
                     .split(","))
                     .map(String::trim)
                     .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 
-//            if (Collections.max(_distancesMM) > maxDist) {
-//                MainFrame.get().showMessageDialog(
-//                        "Distance can't be more than " + maxDist + " mm");
-//            }
 
             // Technique
             try {
@@ -207,6 +179,19 @@ public class Config {
             System.out.println(TAG + "_netPort = " + _netPort);
         }
 
+    }
+
+    public static void updateDisplayValues() {
+        _dispAreaW = MainFrame.get().getWidth() - 2 * _winWidthMargin;
+        _dispAreaH = MainFrame.get().getHeight() - 2 * _winHeightMargin;
+        if (toLog) System.out.println(TAG + "winW = " + Utils.px2mm(MainFrame.get().getWidth()));
+        if (toLog) System.out.println(TAG + "_dispAreaW = " + _dispAreaW);
+        if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
+        int maxRadMM = Utils.px2mm(_dispAreaH / 4);
+
+        _stacleRad = Utils.mm2px(_stacleRadMM);
+
+        int maxDist = Utils.px2mm(_dispAreaW) - Collections.max(_targetRadiiMM) - _stacleRadMM;
     }
 
     //endregion

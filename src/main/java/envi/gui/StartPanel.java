@@ -1,6 +1,8 @@
 package envi.gui;
 
+import envi.experiment.Experiment;
 import envi.experiment.Experimenter;
+import envi.experiment.Practice;
 import envi.experiment.ShowCaser;
 import envi.tools.Config;
 
@@ -33,14 +35,25 @@ public class StartPanel extends JPanel {
     private final Action startWarmUp = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Experimenter.get().startExperiment(false);
+            Config.updateDisplayValues();
+
+            MainFrame.get().showPanel(
+                    new ExperimentPanel(
+                            new Practice(1, 3)));
+//
+//            Experimenter.get().startExperiment(false);
         }
     };
 
     private final Action startExperiment = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Experimenter.get().startExperiment(true);
+            Config.updateDisplayValues();
+
+            MainFrame.get().showPanel(
+                    new ExperimentPanel(
+                    new Experiment(4, 2)));
+//            Experimenter.get().startExperiment(true);
         }
     };
 
@@ -96,6 +109,8 @@ public class StartPanel extends JPanel {
         this.add(Box.createVerticalStrut(100)); // Space
 
         startButton.requestFocusInWindow();
+
+        Config.setFromFile();
     }
 
     /**

@@ -1,10 +1,8 @@
 package envi.tools;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
@@ -112,5 +110,20 @@ public class Utils {
      */
     public static int randInt(int min, int bound) {
         return ThreadLocalRandom.current().nextInt(min, bound);
+    }
+
+    /**
+     * Generate a random permutation of {0, 1, ..., len - 1}
+     * @param len Length of the permutation
+     * @return Random permutation
+     */
+    public static List<Integer> randPerm(int len) {
+        List<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            indexes.add(i);
+        }
+        Collections.shuffle(indexes);
+
+        return indexes;
     }
 }

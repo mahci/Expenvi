@@ -5,7 +5,6 @@ package envi.tools;
  */
 public class Strs {
 
-    // Messages --------------------------------------------
     //region [Messages]
     public static final String MSSG_MOOSE       = "MOOSE";
     public static final String MSSG_CONFIRM     = "CONFIRM";
@@ -20,7 +19,6 @@ public class Strs {
     public static final String MSSG_END_LOG     = "ENDLOG";
     public static final String MSSG_ACK         = "ACK";
     //endregion
-    // -----------------------------------------------------
 
     //region [Dialogs]
     public static final String DLG_BREAK_TITLE  = "Time for a break!";
@@ -30,4 +28,11 @@ public class Strs {
     public static final String DLG_END_TITLE    = "END";
     public static final String DLG_END_TEXT     = "Technique Finished! Thank You!";
     //endregion
+
+    //region [Errors]
+    public static final String ERR_NOT_INSIDE   =
+            "PLEASE CLICK INSIDE THE START CIRCLE";
+    //endregion
+
+
 }

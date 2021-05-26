@@ -1,11 +1,12 @@
 package envi.gui;
 
+import envi.experiment.*;
 import envi.tools.Config;
 import envi.action.Actions;
 import envi.action.VouseEvent;
 import envi.connection.MooseServer;
-import envi.experiment.Experimenter;
-import envi.experiment.Mologger;
+import envi.tools.Pref;
+import envi.tools.Strs;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -32,12 +33,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private String trialStatText = "";
     private String errText = "";
 
-    // Graphics
-    private Graphics2D graphics2D;
-
     // Experiment vars
-    private boolean startClicked = false;
-    private boolean pressedInsideStacle = false;
+    private boolean startPressed = false;
+    private boolean pressedInsideStart = false;
 
     // Publishing all the movements
     private static PublishSubject<MouseEvent> mouseSubject;
@@ -51,12 +49,23 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         }
     };
 
+    // List of blocks to display
+//    private List<Block> blocks = new ArrayList<>();
+    private Experiment experiment;
+
+    private int blockNum;
+    private int subBlockNum;
+    private int trialNum;
+
+//    private FittsTrial trial;
+    private Block block;
+
     // ===============================================================================
 
-    /***
+    /**
      * Constructor
      */
-    public ExperimentPanel() {
+    public ExperimentPanel(Experiment exp) {
         addMouseListener(this);
         addMouseMotionListener(this);
         getInputMap().put(
@@ -81,26 +90,81 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                     vReleasePrimary();
                     break;
                 case Actions.ACT_PRESS_SEC:
-                    break;
-                case Actions.ACT_RELEASE_SEC:
-                    break;
+            case Actions.ACT_RELEASE_SEC:
+                break;
             }
         });
+
+        experiment = exp;
+
+        init();
+        setScene();
 
         requestFocusInWindow();
     }
 
-    /***
+    public void init() {
+        blockNum = 1;
+        subBlockNum = 1;
+        trialNum = 1;
+    }
+
+    /**
+     * Generate blosks in the experiment
+     * @param nBlocks Number of blocks to generate
+     * @param nSubBlocks Number of sub-blocks in each block
+     */
+//    public ExperimentPanel genBlocks(int nBlocks, int nSubBlocks) {
+//        for(int bi = 0; bi < nBlocks; bi++) {
+//            blocks.add(new Block().withSubBlocks(nSubBlocks));
+//        }
+//        if(toLog) System.out.println("Blocks generated");
+//        assignTrial();
+//        return this;
+//    }
+
+//    public void fetchTrial() {
+//
+//
+//        if (blockInd < blocks.size()) {
+//
+//            Block subBlock = blocks.get(blockInd).getSubBlock(subBlockInd);
+//            if (subBlock != null) {
+//
+//                trial = subBlock.getTrial(trialInd);
+//                if (trial != null) {
+//                    // Show the trial
+//                    setScene();
+//
+//                } else { // Trials finished
+//                    System.out.println("Next sub-block...");
+//                    subBlockInd++;
+//                    trialInd = 0;
+//                }
+//
+//            } else { // Sub-blocks finished
+//                System.out.println("Next block...");
+//                blockInd++;
+//                subBlockInd = 0;
+//                trialInd = 0;
+//            }
+//
+//        } else { // Blocks finished
+//            System.out.println("Blocks finished");
+//        }
+//    }
+
+    /**
      * Main printing function
      * @param graphics Graphics
      */
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
+        Graphics2D graphics2D = (Graphics2D) graphics;
+
         int winW = this.getWidth();
         int winH = this.getHeight();
-
-        graphics2D = (Graphics2D) graphics;
 
         // Set anti-alias
         graphics2D.setRenderingHint(
@@ -108,60 +172,135 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         //-- Draw circles
+        // Colors
+        Color startColor = startPressed ? Pref.COLOR_START_SEL : Pref.COLOR_START_DEF;
+
         // Start circle
-        graphics2D.setColor(stacle.getColor());
+        graphics2D.setColor(startColor);
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
-
-        graphics2D.setColor(Config._starcleTextColor);
-        graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, 14));
-        graphics2D.drawString("S", stacle.cx - 3, stacle.cy + 5);
+//        if(toLog) System.out.println(TAG + "stacle: " + stacle.tlX + " , " + stacle.tlY);
+        graphics2D.setColor(Pref.COLOR_TEXT);
+        graphics2D.setFont(Pref.S_FONT);
+        graphics2D.drawString("S",
+                stacle.cx - Utils.mm2px(Pref.S_TEXT_X_OFFSET_mm),
+                stacle.cy + Utils.mm2px(Pref.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
-        graphics2D.setColor(tarcle.getColor());
+        graphics2D.setColor(Pref.COLOR_TARGET_DEF);
         graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
+//        if(toLog) System.out.println(TAG + "tarcle: " + tarcle.tlX + " , " + tarcle.tlY);
 
-        //-- Draw stat texts
-        graphics2D.setColor(Config._normalTextColor);
-        graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
-        graphics2D.drawString(blockStatText + " --- " + trialStatText,
-                winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
-//        graphics2D.drawString(trialStatText, winW - Config.TEXT_X, Config.TEXT_Y + 20);
+        //--- Draw stat rectangles and texts
+        graphics2D.setColor(Pref.COLOR_TEXT);
+        graphics2D.setFont(Pref.STAT_FONT);
 
-        // -- Show error
+        int rect1W = Utils.mm2px(Pref.STAT_RECT_WIDTH_mm) * 3/4;
+        int rect2W = Utils.mm2px(Pref.STAT_RECT_WIDTH_mm);
+        int rectH = Utils.mm2px(Pref.STAT_RECT_HEIGHT_mm);
+        int rect2X = winW - (Utils.mm2px(Pref.STAT_MARG_X_mm) + Utils.mm2px(Pref.STAT_RECT_WIDTH_mm));
+        int rect1X = winW - (Utils.mm2px(Pref.STAT_MARG_X_mm) + rect1W + rect2W);
+        int rect1Y = Utils.mm2px(Pref.STAT_MARG_Y_mm);
+        graphics2D.drawRect(rect1X, rect1Y, rect1W, rectH);
+        graphics2D.drawRect(rect2X, rect1Y, rect2W, rectH);
+
+        int text1X = rect1X + Utils.mm2px(Pref.STAT_TEXT_X_PAD_mm);
+        int text1Y = rect1Y + Utils.mm2px(Pref.STAT_TEXT_Y_PAD_mm);
+        int text2X = rect2X + Utils.mm2px(Pref.STAT_TEXT_X_PAD_mm);
+        graphics2D.setFont(Pref.STAT_FONT);
+        graphics2D.drawString(trialStatText, text1X, text1Y);
+        graphics2D.drawString(blockStatText, text2X, text1Y);
+
+        //--- Show error
         if (!errText.isEmpty()) {
             int errTextX = winW / 2 - 200;
-            graphics2D.setColor(Config._errorTextColor);
-            graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
-            graphics2D.drawString(errText, errTextX, Config.ERROR_Y);
+            graphics2D.setColor(Pref.COLOR_ERROR);
+            graphics2D.drawString(errText, errTextX, Pref.STAT_MARG_Y_mm);
         }
 
         requestFocus();
-
     }
 
-    /***
-     * Set the circles (with their default colors)
-     * @param c1 Start circle
-     * @param c2 Target circle
+    /**
+     * Set the scene for painting
      */
-    public void setCircles(Circle c1, Circle c2) {
-        stacle = c1;
-        stacle.setColor(Config._starcleDefColor);
-        tarcle = c2;
-        tarcle.setColor(Config._tarcleDefColor);
+    private void setScene() {
+        System.out.println(TAG + blockNum + " | " + subBlockNum + " | " + trialNum);
+        FittsTrial trial = experiment
+                .getBlock(blockNum)
+                .getSubBlock(subBlockNum)
+                .getTrial(trialNum);
+        stacle = new Circle(
+                Utils.dispToWin(trial.getStaclePosition()),
+                Config._stacleRad
+        );
+        tarcle = new Circle(
+                Utils.dispToWin(trial.getTarclePosition()),
+                trial.getTarRad()
+        );
+
+        // Texts
+        blockStatText = "Block: " + blockNum + " | " + experiment.getTotalNSubBlocks();
+        trialStatText = "Trial: " + trialNum;
     }
 
-    /***
-     * Set the stat texts to draw
-     * @param blkTxt Block stat text
-     * @param trlTxt Trial stat text
+    /**
+     * Start is clicked
      */
-    public void setStatTexts(String blkTxt, String trlTxt) {
-        blockStatText = blkTxt;
-        trialStatText = trlTxt;
+    private void trialStarted() {
+        startPressed = true; // Pressed
+
+        repaint();
     }
+
+    /**
+     * Click attempted on Target
+     */
+    private void trialDone() {
+
+        startPressed = false; // Reset pressed
+
+        // Next step
+        if (experiment
+                .getBlock(blockNum)
+                .getSubBlock(subBlockNum)
+                .hasNext(trialNum)) {
+            trialNum++;
+        } else { // Trials in the sub-block finished
+            if (experiment
+                    .getBlock(blockNum)
+                    .hasNext(subBlockNum)) { // Next sub-block
+                breakDialog();
+                subBlockNum++;
+                trialNum = 1;
+            } else { // Sub-blocks finished
+                if (experiment.hasNext(blockNum)) { // Next block
+                    breakDialog();
+                    blockNum++;
+                    subBlockNum = 1;
+                    trialNum = 1;
+                } else {
+                    endDialog();
+                }
+            }
+        }
+
+        setScene();
+        repaint();
+
+    }
+
+    /**
+     * Clicked outside the start
+     */
+    private void repeatTrial() {
+        errText = Strs.ERR_NOT_INSIDE; // Show error
+        startPressed = false; // Reset pressed
+
+        repaint();
+    }
+
 
     // -------------------------------------------------------------------------------
     //region [virtual acitons]
@@ -184,21 +323,18 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         Mologger.get().log(ve, Mologger.LOG_LEVEL.ALL);
 
         // Check where pressed...
-        if (startClicked) { // Target pressing
+        if (startPressed) { // Target pressing
             // Log the press
-            if (Experimenter.get().realExperiment) Mologger.get().log(ve);
-
+//            if (Experimenter.get().realExperiment) Mologger.get().log(ve);
         } else { // Start pressing
             if (stacle.isInside(crsPos.x, crsPos.y)) {
-                pressedInsideStacle = true;
+                pressedInsideStart = true;
 
                 // Log in gen
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
 
                 // change the color of the start circle
-                stacle.setColor(Config._starcleClickedColor);
-            } else { // Show error (NOT INSIDE)
-                errText = Config.ERR_NOT_INSIDE;
+
             }
 
             repaint();
@@ -219,35 +355,32 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         Mologger.get().log(ve, Mologger.LOG_LEVEL.ALL);
 
         // Check where released...
-        if (startClicked) { // Released on the target is clicked => Trial finished
+        if (startPressed) { // Released on the target is clicked => Trial finished
             // Valid release => Log in gen and spec
             Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
             Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
-            // Falsify the startClicked
-            startClicked = false;
 
             // Report the result to the Experimenter
-            boolean result = tarcle.isInside(crsPos.x, crsPos.y);
-            Experimenter.get().trialDone(result);
+//            boolean result = tarcle.isInside(crsPos.x, crsPos.y);
+//            Experimenter.get().trialDone(result);
 
+            trialDone();
         } else { // Released from the start
-            if (pressedInsideStacle && stacle.isInside(crsPos.x, crsPos.y)) {
-                startClicked = true;
 
+            if (pressedInsideStart && stacle.isInside(crsPos.x, crsPos.y)) {
                 // Valid release => log in gen and spec
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
-            } else { // Show error (NOT INSIDE) and change back the Stacle color
-                errText = Config.ERR_NOT_INSIDE;
-                stacle.setColor(Config._starcleDefColor);
+                trialStarted();
 
+            } else { // Repeat trial
                 // Invalid release => log in only gen
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
-            }
 
-            repaint();
+                repeatTrial();
+            }
         }
     }
 
@@ -307,8 +440,39 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
             Experimenter.get().setHomingStart(0); // Reset the time
         }
+
+        // If error is shown, clear it
+        if (!errText.isEmpty()) {
+            errText = "";
+            repaint();
+        }
     }
 
     //endregion
 
+    /**
+     * Show the break dialog (between blocks)
+     */
+    public void breakDialog() {
+        MainFrame.get().showDialog(new BreakDialog());
+    }
+
+    /**
+     * Show the end dialog
+     */
+    private void endDialog() {
+        int input = JOptionPane.showOptionDialog(
+                MainFrame.get(),
+                Strs.DLG_END_TEXT,
+                Strs.DLG_END_TITLE,
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                null,
+                null);
+        if(input == JOptionPane.OK_OPTION)
+        {
+            System.exit(0);
+        }
+    }
 }
