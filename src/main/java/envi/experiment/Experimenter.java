@@ -69,7 +69,7 @@ public class Experimenter {
         expSubject = PublishSubject.create();
 
         // set the config from file
-//        Config.setFromFile();
+        Config.setFromFile();
 
         // Save radii and distances in px values
         for(int rad: Config._targetRadiiMM) {

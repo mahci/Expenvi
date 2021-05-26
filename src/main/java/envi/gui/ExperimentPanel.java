@@ -125,8 +125,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         //-- Draw stat texts
         graphics2D.setColor(Config._normalTextColor);
         graphics2D.setFont(new Font(Config.FONT_STYLE, Font.PLAIN, Config.EXP_INFO_FONT_SIZE));
-        graphics2D.drawString(blockStatText, winW - Config.TEXT_X, Config.TEXT_Y);
-        graphics2D.drawString(trialStatText, winW - Config.TEXT_X, Config.TEXT_Y + 20);
+        graphics2D.drawString(blockStatText + " --- " + trialStatText,
+                winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
+//        graphics2D.drawString(trialStatText, winW - Config.TEXT_X, Config.TEXT_Y + 20);
 
         // -- Show error
         if (!errText.isEmpty()) {

@@ -1,10 +1,3 @@
------ Display -----
-Monitor Number = 1
-DPI = 109
-Width Margin (mm) = 10
-Height Margin (mm) = 10
------ Network -----
-Port = 8000
 ----- Colors -----
 Normal Text = #0000FF
 Error Text = #FF0000
@@ -20,7 +13,8 @@ Window's Height / Max Target Radius = 6
 Start Radius (mm) = 8
 Number of Blocks = 2
 Target Radii (mm) = 2,5,10,20
-Target Distances (mm) = 125,250,500
-Interaction = TAP_LCLICK
+Target Distances (mm) = 100,200,400
+Interaction = MOUSE_LCLICK
 Vibrate = false
 
+Target Distances (mm) = 125,250,500

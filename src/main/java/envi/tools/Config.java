@@ -33,22 +33,23 @@ public class Config {
     // Display
     public static final int BENQ_DPI = 90;
     public static final int MacCinDisp_DPI = 109;
-
-    public static int _dpi = MacCinDisp_DPI;
+    public static final int _dpi = BENQ_DPI;
 
     public static int _nScr = 1; // Set programmatically
     public static int _scrId = 1; // Used in Main
     public static Rectangle _scrDims; // Screen dimenstions (px)
 
-    public static int _winWidthMargin = 100;   // Left/right margin (px)
-    public static int _winHeightMargin = 50;   // Top bottom margin (px)
+    public static int WIN_W_MARGIN = 10; // Width margin (mm)
+    public static int WIN_H_MARGIN = 20; // Width margin (mm)
+    public static int _winWidthMargin = Utils.mm2px(WIN_W_MARGIN);   // Left/right margin (px)
+    public static int _winHeightMargin = Utils.mm2px(WIN_H_MARGIN);   // Top bottom margin (px)
 
     public static int _dispAreaH, _dispAreaW; // px
 
     // Text -----------------------------------------------
-    public static int TEXT_X = 100; // From the right edge
-    public static int TEXT_Y = 50; // From the top
-    public static int ERROR_Y = 50; // X is calculated dynamically (from middle of the screen)
+    public static int TEXT_X = 50; // (mm) From the right edge
+    public static int TEXT_Y = 10; // (mm) From the top
+    public static int ERROR_Y = 50; // (X is calculated dynamically from middle of the screen)
     public static String FONT_STYLE = "Sans-serif";
     public static int EXP_INFO_FONT_SIZE = 14;
     public static Font EXP_INFO_FONT = new Font(FONT_STYLE, Font.PLAIN, EXP_INFO_FONT_SIZE);
@@ -101,13 +102,13 @@ public class Config {
             Scanner fileScan = new Scanner(new File(CONFIG_FILE_PATH));
 
             //===== Read display values
-            fileScan.nextLine(); // skip title
+//            fileScan.nextLine(); // skip title
 
-            _scrId = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            _dpi = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            _winWidthMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
-            _winHeightMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
-            if (toLog) System.out.println(TAG + "wM = " + _winWidthMargin);
+//            _scrId = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+//            _dpi = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+//            _winWidthMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
+//            _winHeightMargin = Utils.mm2px(Integer.parseInt(Utils.lastPart(fileScan.nextLine())));
+//            if (toLog) System.out.println(TAG + "wM = " + _winWidthMargin);
             // Additional info
             _dispAreaW = MainFrame.get().getWidth() - 2 * _winWidthMargin;
             _dispAreaH = MainFrame.get().getHeight() - 2 * _winHeightMargin;
@@ -116,9 +117,9 @@ public class Config {
             if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
             int maxRadMM = Utils.px2mm(_dispAreaH / 2);
             //===== Read network values
-            fileScan.nextLine(); // skip title
-
-            _netPort = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+//            fileScan.nextLine(); // skip title
+//
+//            _netPort = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
             //===== Read color values
             fileScan.nextLine(); // skip title

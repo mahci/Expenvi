@@ -65,7 +65,7 @@ public class StartPanel extends JPanel {
                 startButton.getInputMap().put(
                         KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
                         "SPACE");
-                startButton.getActionMap().put("SPACE", startShowCase);
+                startButton.getActionMap().put("SPACE", startExperiment);
             }
             case WARM_UP -> {
                 labelText = warmUpHint;

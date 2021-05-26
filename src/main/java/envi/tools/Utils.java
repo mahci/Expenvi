@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
@@ -101,5 +102,15 @@ public class Utils {
      */
     public static long now() {
         return Calendar.getInstance().getTimeInMillis();
+    }
+
+    /**
+     * Return a radnom int
+     * @param min Minimum (inclusive)
+     * @param bound Bound (exclusive)
+     * @return Random int
+     */
+    public static int randInt(int min, int bound) {
+        return ThreadLocalRandom.current().nextInt(min, bound);
     }
 }
