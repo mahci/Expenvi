@@ -1,5 +1,6 @@
 package envi.experiment;
 
+import envi.gui.MainFrame;
 import envi.tools.Config;
 import envi.tools.Pair;
 import envi.tools.Utils;
@@ -11,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Class for the Fitt's experiment
  */
-public class FittsTrial extends Trial {
+public class FittsTrial {
 
     private final String TAG = "[[FittsTrial]] ";
     private final boolean toLog = true;
@@ -21,113 +22,105 @@ public class FittsTrial extends Trial {
     private Point staclePosition = new Point();
     private Point tarclePosition = new Point();
 
-    // Vars
-    private int tarRad;
-    private int tarDist;
-    private int tarDir;
+    // Variables tuple
+    public FittsTuple vars;
 
     // ===============================================================================
 
     /**
-     * Create a trial
-     * @param radDist Pair of rad,dist
-     * @param leftRight Left or right
+     * Generate a trial with a tuple
+     * @param fTuple FittsTuple
      */
-    public FittsTrial(Pair<Integer, Integer> radDist, int leftRight) {
-        // Set the vars
-        tarRad = radDist.first;
-        tarDist = radDist.second;
-        tarDir = leftRight;
-
-        // Set the postions
-        setPositions(Config._dispAreaW, Config._dispAreaH);
+    public FittsTrial(FittsTuple fTuple) {
+        this.vars = fTuple;
+        positionMM();
     }
 
     /**
-     * Generate and return a random Fitts trial
-     * @param dispW Width of the display area
-     * @param dispH Height of the display area
+     * Set the positions of the circles
      */
-    public FittsTrial(int dispW, int dispH) {
-
-        //--- Random target radius
-        int minTarRad = Utils.mm2px(Config._minTarRadMM);
-        int maxTarRad = dispH / Config._dispHRatioToMaxRad;
-        if (toLog) System.out.println(TAG +
-            String.format("minTarRad = %d, max = %d", minTarRad, maxTarRad));
-
-        this.tarRad = ThreadLocalRandom.current().nextInt(minTarRad, maxTarRad + 1);
-        if (toLog) System.out.println(TAG + String.format("tarRad = %d", tarRad));
-        //--- Random distance
-        int minDist = Config._stacleRad + this.tarRad;
-        int macDist = dispW - Config._stacleRad - this.tarRad;
-
-        this.tarDist = ThreadLocalRandom.current().nextInt(minDist, macDist + 1);
-        if (toLog) System.out.println(TAG + String.format("tarDist = %d", tarDist));
-        // Random direction
-        if (new Random().nextBoolean()) this.tarDir = 1;
-
-        // Set the positions
-        setPositions(dispW, dispH);
+    public void position() {
+//        int dispW = MainFrame.get().getDispArea().first;
+//        int dispH = MainFrame.get().getDispArea().second;
+//
+//        // Convert the value into px for calculations
+//        int tarRad = Utils.mm2px(vars.width);
+//        int tarDist = Utils.mm2px(vars.dist);
+//
+//        if (toLog) System.out.println(TAG + String.format("disp W = %d, H = %d", dispW, dispH));
+//        //--- *STACLE* center position thresholds
+//        int minX, minY, maxX, maxY;
+//        int maxRad = Math.max(tarRad, Config._stacleRad); // Max radius between target or start
+//        if (toLog) System.out.println(TAG + String.format("maxRad = %d", maxRad));
+//
+//        // Y (independant of the left/right)
+//        minY = maxRad;
+//        maxY = dispH - maxRad;
+//        if (toLog) System.out.println(TAG + String.format("Y -> min = %d, max = %d", minY, maxY));
+//        staclePosition.y = ThreadLocalRandom.current().nextInt(minY, maxY + 1);
+//        tarclePosition.y = staclePosition.y;
+//
+//        // X
+//        if (vars.leftRight == 0) { // Left
+//            minX = tarRad + tarDist;
+//            maxX = dispW - Config._stacleRad;
+//            if (toLog) System.out.println(TAG + String.format("(Left) X -> min = %d, max = %d", minX, maxX));
+//            // Determine a random position
+//            staclePosition.x = Utils.randInt(minX, maxX + 1);
+//            tarclePosition.x = staclePosition.x - tarDist;
+//        } else { // Right
+//            minX = Config._stacleRad;
+//            maxX = dispW - (tarRad + tarDist);
+//            if (toLog) System.out.println("maxX -> " + dispW + " | " + tarRad + " , " + tarDist);
+//            if (toLog) System.out.println(TAG + String.format("(Right) X -> min = %d, max = %d", minX, maxX));
+//            // Determine a random position
+//            staclePosition.x = Utils.randInt(minX, maxX + 1);
+//            tarclePosition.x = staclePosition.x + tarDist;
+//        }
+//
+//        if (toLog) System.out.println(TAG + "Stacle position: " + staclePosition);
+//        if (toLog) System.out.println(TAG + "Tarcle position: " + tarclePosition);
     }
 
-    /**
-     * Set the positions of the circles based on other parameters (already set)
-     * The position of *STACLE* is randomly chosen
-     */
-    private void setPositions(int dispW, int dispH) {
+    private void positionMM() {
+        int dispW = MainFrame.get().getDispArea().first;
+        int dispH = MainFrame.get().getDispArea().second;
+
+        int minX, minY, maxX, maxY;
+
         if (toLog) System.out.println(TAG + String.format("disp W = %d, H = %d", dispW, dispH));
         //--- *STACLE* center position thresholds
-        int minX, minY, maxX, maxY;
-        int maxRad = Math.max(tarRad, Config._stacleRad); // Max radius between target or start
+        int maxRad = Math.max(vars.width, Config._stacleRadMM); // Max radius between target or start
         if (toLog) System.out.println(TAG + String.format("maxRad = %d", maxRad));
 
         // Y (independant of the left/right)
         minY = maxRad;
         maxY = dispH - maxRad;
-        if (toLog) System.out.println(TAG + String.format("Y - min = %d, max = %d", minY, maxY));
-        staclePosition.y = ThreadLocalRandom.current().nextInt(minY, maxY + 1);
+        if (toLog) System.out.println(TAG + String.format("Y -> min = %d, max = %d", minY, maxY));
+        staclePosition.y = Utils.randInt(minY, maxY + 1);
         tarclePosition.y = staclePosition.y;
 
         // X
-        if (tarDir == 0) { // Left
-            minX = tarRad + tarDist;
+        if (vars.leftRight == 0) { // Left
+            minX = vars.width + vars.dist;
             maxX = dispW - Config._stacleRad;
-            if (toLog) System.out.println(TAG + String.format("X -> min = %d, max = %d", minX, maxX));
+            if (toLog) System.out.println(TAG + String.format("(Left) X -> min = %d, max = %d", minX, maxX));
             // Determine a random position
             staclePosition.x = Utils.randInt(minX, maxX + 1);
-            tarclePosition.x = staclePosition.x - tarDist;
+            tarclePosition.x = staclePosition.x - vars.dist;
         } else { // Right
-            minX = Config._stacleRad;
-            maxX = dispW - (tarRad + tarDist);
-            if (toLog) System.out.println("maxX -> " + dispW + " | " + tarRad + " , " + tarDist);
-            if (toLog) System.out.println(TAG + String.format("X -> min = %d, max = %d", minX, maxX));
+            minX = Config._stacleRadMM;
+            maxX = dispW - (vars.width + vars.dist);
+//            if (toLog) System.out.println("maxX -> " + dispW + " | " + tarRad + " , " + tarDist);
+            if (toLog) System.out.println(TAG + String.format("(Right) X -> min = %d, max = %d", minX, maxX));
             // Determine a random position
             staclePosition.x = Utils.randInt(minX, maxX + 1);
-            tarclePosition.x = staclePosition.x + tarDist;
+            tarclePosition.x = staclePosition.x + vars.dist;
         }
 
         if (toLog) System.out.println(TAG + "Stacle position: " + staclePosition);
         if (toLog) System.out.println(TAG + "Tarcle position: " + tarclePosition);
     }
-
-    /**
-     * Return target radius
-     * @return Target radius
-     */
-    public int getTarRad() { return tarRad; }
-
-    /**
-     * Return target distance
-     * @return Target distance
-     */
-    public int getTarDist() { return tarDist; }
-
-    /**
-     * Return target direction
-     * @return Target direction
-     */
-    public int getTarDir() { return tarDir; }
 
     /**
      * Return start cicle position
@@ -142,19 +135,29 @@ public class FittsTrial extends Trial {
     public Point getTarclePosition() { return tarclePosition; }
 
     /**
+     * Get target radius (px)
+     * @return int
+     */
+//    public int getTarRad() {
+//        return Utils.mm2px(vars.width);
+//    }
+
+    public int getTarWidth() {
+        return vars.width;
+    }
+
+    /**
      * Get the string of the FittsTrial
      * @return String of the parameters
      */
     @Override
     public String toString() {
         return "FittsTrial{" +
-                "TAG='" + TAG + '\'' +
-                ", toLog=" + toLog +
                 ", staclePosition=" + staclePosition +
                 ", tarclePosition=" + tarclePosition +
-                ", tarRad=" + tarRad +
-                ", tarDist=" + tarDist +
-                ", tarDir=" + tarDir +
+                ", tarRad=" + vars.width +
+                ", tarDist=" + vars.dist +
+                ", tarDir=" + vars.leftRight +
                 '}';
     }
 }

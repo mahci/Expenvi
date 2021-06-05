@@ -1,35 +1,19 @@
 package envi.tools;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
-    private static final double MM_IN_INCH = 25.4;
+    public static final double MM_IN_INCH = 25.4;
 
     // ===============================================================================
 
-    /**
-     * Convert mm to pixels
-     * @param mm Millimeters
-     * @return Pixels
-     */
-    public static int mm2px(int mm) {
-        return (int)((mm / MM_IN_INCH) * Config._dpi);
-    }
 
-    /**
-     * Convert pixels to mm
-     * @param px Pixels
-     * @return Millimeters
-     */
-    public static int px2mm(int px) {
-        return (int)((px / Config._dpi) * MM_IN_INCH);
-    }
+
+
 
     /**
      * Get the int values from a String with a delimiter
@@ -72,15 +56,7 @@ public class Utils {
         return result;
     }
 
-    /**
-     * Display area coordinates --> Windows coordinates
-     * @param inPoint Point in display area
-     * @return Window's coordinates
-     */
-    public static Point dispToWin(Point inPoint) {
-        inPoint.translate(Config._winWidthMargin, Config._winHeightMargin);
-        return inPoint;
-    }
+
 
     /**
      * Get the last part of the input String (split by SPACE)
@@ -112,5 +88,20 @@ public class Utils {
      */
     public static int randInt(int min, int bound) {
         return ThreadLocalRandom.current().nextInt(min, bound);
+    }
+
+    /**
+     * Generate a random permutation of {0, 1, ..., len - 1}
+     * @param len Length of the permutation
+     * @return Random permutation
+     */
+    public static List<Integer> randPerm(int len) {
+        List<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < len; i++) {
+            indexes.add(i);
+        }
+        Collections.shuffle(indexes);
+
+        return indexes;
     }
 }

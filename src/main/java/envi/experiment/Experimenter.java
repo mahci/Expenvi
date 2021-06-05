@@ -21,7 +21,7 @@ public class Experimenter {
     private boolean toLog = false;
 
     private static Experimenter self = null; // for singleton
-    //==============================================================================
+    //------------------------------------------------------------------------------
 
     // Display
     int winW, winH, dispW, dispH;
@@ -72,14 +72,14 @@ public class Experimenter {
         Config.setFromFile();
 
         // Save radii and distances in px values
-        for(int rad: Config._targetRadiiMM) {
-            radList.add(Utils.mm2px(rad));
-        }
-        if (toLog) System.out.println(TAG + "Rad list: " + radList);
-        for(int dist: Config._distancesMM) {
-            distList.add(Utils.mm2px(dist));
-        }
-        if (toLog) System.out.println(TAG + "Dist list: " + distList);
+//        for(int rad: Config._targetRadiiMM) {
+//            radList.add(Utils.mm2px(rad));
+//        }
+//        if (toLog) System.out.println(TAG + "Rad list: " + radList);
+//        for(int dist: Config._distancesMM) {
+//            distList.add(Utils.mm2px(dist));
+//        }
+//        if (toLog) System.out.println(TAG + "Dist list: " + distList);
     }
 
     /**
@@ -105,15 +105,15 @@ public class Experimenter {
 
             // Even ind x R => B1 | Even ind x L => B2
             // Odd ind x R => B2 | Odd ind x L => B1
-            for(int ti = 0; ti < allRadDists.size(); ti++) {
-                if (ti % 2 == 0) { // Even
-                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 1));
-                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 0));
-                } else { // Odd
-                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 1));
-                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 0));
-                }
-            }
+//            for(int ti = 0; ti < allRadDists.size(); ti++) {
+//                if (ti % 2 == 0) { // Even
+//                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 1));
+//                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 0));
+//                } else { // Odd
+//                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 1));
+//                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 0));
+//                }
+//            }
 
             // Add the blocks to the list of blocks
             blocks.add(b1.shuffle());
@@ -135,8 +135,8 @@ public class Experimenter {
         // Set the display size
         winW = MainFrame.get().getBounds().width;
         winH = MainFrame.get().getBounds().height;
-        dispW = winW - (2 * Config._winWidthMargin);
-        dispH = winH - (2 * Config._winHeightMargin);
+//        dispW = winW - (2 * Config._winWidthMargin);
+//        dispH = winH - (2 * Config._winHeightMargin);
 
         // participant starts
         if (realExperiment) {
@@ -242,27 +242,27 @@ public class Experimenter {
     private void runFittsTrial(FittsTrial ftr) {
 
         // Create circles (translate the display area to appropriate location)
-        Circle stacle = new Circle(
-                Utils.dispToWin(ftr.getStaclePosition()),
-                Config._stacleRad);
-        Circle tarcle = new Circle(
-                Utils.dispToWin(ftr.getTarclePosition()),
-                ftr.getTarRad());
-        if(toLog) System.out.println(TAG + "Stacle: " + stacle);
-        if(toLog) System.out.println(TAG + "Tarcle: " + tarcle);
+//        Circle stacle = new Circle(
+//                Utils.dispToWin(ftr.getStaclePosition()),
+//                Config._stacleRad);
+//        Circle tarcle = new Circle(
+//                Utils.dispToWin(ftr.getTarclePosition()),
+//                ftr.getTarRad());
+//        if(toLog) System.out.println(TAG + "Stacle: " + stacle);
+//        if(toLog) System.out.println(TAG + "Tarcle: " + tarcle);
 
         //-- Create and send the panel to be drawn
-        ExperimentPanel expPanel = new ExperimentPanel();
-        expPanel.setCircles(stacle, tarcle);
+//        ExperimentPanel expPanel = new ExperimentPanel();
+//        expPanel.setCircles(stacle, tarcle);
 
         // Set texts
         String trlStat = "Trial: " + currTrialNum;
         int blockNum = currBlockInd + 1;
         String blkStat = "Block: " + blockNum + " / " + blocks.size();
-        expPanel.setStatTexts(blkStat, trlStat);
+//        expPanel.setStatTexts(blkStat, trlStat);
 
         // Send to be shown!
-        MainFrame.get().showPanel(expPanel);
+//        MainFrame.get().showPanel(expPanel);
     }
 
     /**
