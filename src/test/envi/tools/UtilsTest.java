@@ -32,6 +32,9 @@ public class UtilsTest {
 
     @org.junit.jupiter.api.Test
     void randInt() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println(Utils.randInt(0, 2));
+        }
     }
 
     @org.junit.jupiter.api.Test

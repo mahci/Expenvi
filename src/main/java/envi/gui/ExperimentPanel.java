@@ -45,7 +45,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(toLog) System.out.println(TAG + "SPACE Performed");
-            Experimenter.get().trialDone(true);
+            trialDone();
         }
     };
 
@@ -63,13 +63,18 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Constructor
      */
     public ExperimentPanel(Experiment exp) {
+
+        // Add mouse movement/click listeners
         addMouseListener(this);
         addMouseMotionListener(this);
+
+        // SPACE => next trrial
         getInputMap().put(
                 KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
                 "SPACE");
         getActionMap().put("SPACE", nextTrial);
 
+        // For publishing mouse actions
         mouseSubject = PublishSubject.create();
 
         // Subscribe to the actions Publisher from MooseServer

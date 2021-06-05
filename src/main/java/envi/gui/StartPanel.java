@@ -1,9 +1,7 @@
 package envi.gui;
 
 import envi.experiment.Experiment;
-import envi.experiment.Experimenter;
 import envi.experiment.Practice;
-import envi.experiment.ShowCaser;
 import envi.tools.Config;
 
 import javax.swing.*;
@@ -28,7 +26,8 @@ public class StartPanel extends JPanel {
     private final Action startShowCase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            ShowCaser.get().startShowCase();
+//            ShowCaser.get().startShowCase();
+            MainFrame.get().showPanel(new ShowcasePanel());
         }
     };
 
@@ -78,7 +77,7 @@ public class StartPanel extends JPanel {
                 startButton.getInputMap().put(
                         KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
                         "SPACE");
-                startButton.getActionMap().put("SPACE", startExperiment);
+                startButton.getActionMap().put("SPACE", startShowCase);
             }
             case WARM_UP -> {
                 labelText = warmUpHint;

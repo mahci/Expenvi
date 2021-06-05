@@ -1,7 +1,6 @@
 package envi.tools;
 
 import envi.connection.MooseServer;
-import envi.gui.MainFrame;
 
 import java.awt.*;
 import java.io.File;
@@ -33,10 +32,9 @@ public class Config {
     // Experiment ==================================================================
     public static int _stacleRadMM = 8; // Stacle radius (mm)
     public static int _stacleRad; // Stacle radius (px) Set programmatically
-    // Target radii (mm)
-    public static List<Integer> _targetRadiiMM = new ArrayList<Integer>();
-    // Distances (mm)
-    public static List<Integer> _distancesMM = new ArrayList<Integer>();
+
+    public static List<Integer> _widthsMM = new ArrayList<Integer>(); // Target radii (mm)
+    public static List<Integer> _distancesMM = new ArrayList<Integer>(); // Distances (mm)
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
     // The gesture for clicks
@@ -84,13 +82,13 @@ public class Config {
             _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
             // Target radii
-            _targetRadiiMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
+            _widthsMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
                     .split(","))
                     .map(String::trim)
                     .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 
             // Target distances
-            if (toLog) System.out.println(TAG + "Target Rs = " + _targetRadiiMM);
+            if (toLog) System.out.println(TAG + "Target Rs = " + _widthsMM);
 
             _distancesMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
                     .split(","))
@@ -120,7 +118,7 @@ public class Config {
             System.out.println(TAG + "_dispHRatioToMaxRad = " + _dispHRatioToMaxRad);
             System.out.println(TAG + "_stacleRadMM = " + _stacleRadMM);
             System.out.println(TAG + "_nBlocksInExperiment = " + _nBlocksInExperiment);
-            System.out.println(TAG + "_targetRadiiMM = " + _targetRadiiMM);
+            System.out.println(TAG + "_targetRadiiMM = " + _widthsMM);
             System.out.println(TAG + "_distancesMM = " + _distancesMM);
             System.out.println(TAG + "_TECHNIQUE = " + _technique);
             System.out.println(TAG + "_vibrate = " + _vibrate);

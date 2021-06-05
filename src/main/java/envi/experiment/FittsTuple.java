@@ -1,5 +1,10 @@
 package envi.experiment;
 
+import envi.tools.Config;
+import envi.tools.Utils;
+
+import java.util.Collections;
+
 /**
  * FittsTuple class to hold one combination of values
  */
@@ -26,6 +31,23 @@ public class FittsTuple {
         this.width = w;
         this.dist = d;
         this.leftRight = lr;
+    }
+
+    /**
+     * Generate a random FittsTuple
+     * @return FittsTuple
+     */
+    public static FittsTuple randFittsTuple() {
+        FittsTuple result = new FittsTuple();
+        result.width = Utils.randInt(
+                Collections.min(Config._widthsMM),
+                Collections.max(Config._widthsMM) + 1);
+        result.dist = Utils.randInt(
+                Collections.min(Config._distancesMM),
+                Collections.max(Config._distancesMM) + 1);
+        result.leftRight = Utils.randInt(0, 2);
+
+        return result;
     }
 
     @Override
