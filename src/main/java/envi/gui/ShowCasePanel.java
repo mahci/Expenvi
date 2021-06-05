@@ -61,8 +61,8 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
         winW = MainFrame.get().getWidth();
         winH = MainFrame.get().getHeight();
 
-        dispW = winW - (2 * Config._winWidthMargin);
-        dispH = winH - (2 * Config._winHeightMargin);
+        dispW = MainFrame.get().getDispArea().first;
+        dispH = MainFrame.get().getDispArea().second;
 
         // Set listeners and binding
         addMouseListener(this);
@@ -133,24 +133,24 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
 
         //-- Draw circles
         // Start circle
-        graphics2D.setColor(stacle.getColor());
-        graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
-        graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
-
-        graphics2D.setColor(Config._stacleTextColor);
-        graphics2D.setFont(Pref.STAT_FONT);
-        graphics2D.drawString("S", stacle.cx - 3, stacle.cy + 5);
-
-        //  Target circle
-        graphics2D.setColor(tarcle.getColor());
-        graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
-        graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
-
-        //-- Draw stat text
-        graphics2D.setColor(Config._normalTextColor);
-//        graphics2D.setFont(Config.EXP_INFO_FONT);
-        graphics2D.drawString(String.valueOf(trialNum),
-                winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
+//        graphics2D.setColor(stacle.getColor());
+//        graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
+//        graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
+//
+//        graphics2D.setColor(Config._stacleTextColor);
+//        graphics2D.setFont(Pref.STAT_FONT);
+//        graphics2D.drawString("S", stacle.cx - 3, stacle.cy + 5);
+//
+//        //  Target circle
+//        graphics2D.setColor(tarcle.getColor());
+//        graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
+//        graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
+//
+//        //-- Draw stat text
+//        graphics2D.setColor(Config._normalTextColor);
+////        graphics2D.setFont(Config.EXP_INFO_FONT);
+//        graphics2D.drawString(String.valueOf(trialNum),
+//                winW - Utils.mm2px(Config.TEXT_X), Utils.mm2px(Config.TEXT_Y));
 
         requestFocus();
     }
@@ -165,12 +165,12 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
         // Position of the curser
         Point crsPos = getCursorPosition();
 
-        if (!stacleClicked) { // Pressing the start
-            if (stacle.isInside(crsPos.x, crsPos.y)) {
-                pressedInsideStacle = true;
-                stacle.setColor(Config._stacleClickedColor);
-            }
-        }
+//        if (!stacleClicked) { // Pressing the start
+//            if (stacle.isInside(crsPos.x, crsPos.y)) {
+//                pressedInsideStacle = true;
+//                stacle.setColor(Config._stacleClickedColor);
+//            }
+//        }
 
         repaint();
     }
@@ -184,7 +184,7 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
 
         if (stacleClicked) { // Target Second release
             stacleClicked = false;
-            stacle.setColor(Config._stacleDefColor);
+//            stacle.setColor(Config._stacleDefColor);
 
             // Next trial
             trialNum++;
@@ -193,7 +193,7 @@ public class ShowCasePanel extends JPanel implements MouseInputListener {
             if (pressedInsideStacle && stacle.isInside(crsPos.x, crsPos.y)) {
                 stacleClicked = true;
             } else { // NOT INSIDE!
-                stacle.setColor(Config._stacleDefColor);
+//                stacle.setColor(Config._stacleDefColor);
             }
         }
 

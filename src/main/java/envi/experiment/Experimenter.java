@@ -72,14 +72,14 @@ public class Experimenter {
         Config.setFromFile();
 
         // Save radii and distances in px values
-        for(int rad: Config._targetRadiiMM) {
-            radList.add(Utils.mm2px(rad));
-        }
-        if (toLog) System.out.println(TAG + "Rad list: " + radList);
-        for(int dist: Config._distancesMM) {
-            distList.add(Utils.mm2px(dist));
-        }
-        if (toLog) System.out.println(TAG + "Dist list: " + distList);
+//        for(int rad: Config._targetRadiiMM) {
+//            radList.add(Utils.mm2px(rad));
+//        }
+//        if (toLog) System.out.println(TAG + "Rad list: " + radList);
+//        for(int dist: Config._distancesMM) {
+//            distList.add(Utils.mm2px(dist));
+//        }
+//        if (toLog) System.out.println(TAG + "Dist list: " + distList);
     }
 
     /**
@@ -135,8 +135,8 @@ public class Experimenter {
         // Set the display size
         winW = MainFrame.get().getBounds().width;
         winH = MainFrame.get().getBounds().height;
-        dispW = winW - (2 * Config._winWidthMargin);
-        dispH = winH - (2 * Config._winHeightMargin);
+//        dispW = winW - (2 * Config._winWidthMargin);
+//        dispH = winH - (2 * Config._winHeightMargin);
 
         // participant starts
         if (realExperiment) {

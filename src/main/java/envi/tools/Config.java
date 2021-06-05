@@ -21,18 +21,6 @@ public class Config {
     // Config file path
     public static final String CONFIG_FILE_PATH = "config.txt";
 
-    // Colors
-    public static Color _normalTextColor        = Color.BLACK;
-    public static Color _errorTextColor         = Color.RED;
-    public static Color _titleTextColor         = Color.DARK_GRAY;
-
-    public static Color _stacleDefColor         = Color.decode("#3dcf38");
-    public static Color _stacleClickedColor     = Color.decode("#3d6e3b");
-    public static Color _stacleTextColor        = Color.black;
-
-    public static Color _tarcleDefColor         = Color.decode("#e05c2f");
-
-
     // Display
     public static final int BENQ_DPI = 90;
     public static final int MacCinDisp_DPI = 109;
@@ -41,19 +29,6 @@ public class Config {
     public static int _nScr = 1; // Set programmatically
     public static int _scrId = 1; // Used in Main
     public static Rectangle _scrDims; // Screen dimenstions (px)
-
-    public static int WIN_W_MARGIN = 70; // Width margin (mm)
-    public static int WIN_H_MARGIN = 30; // Width margin (mm)
-    public static int _winWidthMargin = Utils.mm2px(WIN_W_MARGIN);   // Left/right margin (px)
-    public static int _winHeightMargin = Utils.mm2px(WIN_H_MARGIN);   // Top bottom margin (px)
-
-    public static int _dispAreaH, _dispAreaW; // px
-
-    // Text -----------------------------------------------
-    public static int TEXT_X = 55; // (mm) From the right edge
-    public static int TEXT_Y = 10; // (mm) From the top
-    public static int ERROR_Y = 50; // (X is calculated dynamically from middle of the screen)
-
 
     // Experiment ==================================================================
     public static int _stacleRadMM = 8; // Stacle radius (mm)
@@ -74,7 +49,6 @@ public class Config {
     public static boolean _vibrate = false; // Vibrate?
 
     // --- Show Case
-//    public static int _practiceTime = 10; // Practice time (min)
     public static int _minTarRadMM = 5; // Minimum traget radius (mm)
     public static int _dispHRatioToMaxRad = 6; // Maximum target radius = dispH / this (for random)
     public static enum PROCESS_STATE {
@@ -82,10 +56,6 @@ public class Config {
         WARM_UP,
         EXPERIMENT
     }
-
-    // --- ERRORS and TEXTs
-
-
 
     // ===============================================================================
     //region [Methods]
@@ -97,24 +67,6 @@ public class Config {
         try {
             Scanner fileScan = new Scanner(new File(CONFIG_FILE_PATH));
 
-            //===== Read display values
-
-            //===== Read network values
-//            fileScan.nextLine(); // skip title
-//
-//            _netPort = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-
-            //===== Read color values
-//            fileScan.nextLine(); // skip title
-//
-//            _normalTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            _errorTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            _titleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            _stacleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            _stacleClickedColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            _stacleTextColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            _tarcleDefColor = Color.decode(Utils.lastPart(fileScan.nextLine()));
-//            if (toLog) System.out.println(TAG + "Colors set!");
             //===== Read show case values
             fileScan.nextLine(); // skip title
 
@@ -174,25 +126,19 @@ public class Config {
             System.out.println(TAG + "_vibrate = " + _vibrate);
             System.out.println(TAG + "_scrId = " + _scrId);
             System.out.println(TAG + "_dpi = " + _dpi);
-            System.out.println(TAG + "_winWMargin = " + _winWidthMargin);
-            System.out.println(TAG + "_winHMargin = " + _winHeightMargin);
             System.out.println(TAG + "_netPort = " + _netPort);
         }
 
     }
 
-    public static void updateDisplayValues() {
-        _dispAreaW = MainFrame.get().getWidth() - 2 * _winWidthMargin;
-        _dispAreaH = MainFrame.get().getHeight() - 2 * _winHeightMargin;
-        if (toLog) System.out.println(TAG + "winW = " + Utils.px2mm(MainFrame.get().getWidth()));
-        if (toLog) System.out.println(TAG + "_dispAreaW = " + _dispAreaW);
-        if (toLog) System.out.println(TAG + "_dispAreaH = " + _dispAreaH);
-        int maxRadMM = Utils.px2mm(_dispAreaH / 4);
+//    public static void updateDisplayValues() {
 
-        _stacleRad = Utils.mm2px(_stacleRadMM);
+//        int maxRadMM = Utils.px2mm(_dispAreaH / 4);
 
-        int maxDist = Utils.px2mm(_dispAreaW) - Collections.max(_targetRadiiMM) - _stacleRadMM;
-    }
+//        _stacleRad = Utils.mm2px(_stacleRadMM);
+
+//        int maxDist = Utils.px2mm(_dispAreaW) - Collections.max(_targetRadiiMM) - _stacleRadMM;
+//    }
 
     //endregion
 }

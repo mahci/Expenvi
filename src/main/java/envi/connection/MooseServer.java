@@ -19,7 +19,7 @@ import java.util.Objects;
 public class MooseServer {
 
     private String TAG = "[[MooseServer]] ";
-    private boolean toLog = true;
+    private boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     private static MooseServer self; // for singleton

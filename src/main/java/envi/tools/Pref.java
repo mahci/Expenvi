@@ -23,7 +23,7 @@ public class Pref {
     public static int STAT_MARG_X_mm        = 15; // Margin from the right edge of the screen (mm)
     public static int STAT_MARG_Y_mm        = 8; // Margin from the top edge of the screen (mm)
 
-    public static int STAT_TEXT_X_PAD_mm    = 5; // Stats X padding (mm)
+    public static int STAT_TEXT_X_PAD_mm    = 3; // Stats X padding (mm)
     public static int STAT_TEXT_Y_PAD_mm    = 6; // Stats Y padding (mm)
 
     public static int S_TEXT_X_OFFSET_mm    = 1; // S X offset from circle center (mm)

@@ -1,6 +1,9 @@
 package envi.gui;
 
 import envi.tools.Config;
+import envi.tools.Pair;
+import envi.tools.Pref;
+import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,6 +30,56 @@ public class MainFrame extends JFrame {
     public static MainFrame get() {
         if (self == null) self = new MainFrame();
         return self;
+    }
+
+    /**
+     * Return the display area (removing the margins)
+     * @return Display area
+     */
+    public Pair<Integer, Integer> getDispArea() {
+        return new Pair<>(
+                getWidthMM() - 2 * Pref.WIN_MARG_W_mm,
+                getHeightMM() - 2 * Pref.WIN_MARG_H_mm);
+    }
+
+    public int getWidthMM() {
+        return px2mm(getWidth());
+    }
+
+    public int getHeightMM() {
+        return px2mm(getHeight());
+    }
+
+    /**
+     * Display area coordinates --> Windows coordinates
+     * @param inPoint Point in display area
+     * @return Window's coordinates
+     */
+    public Point dispToWin(Point inPoint) {
+        inPoint.translate(Pref.WIN_MARG_W_mm, Pref.WIN_MARG_H_mm);
+        return pointMM2Px(inPoint);
+    }
+
+    /**
+     * Convert mm to pixels
+     * @param mm Millimeters
+     * @return Pixels
+     */
+    public int mm2px(int mm) {
+        return (int)((mm / Utils.MM_IN_INCH) * Config._dpi);
+    }
+
+    /**
+     * Convert pixels to mm
+     * @param px Pixels
+     * @return Millimeters
+     */
+    public static int px2mm(int px) {
+        return (int)((px / Config._dpi) * Utils.MM_IN_INCH);
+    }
+
+    public Point pointMM2Px(Point mmP) {
+        return new Point(mm2px(mmP.x), mm2px(mmP.y));
     }
 
     /***

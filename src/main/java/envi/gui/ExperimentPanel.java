@@ -49,16 +49,13 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         }
     };
 
-    // List of blocks to display
-//    private List<Block> blocks = new ArrayList<>();
+    // The experiment to show
     private Experiment experiment;
 
+    // Indexes
     private int blockNum;
     private int subBlockNum;
     private int trialNum;
-
-//    private FittsTrial trial;
-    private Block block;
 
     // ===============================================================================
 
@@ -103,56 +100,15 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         requestFocusInWindow();
     }
 
+    /**
+     * Initialize
+     */
     public void init() {
         blockNum = 1;
         subBlockNum = 1;
         trialNum = 1;
     }
 
-    /**
-     * Generate blosks in the experiment
-     * @param nBlocks Number of blocks to generate
-     * @param nSubBlocks Number of sub-blocks in each block
-     */
-//    public ExperimentPanel genBlocks(int nBlocks, int nSubBlocks) {
-//        for(int bi = 0; bi < nBlocks; bi++) {
-//            blocks.add(new Block().withSubBlocks(nSubBlocks));
-//        }
-//        if(toLog) System.out.println("Blocks generated");
-//        assignTrial();
-//        return this;
-//    }
-
-//    public void fetchTrial() {
-//
-//
-//        if (blockInd < blocks.size()) {
-//
-//            Block subBlock = blocks.get(blockInd).getSubBlock(subBlockInd);
-//            if (subBlock != null) {
-//
-//                trial = subBlock.getTrial(trialInd);
-//                if (trial != null) {
-//                    // Show the trial
-//                    setScene();
-//
-//                } else { // Trials finished
-//                    System.out.println("Next sub-block...");
-//                    subBlockInd++;
-//                    trialInd = 0;
-//                }
-//
-//            } else { // Sub-blocks finished
-//                System.out.println("Next block...");
-//                blockInd++;
-//                subBlockInd = 0;
-//                trialInd = 0;
-//            }
-//
-//        } else { // Blocks finished
-//            System.out.println("Blocks finished");
-//        }
-//    }
 
     /**
      * Main printing function
@@ -183,8 +139,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(Pref.COLOR_TEXT);
         graphics2D.setFont(Pref.S_FONT);
         graphics2D.drawString("S",
-                stacle.cx - Utils.mm2px(Pref.S_TEXT_X_OFFSET_mm),
-                stacle.cy + Utils.mm2px(Pref.S_TEXT_Y_OFFSET_mm));
+                stacle.cx - MainFrame.get().mm2px((Pref.S_TEXT_X_OFFSET_mm)),
+                stacle.cy + MainFrame.get().mm2px(Pref.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
         graphics2D.setColor(Pref.COLOR_TARGET_DEF);
@@ -196,18 +152,19 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(Pref.COLOR_TEXT);
         graphics2D.setFont(Pref.STAT_FONT);
 
-        int rect1W = Utils.mm2px(Pref.STAT_RECT_WIDTH_mm) * 3/4;
-        int rect2W = Utils.mm2px(Pref.STAT_RECT_WIDTH_mm);
-        int rectH = Utils.mm2px(Pref.STAT_RECT_HEIGHT_mm);
-        int rect2X = winW - (Utils.mm2px(Pref.STAT_MARG_X_mm) + Utils.mm2px(Pref.STAT_RECT_WIDTH_mm));
-        int rect1X = winW - (Utils.mm2px(Pref.STAT_MARG_X_mm) + rect1W + rect2W);
-        int rect1Y = Utils.mm2px(Pref.STAT_MARG_Y_mm);
+        int rect1W = MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm) * 3/4;
+        int rect2W = MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm);
+        int rectH = MainFrame.get().mm2px(Pref.STAT_RECT_HEIGHT_mm);
+        int rect2X = winW - (MainFrame.get().mm2px(Pref.STAT_MARG_X_mm) +
+                MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm));
+        int rect1X = winW - (MainFrame.get().mm2px(Pref.STAT_MARG_X_mm) + rect1W + rect2W);
+        int rect1Y = MainFrame.get().mm2px(Pref.STAT_MARG_Y_mm);
         graphics2D.drawRect(rect1X, rect1Y, rect1W, rectH);
         graphics2D.drawRect(rect2X, rect1Y, rect2W, rectH);
 
-        int text1X = rect1X + Utils.mm2px(Pref.STAT_TEXT_X_PAD_mm);
-        int text1Y = rect1Y + Utils.mm2px(Pref.STAT_TEXT_Y_PAD_mm);
-        int text2X = rect2X + Utils.mm2px(Pref.STAT_TEXT_X_PAD_mm);
+        int text1X = rect1X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
+        int text1Y = rect1Y + MainFrame.get().mm2px(Pref.STAT_TEXT_Y_PAD_mm);
+        int text2X = rect2X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
         graphics2D.setFont(Pref.STAT_FONT);
         graphics2D.drawString(trialStatText, text1X, text1Y);
         graphics2D.drawString(blockStatText, text2X, text1Y);
@@ -232,14 +189,17 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 .getSubBlock(subBlockNum)
                 .getTrial(trialNum);
         stacle = new Circle(
-                Utils.dispToWin(trial.getStaclePosition()),
-                Config._stacleRad
+                MainFrame.get().dispToWin(trial.getStaclePosition()),
+                MainFrame.get().mm2px(Config._stacleRadMM)
         );
         tarcle = new Circle(
-                Utils.dispToWin(trial.getTarclePosition()),
-                trial.getTarRad()
+                MainFrame.get().dispToWin(trial.getTarclePosition()),
+                MainFrame.get().mm2px(trial.getTarWidth())
         );
-
+        if(toLog) System.out.println(trial.getStaclePosition());
+        if(toLog) System.out.println(trial.getTarWidth());
+        if(toLog) System.out.println(stacle);
+        if(toLog) System.out.println(tarcle);
         // Texts
         blockStatText = "Block: " + blockNum + " | " + experiment.getTotalNSubBlocks();
         trialStatText = "Trial: " + trialNum;

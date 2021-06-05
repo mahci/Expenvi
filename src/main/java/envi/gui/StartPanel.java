@@ -35,7 +35,7 @@ public class StartPanel extends JPanel {
     private final Action startWarmUp = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Config.updateDisplayValues();
+//            Config.updateDisplayValues();
 
             MainFrame.get().showPanel(
                     new ExperimentPanel(
@@ -48,7 +48,7 @@ public class StartPanel extends JPanel {
     private final Action startExperiment = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Config.updateDisplayValues();
+//            Config.updateDisplayValues();
 
             MainFrame.get().showPanel(
                     new ExperimentPanel(
