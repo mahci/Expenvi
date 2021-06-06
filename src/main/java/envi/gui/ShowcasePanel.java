@@ -18,6 +18,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ShowcasePanel extends JPanel implements MouseInputListener {
 
@@ -32,6 +35,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     // Texts to draw
     private String blockStatText = "Showcase";
     private String trialStatText = "";
+    private String techText = "SWIPE";
 
     // Experiment vars
     private boolean startPressed = false;
@@ -39,6 +43,9 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
     // Keys
     private final String SPACE = "SPACE";
+    private final String N1 = "1";
+    private final String N2 = "2";
+    private final String N3 = "3";
 
     // Next phase action
     private Action nextPhase = new AbstractAction() {
@@ -48,6 +55,35 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
             setVisible(false);
         }
     };
+
+    // Set first, second, and third technique
+    private Action technique1 = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Config._technique = Config.TECHNIQUE.SWIPE_LCLICK;
+            techText = "[1] SWIPE";
+            repaint();
+        }
+    };
+    private Action technique2 = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Config._technique = Config.TECHNIQUE.TAP_LCLICK;
+            techText = "[2] TAP";
+            repaint();
+        }
+    };
+    private Action technique3 = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Config._technique = Config.TECHNIQUE.MOUSE_LCLICK;
+            techText = "[3] MOUSE";
+            repaint();
+        }
+    };
+    private List<Action> techActions =
+            Arrays.asList(technique1, technique2, technique3);
+    
 
     // ===============================================================================
 
@@ -59,14 +95,6 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         // Add mouse movement/click listeners
         addMouseListener(this);
         addMouseMotionListener(this);
-
-        // With SPACE go to the next phase
-        getInputMap().put(
-                KeyStroke.getKeyStroke(
-                        KeyEvent.VK_SPACE,
-                        0, true),
-                SPACE);
-        getActionMap().put(SPACE, nextPhase);
 
         // Subscribe to the actions Publisher from MooseServer
         MooseServer.get().actionSubject.subscribe(action -> {
@@ -89,11 +117,51 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
             }
         });
 
+        setActions();
         setScene();
 
         requestFocusInWindow();
 
 //        setFocusable(true);
+    }
+
+    private void setActions() {
+        // With SPACE go to the next phase
+        getInputMap().put(
+                KeyStroke.getKeyStroke(
+                        KeyEvent.VK_SPACE,
+                        0, true),
+                SPACE);
+        getActionMap().put(SPACE, nextPhase);
+
+        // Technique switching (based on the order in Config)
+        int orderNum = Config._participNum % 6;
+        getInputMap().put(
+                KeyStroke.getKeyStroke(
+                        KeyEvent.VK_1,
+                        0, true),
+                N1);
+        getActionMap().put(
+                N1,
+                techActions.get(Config._techOrderList.get(orderNum)[0]));
+
+        getInputMap().put(
+                KeyStroke.getKeyStroke(
+                        KeyEvent.VK_2,
+                        0, true),
+                N2);
+        getActionMap().put(
+                N2,
+                techActions.get(Config._techOrderList.get(orderNum)[1]));
+
+        getInputMap().put(
+                KeyStroke.getKeyStroke(
+                        KeyEvent.VK_3,
+                        0, true),
+                N3);
+        getActionMap().put(
+                N3,
+                techActions.get(Config._techOrderList.get(orderNum)[2]));
     }
 
     /**
@@ -132,9 +200,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(Pref.COLOR_TARGET_DEF);
         graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
-//        if(toLog) System.out.println(TAG + "tarcle: " + tarcle.tlX + " , " + tarcle.tlY);
 
-        //--- Draw stat rectangles and texts
+        //--- Draw stat rectangles and stat texts
         graphics2D.setColor(Pref.COLOR_TEXT);
         graphics2D.setFont(Pref.STAT_FONT);
 
@@ -151,9 +218,14 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         int text1X = rect1X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
         int text1Y = rect1Y + MainFrame.get().mm2px(Pref.STAT_TEXT_Y_PAD_mm);
         int text2X = rect2X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
-        graphics2D.setFont(Pref.STAT_FONT);
         graphics2D.drawString(trialStatText, text1X, text1Y);
         graphics2D.drawString(blockStatText, text2X, text1Y);
+
+        //--- Draw technique text
+        int techTextX = MainFrame.get().mm2px(Pref.STAT_MARG_X_mm);
+        int techTextY = MainFrame.get().mm2px(Pref.STAT_MARG_Y_mm)
+                + MainFrame.get().mm2px(Pref.STAT_TEXT_Y_PAD_mm);;
+        graphics2D.drawString(techText, techTextX, techTextY);
 
         requestFocus();
     }

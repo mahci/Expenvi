@@ -37,7 +37,8 @@ public class Config {
     public static List<Integer> _distancesMM = new ArrayList<Integer>(); // Distances (mm)
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
-    // The gesture for clicks
+
+    // The technique for clicks
     public enum TECHNIQUE {
         SWIPE_LCLICK,
         TAP_LCLICK,
@@ -46,7 +47,12 @@ public class Config {
     public static TECHNIQUE _technique = TECHNIQUE.MOUSE_LCLICK;
     public static boolean _vibrate = false; // Vibrate?
 
-    // --- Show Case
+    public static List<int[]> _techOrderList = new ArrayList<>();
+
+    // Participant number
+    public static int _participNum = 1;
+
+    // Showcase ====================================================================
     public static int _minTarRadMM = 5; // Minimum traget radius (mm)
     public static int _dispHRatioToMaxRad = 6; // Maximum target radius = dispH / this (for random)
     public static enum PROCESS_STATE {
@@ -57,6 +63,16 @@ public class Config {
 
     // ===============================================================================
     //region [Methods]
+
+    static {
+        // Setting the techniques orders
+        _techOrderList.add(new int[] {1, 2, 0});
+        _techOrderList.add(new int[] {0, 1, 2});
+        _techOrderList.add(new int[] {2, 0, 1});
+        _techOrderList.add(new int[] {1, 0, 2});
+        _techOrderList.add(new int[] {2, 1, 0});
+        _techOrderList.add(new int[] {0, 2, 1});
+    }
 
     /**
      * Read and set the config from file
