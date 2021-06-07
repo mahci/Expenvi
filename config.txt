@@ -6,5 +6,4 @@ Start Radius (mm) = 8
 Number of Blocks = 2
 Target Widths (mm) = 2,5,10,20
 Target Distances (mm) = 75,150,300
-Technique = SWIPE_LCLICK
 Vibrate = false

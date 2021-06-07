@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import envi.gui.*;
 import envi.tools.Pair;
 import envi.tools.Strs;
-import envi.tools.Utils;
 import envi.tools.Config;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -158,7 +157,7 @@ public class Experimenter {
 //        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
 
         // Publish the start of the experiment
-        if (Config._technique != Config.TECHNIQUE.MOUSE_LCLICK) {
+        if (Config._technique != Config.TECH.MOUSE) {
             LocalDateTime startTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
             expSubject.onNext(Strs.MSSG_BEG_EXP + "-" + Config._technique + "--" + startTime);
         }

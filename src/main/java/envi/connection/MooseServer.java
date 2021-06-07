@@ -100,7 +100,7 @@ public class MooseServer {
 
                     // If interactino is not the Mouse, send actions to the Moose
                     Experimenter.get().getExpSubject().subscribe(state -> {
-                        if (Config._technique != Config.TECHNIQUE.MOUSE_LCLICK) sendMssg(state);
+                        if (Config._technique != Config.TECH.MOUSE) sendMssg(state);
                     });
 
                 }

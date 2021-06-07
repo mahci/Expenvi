@@ -1,6 +1,5 @@
 package envi.tools;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -37,19 +36,19 @@ public class Utils {
 
     /**
      * Get the string of gestures
-     * @param TECHNIQUE Config.GESTURe
+     * @param TECH Config.GESTURe
      * @return String
      */
-    public static String interactionString(Config.TECHNIQUE TECHNIQUE) {
+    public static String interactionString(Config.TECH TECH) {
         String result = "";
-        switch (TECHNIQUE) {
-        case SWIPE_LCLICK:
+        switch (TECH) {
+        case SWIPE:
             result = "SWIPE_LCLICK";
             break;
-        case TAP_LCLICK:
+        case TAP:
             result = "TAP_LCLICK";
             break;
-        case MOUSE_LCLICK:
+        case MOUSE:
             result = "MOUSE_LCLICK";
             break;
         }

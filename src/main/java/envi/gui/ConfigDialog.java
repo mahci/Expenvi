@@ -72,8 +72,8 @@ public class ConfigDialog extends JDialog {
 //            Config._targetRadiiMM = new ArrayList<>(Utils.intValues(radiiField.getText(), ","));
 //            Config._distancesMM = new ArrayList<>(Utils.intValues(distField.getText(), ","));
 //
-//            if (swipeRBtn.isSelected()) Config._technique = Config.TECHNIQUE.SWIPE_LCLICK;
-//            if (tapRBtn.isSelected()) Config._technique = Config.TECHNIQUE.TAP_LCLICK;
+//            if (swipeRBtn.isSelected()) Config._technique = Config.TECH.SWIPE_LCLICK;
+//            if (tapRBtn.isSelected()) Config._technique = Config.TECH.TAP_LCLICK;
 //            Config._vibrate = vibChBox.isSelected();
 //
 //            Config._stacleRadMM = (int) stacleRadSpinner.getValue();

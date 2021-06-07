@@ -1,7 +1,5 @@
 package envi.tools;
 
-import envi.connection.MooseServer;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,15 +37,16 @@ public class Config {
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
 
     // The technique for clicks
-    public enum TECHNIQUE {
-        SWIPE_LCLICK,
-        TAP_LCLICK,
-        MOUSE_LCLICK
+    public enum TECH {
+        SWIPE,
+        TAP,
+        MOUSE
     }
-    public static TECHNIQUE _technique = TECHNIQUE.MOUSE_LCLICK;
+    public static TECH _technique = TECH.MOUSE;
     public static boolean _vibrate = false; // Vibrate?
 
-    public static List<int[]> _techOrderList = new ArrayList<>();
+    public static List<TECH[]> _techOrderList = new ArrayList<>();
+    public static TECH[] _techOrder;
 
     // Participant number
     public static int _participNum = 1;
@@ -55,7 +54,7 @@ public class Config {
     // Showcase ====================================================================
     public static int _minTarRadMM = 5; // Minimum traget radius (mm)
     public static int _dispHRatioToMaxRad = 6; // Maximum target radius = dispH / this (for random)
-    public static enum PROCESS_STATE {
+    public enum PROCESS_STATE {
         SHOW_CASE,
         WARM_UP,
         EXPERIMENT
@@ -66,12 +65,15 @@ public class Config {
 
     static {
         // Setting the techniques orders
-        _techOrderList.add(new int[] {1, 2, 0});
-        _techOrderList.add(new int[] {0, 1, 2});
-        _techOrderList.add(new int[] {2, 0, 1});
-        _techOrderList.add(new int[] {1, 0, 2});
-        _techOrderList.add(new int[] {2, 1, 0});
-        _techOrderList.add(new int[] {0, 2, 1});
+        _techOrderList.add(new TECH[] {TECH.TAP, TECH.MOUSE, TECH.SWIPE});
+        _techOrderList.add(new TECH[] {TECH.SWIPE, TECH.TAP, TECH.MOUSE});
+        _techOrderList.add(new TECH[] {TECH.MOUSE, TECH.SWIPE, TECH.TAP});
+        _techOrderList.add(new TECH[] {TECH.TAP, TECH.SWIPE, TECH.MOUSE});
+        _techOrderList.add(new TECH[] {TECH.MOUSE, TECH.TAP, TECH.SWIPE});
+        _techOrderList.add(new TECH[] {TECH.SWIPE, TECH.MOUSE, TECH.TAP});
+
+        // Get the order for the participant
+        _techOrder = _techOrderList.get(_participNum % 6);
     }
 
     /**
@@ -111,18 +113,7 @@ public class Config {
                     .map(String::trim)
                     .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
 
-
-            // Technique
-            try {
-                _technique = TECHNIQUE.valueOf(Utils.lastPart(fileScan.nextLine()));
-            } catch (IllegalArgumentException iaException) {
-                _technique = TECHNIQUE.TAP_LCLICK;
-            }
-
             _vibrate = Boolean.parseBoolean(Utils.lastPart(fileScan.nextLine()));
-
-            // Send the technique to the Moose
-            MooseServer.get().sendMssg(Strs.MSSG_TECHNIQUE + "-" + _technique);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
