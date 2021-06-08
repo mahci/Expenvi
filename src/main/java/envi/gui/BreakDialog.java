@@ -46,9 +46,9 @@ public class BreakDialog extends JDialog implements KeyListener {
         // Close on Ctrl + DEL
         if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_BACK_SLASH) {
             setVisible(false);
-            Experimenter.get().nextBlock();
+//            Experimenter.get().nextBlock();
             // Set the start of homing
-            Experimenter.get().setHomingStart(Utils.now());
+//            Experimenter.get().setHomingStart(Utils.now());
         }
     }
 

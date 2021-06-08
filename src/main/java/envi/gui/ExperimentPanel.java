@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 public class ExperimentPanel extends JPanel implements MouseInputListener {
 
@@ -68,11 +69,11 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         addMouseListener(this);
         addMouseMotionListener(this);
 
-        // SPACE => next trrial
-        getInputMap().put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                "SPACE");
-        getActionMap().put("SPACE", nextTrial);
+        // SPACE => next trrial [JFT]
+//        getInputMap().put(
+//                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+//                "SPACE");
+//        getActionMap().put("SPACE", nextTrial);
 
         // For publishing mouse actions
         mouseSubject = PublishSubject.create();
@@ -112,6 +113,11 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         blockNum = 1;
         subBlockNum = 1;
         trialNum = 1;
+
+        // Log the start of the block
+        Mologger.get().logBlockStart(
+                blockNum,
+                LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
 
@@ -178,7 +184,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if (!errText.isEmpty()) {
             int errTextX = winW / 2 - 200;
             graphics2D.setColor(Pref.COLOR_ERROR);
-            graphics2D.drawString(errText, errTextX, Pref.STAT_MARG_Y_mm);
+            graphics2D.drawString(
+                    errText,
+                    errTextX, text1Y);
         }
 
         requestFocus();
@@ -206,7 +214,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if(toLog) System.out.println(stacle);
         if(toLog) System.out.println(tarcle);
         // Texts
-        blockStatText = "Block: " + blockNum + " | " + experiment.getTotalNSubBlocks();
+        int dispBlockNum = (blockNum - 1) * experiment.getNSubInBlock() +
+                subBlockNum;
+        blockStatText = "Block: " + dispBlockNum + " | " + experiment.getTotalNSubBlocks();
         trialStatText = "Trial: " + trialNum;
     }
 
@@ -214,6 +224,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Start is clicked
      */
     private void trialStarted() {
+        if(toLog) System.out.println(TAG + "TrialStarted");
         startPressed = true; // Pressed
 
         repaint();
@@ -223,7 +234,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Click attempted on Target
      */
     private void trialDone() {
-
+        if(toLog) System.out.println(TAG + "TrialDone");
         startPressed = false; // Reset pressed
 
         // Next step
@@ -231,6 +242,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 .getBlock(blockNum)
                 .getSubBlock(subBlockNum)
                 .hasNext(trialNum)) {
+            Mologger.get().logTrialEnd();
             trialNum++;
         } else { // Trials in the sub-block finished
             if (experiment
@@ -242,11 +254,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             } else { // Sub-blocks finished
                 if (experiment.hasNext(blockNum)) { // Next block
                     breakDialog();
+                    Mologger.get().logBlockEnd(Utils.nowTime());
+
                     blockNum++;
                     subBlockNum = 1;
                     trialNum = 1;
                 } else {
-                    endDialog();
+                    // Experimenter takes control
+                    Experimenter.get().endPhase();
                 }
             }
         }
@@ -260,7 +275,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Clicked outside the start
      */
     private void repeatTrial() {
-        errText = Strs.ERR_NOT_INSIDE; // Show error
+        if(toLog) System.out.println(TAG + "TrialRepeat");
+//        errText = Strs.ERR_NOT_INSIDE; // Show error
+        Utils.playSound("err1.wav");
         startPressed = false; // Reset pressed
 
         repaint();
@@ -290,16 +307,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // Check where pressed...
         if (startPressed) { // Target pressing
             // Log the press
-//            if (Experimenter.get().realExperiment) Mologger.get().log(ve);
         } else { // Start pressing
             if (stacle.isInside(crsPos.x, crsPos.y)) {
                 pressedInsideStart = true;
 
                 // Log in gen
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
-
-                // change the color of the start circle
-
             }
 
             repaint();
@@ -325,14 +338,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
             Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
-
-            // Report the result to the Experimenter
-//            boolean result = tarcle.isInside(crsPos.x, crsPos.y);
-//            Experimenter.get().trialDone(result);
-
             trialDone();
         } else { // Released from the start
-
             if (pressedInsideStart && stacle.isInside(crsPos.x, crsPos.y)) {
                 // Valid release => log in gen and spec
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
@@ -363,7 +370,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     }
 
     // -------------------------------------------------------------------------------
-    //region [Overrides]
+    //region [Mouse actions]
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -371,12 +378,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        vPressPrimary(); // Temp
+        if (Experimenter.get().getTechnique()
+                .equals(Config.TECH.MOUSE)) vPressPrimary();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        vReleasePrimary(); // Temp
+        if (Experimenter.get().getTechnique()
+                .equals(Config.TECH.MOUSE)) vReleasePrimary();
     }
 
     @Override
@@ -401,7 +410,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         // If homing on the mouse, log the homing time
         if (Experimenter.get().getHomingStart() > 0) {
-            long homingTime = Utils.now() - Experimenter.get().getHomingStart();
+            long homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
             Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
             Experimenter.get().setHomingStart(0); // Reset the time
         }
@@ -420,24 +429,5 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      */
     public void breakDialog() {
         MainFrame.get().showDialog(new BreakDialog());
-    }
-
-    /**
-     * Show the end dialog
-     */
-    private void endDialog() {
-        int input = JOptionPane.showOptionDialog(
-                MainFrame.get(),
-                Strs.DLG_END_TEXT,
-                Strs.DLG_END_TITLE,
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                null,
-                null);
-        if(input == JOptionPane.OK_OPTION)
-        {
-            System.exit(0);
-        }
     }
 }

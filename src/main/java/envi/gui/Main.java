@@ -3,6 +3,7 @@ package envi.gui;
 import javax.swing.*;
 import java.awt.*;
 
+import envi.experiment.Experimenter;
 import envi.tools.Config;
 import envi.connection.*;
 import envi.tools.Utils;
@@ -23,8 +24,8 @@ public class Main {
         // Save the screens info (id is set in Config)
         saveScreenInfo();
 
-        // Show StartPanel
-        MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.SHOW_CASE));
+        // Start the experiment process
+        Experimenter.get().start(Experimenter.PHASE.SHOWCASE);
 
         // Start the server
         MooseServer.get().start();

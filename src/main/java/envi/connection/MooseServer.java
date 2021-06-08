@@ -99,8 +99,8 @@ public class MooseServer {
                     listenerObservable().subscribe();
 
                     // If interactino is not the Mouse, send actions to the Moose
-                    Experimenter.get().getExpSubject().subscribe(state -> {
-                        if (Config._technique != Config.TECH.MOUSE) sendMssg(state);
+                    Experimenter.get().getExpSubject().subscribe(state -> { // TODO
+//                        if (Config._technique != Config.TECH.MOUSE) sendMssg(state);
                     });
 
                 }
@@ -157,6 +157,22 @@ public class MooseServer {
         } else {
             System.out.println(TAG + "Output PrintWriter not available!");
         }
+    }
+
+    /**
+     * Standar way to send a message with params
+     * @param type Type of the message
+     * @param param Params
+     */
+    public void sendMssg(String type, String param) {
+        sendMssg(type + "-" + param);
+    }
+
+    /**
+     * Update the Moose on the new technique (in Config)
+     */
+    public void updateTechnique(Config.TECH tech) {
+        sendMssg(Strs.MSSG_TECHNIQUE, tech.toString());
     }
 
 }

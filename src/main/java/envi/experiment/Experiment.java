@@ -10,6 +10,9 @@ public class Experiment {
     // List of blocks
     protected List<Block> blocks = new ArrayList<>();
 
+    // Number of sub-blocks in a block
+    protected int nSubInBlock;
+
     // ===============================================================================
 
     /**
@@ -25,6 +28,9 @@ public class Experiment {
      * @param nSubInBlock Number of sub-blocks in each block
      */
     public Experiment(int nBlocks, int nSubInBlock) {
+
+        // Set vars
+        this.nSubInBlock = nSubInBlock;
 
         // Create combinations
         List<FittsTuple> combinations = getCombinations();
@@ -58,6 +64,14 @@ public class Experiment {
      */
     public int getNBlocks() {
         return blocks.size();
+    }
+
+    /**
+     * Get the number of sub-blocks in a block
+     * @return Number of sub-blocks
+     */
+    public int getNSubInBlock() {
+        return nSubInBlock;
     }
 
     /**

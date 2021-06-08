@@ -1,7 +1,10 @@
 package envi.experiment;
 
 import envi.action.VouseEvent;
+import envi.connection.MooseServer;
 import envi.tools.Config;
+import envi.tools.Strs;
+import envi.tools.Utils;
 
 import java.awt.event.MouseEvent;
 import java.io.*;
@@ -50,7 +53,7 @@ public class Mologger {
     private PrintWriter allBlockLogFile;
 
     // Log level
-    public static enum LOG_LEVEL {
+    public enum LOG_LEVEL {
         SPEC,
         GEN,
         ALL
@@ -64,9 +67,8 @@ public class Mologger {
     private Mologger() {
         // Create the top logging directory
         Path parentPath = Paths.get("").toAbsolutePath().getParent();
-        topLogDirPath = parentPath.toAbsolutePath().toString() + "/Expenvi-Logs/";
+        topLogDirPath = parentPath.toAbsolutePath() + "/Expenvi-Logs/";
         createDir(topLogDirPath);
-
     }
 
 
@@ -79,6 +81,14 @@ public class Mologger {
             self = new Mologger();
         }
         return self;
+    }
+
+    /**
+     * Enable/disbale the logging
+     * @param onOff Boolean
+     */
+    public void setEnabled(boolean onOff) {
+        enabled = onOff;
     }
 
     /**
@@ -96,7 +106,7 @@ public class Mologger {
         createDir(ptcDirPath);
 
         // Create a directory for the experiment
-        String expDirPath = ptcDirPath + "/" + Config._technique + "--" + dateTime;
+        String expDirPath = ptcDirPath + "/" + Experimenter.get().getTechnique() + "--" + dateTime;
         createDir(expDirPath);
 
         // Create dirs for three levels
@@ -107,6 +117,11 @@ public class Mologger {
         createDir(specLogDirPath);
         createDir(genLogDirPath);
         createDir(allLogDirPath);
+
+        // Send start-of-experiment message to the Moose
+        MooseServer.get().sendMssg(
+                Strs.MSSG_BEG_EXP,
+                Experimenter.get().getTechnique() + "--" + dateTime);
 
         return 0;
     }
@@ -137,9 +152,15 @@ public class Mologger {
                     allLogDirPath + BLK_FILE_PFX + blockNum + ".txt", true));
             allBlockLogFile.println("Start: " + time);
             allBlockLogFile.println(blkSep);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Sync logging with the Moose
+        MooseServer.get().sendMssg(
+                Strs.MSSG_BEG_BLK,
+                String.valueOf(blockNum));
 
         return 0;
 
@@ -155,6 +176,10 @@ public class Mologger {
         if (specBlockLogFile != null) specBlockLogFile.println(trlSep);
         if (genBlockLogFile != null) genBlockLogFile.println(trlSep);
         if (allBlockLogFile != null) allBlockLogFile.println(trlSep);
+
+        // Sync logging with the Moose
+        MooseServer.get().sendMssg(Strs.MSSG_END_TRL);
+
         return 0;
     }
 
@@ -181,6 +206,10 @@ public class Mologger {
             allBlockLogFile.println("End: " + time);
             allBlockLogFile.close();
         }
+
+        // Sync logging with the Moose
+        MooseServer.get().sendMssg(Strs.MSSG_END_BLK);
+
         return 0;
     }
 

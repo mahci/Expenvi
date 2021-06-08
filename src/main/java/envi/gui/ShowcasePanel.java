@@ -2,6 +2,7 @@ package envi.gui;
 
 import envi.action.Actions;
 import envi.connection.MooseServer;
+import envi.experiment.Experimenter;
 import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
 import envi.tools.Config;
@@ -47,7 +48,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private Action nextPhase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.WARM_UP));
+            Experimenter.get().end(Experimenter.PHASE.SHOWCASE);
             setVisible(false);
         }
     };
@@ -56,7 +57,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private Action tech1Action = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Config._technique = Config._techOrder[0];
+            Experimenter.get().setTechInd(0);
+            MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
             techNum = 0;
             repaint();
         }
@@ -64,7 +66,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private Action tech2Action = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Config._technique = Config._techOrder[1];
+            Experimenter.get().setTechInd(1);
+            MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
             techNum = 1;
             repaint();
         }
@@ -72,7 +75,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private Action tech3Action = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Config._technique = Config._techOrder[2];
+            Experimenter.get().setTechInd(2);
+            MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
             techNum = 2;
             repaint();
         }
@@ -104,7 +108,6 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
                 vReleasePrimary();
                 break;
             case Actions.ACT_PRESS_SEC:
-                break;
             case Actions.ACT_RELEASE_SEC:
                 break;
             }
@@ -150,9 +153,9 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         getActionMap().put(N3, tech3Action);
 
         // Set the text
-        techStrs[0] = "[1] " + Config._techOrder[0].toString();
-        techStrs[1] = "[2] " + Config._techOrder[1].toString();
-        techStrs[2] = "[3] " + Config._techOrder[2].toString();
+        techStrs[0] = "[1] " + Experimenter.get().getTech(0);
+        techStrs[1] = "[2] " + Experimenter.get().getTech(1);
+        techStrs[2] = "[3] " + Experimenter.get().getTech(2);
 
     }
 
@@ -327,12 +330,14 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        vPressPrimary(); // Temp
+        if (Experimenter.get().getTechnique()
+                .equals(Config.TECH.MOUSE)) vPressPrimary();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        vReleasePrimary(); // Temp
+        if (Experimenter.get().getTechnique()
+                .equals(Config.TECH.MOUSE)) vReleasePrimary();
         requestFocus();
     }
 

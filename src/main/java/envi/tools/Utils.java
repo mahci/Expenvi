@@ -1,5 +1,15 @@
 package envi.tools;
 
+import javax.sound.sampled.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -8,11 +18,7 @@ public class Utils {
 
     public static final double MM_IN_INCH = 25.4;
 
-    // ===============================================================================
-
-
-
-
+    // ==============================================================================
 
     /**
      * Get the int values from a String with a delimiter
@@ -75,7 +81,7 @@ public class Utils {
      * Get the time in millis
      * @return Long timestamp
      */
-    public static long now() {
+    public static long nowInMillis() {
         return Calendar.getInstance().getTimeInMillis();
     }
 
@@ -102,5 +108,43 @@ public class Utils {
         Collections.shuffle(indexes);
 
         return indexes;
+    }
+
+    /**
+     * Get the current time up to the seconds
+     * @return LocalTime
+     */
+    public static LocalTime nowTime() {
+        return LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    /**
+     * Get the current date+time up to minutes
+     * @return LocalDateTime
+     */
+    public static LocalDateTime nowDateTime() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    }
+
+    /**
+     * Play a sound
+     * @param resFileName File name in /resources folder
+     */
+    public static void playSound(String resFileName) {
+        try {
+            ClassLoader classLoader = Utils.class.getClassLoader();
+            File soundFile = new File(classLoader.getResource(resFileName).getFile());
+            URI uri = soundFile.toURI();
+            URL url = uri.toURL();
+            AudioClip clip = Applet.newAudioClip(url);
+            AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+            clip.play();
+        } catch ( UnsupportedAudioFileException
+                | NullPointerException
+                | IOException e
+                ) {
+            e.printStackTrace();
+        }
+
     }
 }

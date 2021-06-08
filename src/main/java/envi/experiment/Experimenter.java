@@ -1,6 +1,7 @@
 package envi.experiment;
 
 import com.google.common.collect.ImmutableList;
+import envi.connection.MooseServer;
 import envi.gui.*;
 import envi.tools.Pair;
 import envi.tools.Strs;
@@ -31,9 +32,6 @@ public class Experimenter {
     private final List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
     private final List<List<Integer>> expVarList = new ArrayList<>();
 
-    // Experiment
-    private final int participID = 1; // Participant's ID TODO: Convert to String?
-
     // Blocks
     private final List<Block> blocks = new ArrayList<>();
     private int currBlockInd = 0;
@@ -49,6 +47,21 @@ public class Experimenter {
 
     // Timers
     private long homingStart = 0;
+
+    //------------------------------------------------------------------------------
+    private final int participant = 6; // Participant's number
+
+    private List<Config.TECH[]> techOrderList = new ArrayList<>();
+    private Config.TECH[] techOrder;
+
+    public enum PHASE {
+        SHOWCASE,
+        PRACTICE,
+        EXPERIMENT
+    }
+    private PHASE phase;
+
+    private int techInd = 0;
 
     //==============================================================================
 
@@ -70,6 +83,9 @@ public class Experimenter {
         // set the config from file
         Config.setFromFile();
 
+        // Generate the order of the techniques
+        genTechOrder();
+
         // Save radii and distances in px values
 //        for(int rad: Config._targetRadiiMM) {
 //            radList.add(Utils.mm2px(rad));
@@ -79,6 +95,138 @@ public class Experimenter {
 //            distList.add(Utils.mm2px(dist));
 //        }
 //        if (toLog) System.out.println(TAG + "Dist list: " + distList);
+    }
+
+    public void genTechOrder() {
+        // Setting the techniques orders
+        techOrderList.add(new Config.TECH[] {Config.TECH.TAP, Config.TECH.MOUSE, Config.TECH.SWIPE});
+        techOrderList.add(new Config.TECH[] {Config.TECH.SWIPE, Config.TECH.TAP, Config.TECH.MOUSE});
+        techOrderList.add(new Config.TECH[] {Config.TECH.MOUSE, Config.TECH.SWIPE, Config.TECH.TAP});
+        techOrderList.add(new Config.TECH[] {Config.TECH.TAP, Config.TECH.SWIPE, Config.TECH.MOUSE});
+        techOrderList.add(new Config.TECH[] {Config.TECH.MOUSE, Config.TECH.TAP, Config.TECH.SWIPE});
+        techOrderList.add(new Config.TECH[] {Config.TECH.SWIPE, Config.TECH.MOUSE, Config.TECH.TAP});
+
+        // Get the order for the participant
+        techOrder = techOrderList.get(participant % 6);
+    }
+
+    /**
+     * Get the current order of techniques
+     * @return String
+     */
+    public String getTechOrderStr() {
+        return "[1] " + techOrder[0] + "\t" +
+                "[2] " + techOrder[1] + "\t" +
+                "[3] " + techOrder[2];
+    }
+
+    /**
+     * Get the technique from an index
+     * @param ind Index
+     * @return Technique
+     */
+    public String getTech(int ind) {
+        if (ind < 3) return techOrder[ind].toString();
+        else return "";
+    }
+
+    /**
+     * Start a phase
+     * @param phase PHASE
+     */
+    public void start(PHASE phase) {
+        this.phase = phase;
+        MooseServer.get().updateTechnique(techOrder[techInd]);
+
+        switch (phase) {
+        case SHOWCASE -> {
+            // Disable logging
+            Mologger.get().setEnabled(false);
+            // Show the start panel
+            MainFrame.get().showPanel(
+                    new StartPanel(PHASE.SHOWCASE, techOrder[techInd]));
+        }
+        case PRACTICE -> {
+            // Disable logging
+            Mologger.get().setEnabled(false);
+            // Show the start panel
+            MainFrame.get().showPanel(
+                    new StartPanel(PHASE.PRACTICE, techOrder[techInd]));
+        }
+        case EXPERIMENT -> {
+            // Enable logging
+            Mologger.get().setEnabled(true);
+            // Show the start panel
+            MainFrame.get().showPanel(
+                    new StartPanel(PHASE.EXPERIMENT, techOrder[techInd]));
+        }
+        }
+
+    }
+
+    /**
+     * End of a phase
+     * @param phase PHASE
+     */
+    public void end(PHASE phase) {
+        switch (phase) {
+        case SHOWCASE -> {
+            // Start from the first technique for this participant
+            techInd = 0;
+            start(PHASE.PRACTICE);
+        }
+        case PRACTICE -> {
+            start(PHASE.EXPERIMENT);
+        }
+        case EXPERIMENT -> {
+            if (techInd < 2) { // Still techniques left to experiment
+                techInd++;
+                start(PHASE.PRACTICE); // Start with the next technique
+            } else { // All the techniques are tested
+                // Tell teh Moose about the end of the experiment
+                MooseServer.get().sendMssg(Strs.MSSG_END_EXP);
+                // Show the end dialog
+                endDialog();
+            }
+        }
+        }
+    }
+
+    /**
+     * The current phase is ended
+     */
+    public void endPhase() {
+        end(phase);
+    }
+
+    /**
+     * Show the end dialog
+     */
+    private void endDialog() {
+        int input = JOptionPane.showOptionDialog(
+                MainFrame.get(),
+                Strs.DLG_END_TEXT,
+                Strs.DLG_END_TITLE,
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                null,
+                null);
+        if(input == JOptionPane.OK_OPTION) {
+            System.exit(0);
+        }
+    }
+
+    public Config.TECH getTechnique() {
+        return techOrder[techInd];
+    }
+
+    public PHASE getPhase() {
+        return phase;
+    }
+
+    public void setTechInd(int newInd) {
+        techInd = newInd;
     }
 
     /**
@@ -121,6 +269,8 @@ public class Experimenter {
         }
     }
 
+
+
     /**
      * Start the experiment
      */
@@ -139,13 +289,11 @@ public class Experimenter {
 
         // participant starts
         if (realExperiment) {
-            Mologger.get().logExpStart(
-                    participID,
-                    LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
+
         }
 
         // Generate the combinations rad/dist/dir
-        generateVarList();
+//        generateVarList();
 
         // Generate blocks
         generateBlocks();
@@ -157,162 +305,14 @@ public class Experimenter {
 //        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
 
         // Publish the start of the experiment
-        if (Config._technique != Config.TECH.MOUSE) {
-            LocalDateTime startTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-            expSubject.onNext(Strs.MSSG_BEG_EXP + "-" + Config._technique + "--" + startTime);
-        }
+//        if (Config._technique != Config.TECH.MOUSE) {
+//            LocalDateTime startTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+//            expSubject.onNext(Strs.MSSG_BEG_EXP + "-" + Config._technique + "--" + startTime);
+//        }
 
         // Run the first block
         currBlockInd = 0;
-        startBlock(currBlockInd);
-    }
-
-    /**
-     * Start a block
-     * @param blkInd Block index
-     */
-    private void startBlock(int blkInd) {
-        int blkNum = currBlockInd + 1;
-
-        // Log the block start
-        Mologger.get().logBlockStart(blkNum, LocalTime.now());
-
-        // Publish
-        expSubject.onNext(Strs.MSSG_BEG_BLK + "-" + blkNum);
-
-        // Run the block
-        currTrialNum = 1;
-        blocks.get(blkInd).setCurrTrialInd(-1); // TODO: is it needed?
-        FittsTrial ftr = blocks.get(blkInd).getNextTrial(true);
-        if (ftr != null) runFittsTrial(ftr);
-        else System.out.println(TAG + "Problem in loading the trials! Block #" + blkInd);
-    }
-
-    /**
-     * Trial is done
-     * @param wasSuccess Was it successful?
-     */
-    public void trialDone(boolean wasSuccess) {
-        // Go to the next trial
-        FittsTrial ftr = blocks.get(currBlockInd).getNextTrial(wasSuccess);
-        if (ftr != null) {
-            if (toLog) System.out.println(TAG + "Next trial");
-            // Log the end of the current trial
-            Mologger.get().logTrialEnd();
-
-            // Publish
-            expSubject.onNext(Strs.MSSG_END_TRL);
-
-            // Run the next trial
-            currTrialNum++;
-            runFittsTrial(ftr);
-        }
-        else { // Trials in the block finished
-            if (toLog) System.out.println(TAG + "Trials finished");
-            // Log the end of the block
-            Mologger.get().logBlockEnd(LocalTime.now());
-
-            // Publish
-            expSubject.onNext(Strs.MSSG_END_BLK);
-
-            // Are there more blocks?
-            if (currBlockInd + 1 == blocks.size()) { // Blocks finished
-                if (toLog) System.out.println(TAG + "All blocks finished");
-                if (!realExperiment) { // Warm-up is finished
-                    MainFrame.get().showPanel(new StartPanel(Config.PROCESS_STATE.EXPERIMENT));
-                } else { // Experiment is finished
-                    // Publish
-                    expSubject.onNext(Strs.MSSG_END_EXP + "-" + "_");
-
-                    endDialog();
-                }
-//            System.exit(0);
-            } else { // There are more blocks
-                // Show the break dialog
-                breakDialog();
-            }
-        }
-    }
-
-    /**
-     * Run a Fitts trial
-     * @param ftr Fitts trial
-     */
-    private void runFittsTrial(FittsTrial ftr) {
-
-        // Create circles (translate the display area to appropriate location)
-//        Circle stacle = new Circle(
-//                Utils.dispToWin(ftr.getStaclePosition()),
-//                Config._stacleRad);
-//        Circle tarcle = new Circle(
-//                Utils.dispToWin(ftr.getTarclePosition()),
-//                ftr.getTarRad());
-//        if(toLog) System.out.println(TAG + "Stacle: " + stacle);
-//        if(toLog) System.out.println(TAG + "Tarcle: " + tarcle);
-
-        //-- Create and send the panel to be drawn
-//        ExperimentPanel expPanel = new ExperimentPanel();
-//        expPanel.setCircles(stacle, tarcle);
-
-        // Set texts
-        String trlStat = "Trial: " + currTrialNum;
-        int blockNum = currBlockInd + 1;
-        String blkStat = "Block: " + blockNum + " / " + blocks.size();
-//        expPanel.setStatTexts(blkStat, trlStat);
-
-        // Send to be shown!
-//        MainFrame.get().showPanel(expPanel);
-    }
-
-    /**
-     * Show a break (between blocks)
-     */
-    public void breakDialog() {
-        expSubject.onNext(Strs.MSSG_END_LOG + "-" + "_");
-
-        // Break dialog
-        MainFrame.get().showDialog(new BreakDialog());
-    }
-
-    /**
-     * Start the next block
-     */
-    public void nextBlock() {
-        currBlockInd++;
-        startBlock(currBlockInd);
-    }
-
-    /**
-     * Generate all the combinations of radii, distances, directions
-     */
-    private void generateVarList() {
-        // Generate all the pairs of radius/distance (using Point for int,int)
-        for (int rad: radList) {
-            for (int dist: distList) {
-                for (int dir: dirList) {
-                    expVarList.add(ImmutableList.of(rad, dist, dir));
-                }
-            }
-        }
-    }
-
-    /**
-     * Show the end dialog
-     */
-    private void endDialog() {
-        int input = JOptionPane.showOptionDialog(
-                MainFrame.get(),
-                Strs.DLG_END_TEXT,
-                Strs.DLG_END_TITLE,
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                null,
-                null,
-                null);
-        if(input == JOptionPane.OK_OPTION)
-        {
-            System.exit(0);
-        }
+//        startBlock(currBlockInd);
     }
 
     // -------------------------------------------------------------------------------
@@ -340,7 +340,7 @@ public class Experimenter {
      * @return Participant's ID
      */
     public int getPID() {
-        return participID;
+        return participant;
     }
 
     /**

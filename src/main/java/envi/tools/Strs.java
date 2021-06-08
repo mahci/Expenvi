@@ -20,6 +20,12 @@ public class Strs {
     public static final String MSSG_ACK         = "ACK";
     //endregion
 
+    //region [StartPanel]
+    public static final String STPN_SHOWCASE_HINT   = "Welcome to the Moose! Press SPACE to start.";
+    public static final String STPN_PRACTICE_HINT   = "Let's practice a bit. Press SPACE to go.";
+    public static final String STPN_EXPERIMENT_HINT = "Now the real experiment! Press SPACE to start.";
+    //endregion
+
     //region [Dialogs]
     public static final String DLG_BREAK_TITLE  = "Time for a break!";
     public static final String DLG_BREAK_TEXT   =

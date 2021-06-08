@@ -42,7 +42,7 @@ public class Config {
         TAP,
         MOUSE
     }
-    public static TECH _technique = TECH.MOUSE;
+//    public static TECH _technique = TECH.MOUSE;
     public static boolean _vibrate = false; // Vibrate?
 
     public static List<TECH[]> _techOrderList = new ArrayList<>();
@@ -54,11 +54,6 @@ public class Config {
     // Showcase ====================================================================
     public static int _minTarRadMM = 5; // Minimum traget radius (mm)
     public static int _dispHRatioToMaxRad = 6; // Maximum target radius = dispH / this (for random)
-    public enum PROCESS_STATE {
-        SHOW_CASE,
-        WARM_UP,
-        EXPERIMENT
-    }
 
     // ===============================================================================
     //region [Methods]
@@ -127,7 +122,7 @@ public class Config {
             System.out.println(TAG + "_nBlocksInExperiment = " + _nBlocksInExperiment);
             System.out.println(TAG + "_targetRadiiMM = " + _widthsMM);
             System.out.println(TAG + "_distancesMM = " + _distancesMM);
-            System.out.println(TAG + "_TECHNIQUE = " + _technique);
+//            System.out.println(TAG + "_TECHNIQUE = " + _technique);
             System.out.println(TAG + "_vibrate = " + _vibrate);
             System.out.println(TAG + "_scrId = " + _scrId);
             System.out.println(TAG + "_dpi = " + _dpi);

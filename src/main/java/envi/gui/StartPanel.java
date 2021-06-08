@@ -1,39 +1,44 @@
 package envi.gui;
 
+import envi.connection.MooseServer;
 import envi.experiment.Experiment;
+import envi.experiment.Experimenter;
+import envi.experiment.Mologger;
 import envi.experiment.Practice;
 import envi.tools.Config;
+import envi.tools.Pref;
+import envi.tools.Strs;
+import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class StartPanel extends JPanel {
-
-    // Text labels for each phase
-    private final String showCaseHint = "Welcome to the Moose! Press SPACE to start";
-    private final String warmUpHint = "Let's warm-up a bit. Press SPACE to go";
-    private final String experimentHint = "Now the real experiment! Press SPACE to start";
 
     // Components
     JButton startButton = new JButton();
     JLabel hintLabel = new JLabel();
-
+    JLabel techLabel = new JLabel();
     // -------------------------------------------------------------------------------
-    // Actions to perform on click of the button
 
+    //--- Actions to perform on click of the button
     private final Action startShowCase = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
 //            ShowCaser.get().startShowCase();
             MainFrame.get().showPanel(new ShowcasePanel());
+//            Experimenter.get().start(Experimenter.PHASE.SHOWCASE);
         }
     };
 
-    private final Action startWarmUp = new AbstractAction() {
+    private final Action startPractice = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
+//            Experimenter.get().start(Experimenter.PHASE.PRACTICE);
 //            Config.updateDisplayValues();
 
             MainFrame.get().showPanel(
@@ -47,12 +52,17 @@ public class StartPanel extends JPanel {
     private final Action startExperiment = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-//            Config.updateDisplayValues();
 
+            // Show experiment panel
             MainFrame.get().showPanel(
                     new ExperimentPanel(
-                    new Experiment(4, 2)));
-//            Experimenter.get().startExperiment(true);
+                    new Experiment(5, 2)));
+
+            // Start the log
+            Mologger.get().logExpStart(
+                    Experimenter.get().getPID(),
+                    Utils.nowDateTime());
+
         }
     };
 
@@ -60,52 +70,72 @@ public class StartPanel extends JPanel {
     /**
      * Constructor
      */
-    public StartPanel(Config.PROCESS_STATE state) {
+    public StartPanel(Experimenter.PHASE phase, Config.TECH technique) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // Create the generic button
         startButton.setFont(new Font("Sans", Font.PLAIN, 14));
-        startButton.setMaximumSize(new Dimension(350, 50));
+        startButton.setMaximumSize(new Dimension(400, 50));
         startButton.setAlignmentX(CENTER_ALIGNMENT);
         startButton.setFocusPainted(false);
 
         // Check state for different texts
         String labelText = "";
-        switch (state) {
-            case SHOW_CASE -> {
-                labelText = showCaseHint;
-                startButton.getInputMap().put(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                        "SPACE");
-                startButton.getActionMap().put("SPACE", startShowCase);
-            }
-            case WARM_UP -> {
-                labelText = warmUpHint;
-                startButton.getInputMap().put(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                        "SPACE");
-                startButton.getActionMap().put("SPACE", startWarmUp);
-            }
-            case EXPERIMENT -> {
-                labelText = experimentHint;
-                startButton.getInputMap().put(
-                        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-                        "SPACE");
-                startButton.getActionMap().put("SPACE", startExperiment);
-            }
+        switch (phase) {
+        case SHOWCASE -> {
+            labelText = Strs.STPN_SHOWCASE_HINT;
+            startButton.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                    "SPACE");
+            startButton.getActionMap().put("SPACE", startShowCase);
+        }
+        case PRACTICE -> {
+            labelText = Strs.STPN_PRACTICE_HINT;
+            startButton.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                    "SPACE");
+            startButton.getActionMap().put("SPACE", startPractice);
+        }
+        case EXPERIMENT -> {
+            labelText = Strs.STPN_EXPERIMENT_HINT;
+            startButton.getInputMap().put(
+                    KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                    "SPACE");
+            startButton.getActionMap().put("SPACE", startExperiment);
+        }
         }
 
         // Hint label
         hintLabel.setText(labelText);
         hintLabel.setAlignmentX(CENTER_ALIGNMENT);
-        hintLabel.setFont(new Font("Sans", Font.PLAIN, 14));
+        hintLabel.setFont(Pref.STAT_FONT.deriveFont(16.0F));
 
         // Adding the components
         this.add(Box.createVerticalStrut(350)); // Top space
+        if (Experimenter.get().getPhase() != Experimenter.PHASE.SHOWCASE) {
+            techLabel = new JLabel("<html>Technique: <B>" +
+                    Experimenter.get().getTechnique() +
+                    "</B></html>");
+            techLabel.setFont(Pref.STAT_FONT.deriveFont(16.0F));
+            techLabel.setAlignmentX(CENTER_ALIGNMENT);
+            techLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            this.add(techLabel);
+            this.add(Box.createVerticalStrut(40)); // Space
+        }
         this.add(hintLabel);
         this.add(Box.createVerticalStrut(20)); // Space
         this.add(startButton);
+
         this.add(Box.createVerticalStrut(100)); // Space
+        if (Experimenter.get().getPhase() == Experimenter.PHASE.SHOWCASE) {
+            techLabel = new JLabel("<html>Techniques: <B>" +
+                    Experimenter.get().getTechOrderStr() +
+                    "</B></html>");
+            techLabel.setFont(Pref.STAT_FONT.deriveFont(12.0F));
+            techLabel.setAlignmentX(CENTER_ALIGNMENT);
+            techLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            this.add(techLabel);
+        }
 
         startButton.requestFocusInWindow();
 
