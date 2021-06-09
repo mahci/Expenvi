@@ -6,7 +6,6 @@ import envi.action.Actions;
 import envi.action.VouseEvent;
 import envi.connection.MooseServer;
 import envi.tools.Pref;
-import envi.tools.Strs;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -14,7 +13,6 @@ import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -274,10 +272,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     /**
      * Clicked outside the start
      */
-    private void repeatTrial() {
+    private void trialRepeat() {
         if(toLog) System.out.println(TAG + "TrialRepeat");
 //        errText = Strs.ERR_NOT_INSIDE; // Show error
-        Utils.playSound("err1.wav");
         startPressed = false; // Reset pressed
 
         repaint();
@@ -308,7 +305,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if (startPressed) { // Target pressing
             // Log the press
         } else { // Start pressing
-            if (stacle.isInside(crsPos.x, crsPos.y)) {
+            if (stacle.isInside(crsPos)) {
                 pressedInsideStart = true;
 
                 // Log in gen
@@ -334,13 +331,19 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         // Check where released...
         if (startPressed) { // Released on the target is clicked => Trial finished
+
+            // Play error sound if outside the target
+            if (!tarcle.isInside(crsPos)) {
+                Utils.playSound(Pref.TARGET_MISS_ERR_SOUND);
+            }
+
             // Valid release => Log in gen and spec
             Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
             Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
             trialDone();
         } else { // Released from the start
-            if (pressedInsideStart && stacle.isInside(crsPos.x, crsPos.y)) {
+            if (pressedInsideStart && stacle.isInside(crsPos)) {
                 // Valid release => log in gen and spec
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
@@ -348,10 +351,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 trialStarted();
 
             } else { // Repeat trial
+
+                // Play error sound
+                Utils.playSound(Pref.START_MISS_ERR_SOUND);
+
                 // Invalid release => log in only gen
                 Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
 
-                repeatTrial();
+                trialRepeat();
             }
         }
     }

@@ -37,4 +37,9 @@ public class Pref {
 
     public static Font S_FONT = STAT_FONT.deriveFont((float) 16);
 
+    // Sounds
+    public static String START_MISS_ERR_SOUND   = "err1.wav";
+    public static String TARGET_MISS_ERR_SOUND  = "err2.wav";
+    public static String START_DOUBLE_ERR_SOUND = "err3.wav";
+
 }

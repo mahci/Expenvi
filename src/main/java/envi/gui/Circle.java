@@ -43,7 +43,7 @@ public class Circle {
         color = clr;
     }
 
-    /***
+    /**
      * Check if a point is inside the circle or not (border is counted inside)
      * @param x X
      * @param y Y
@@ -51,8 +51,16 @@ public class Circle {
      */
     public boolean isInside(int x, int y) {
         double distToCenter = sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
-        if (distToCenter <= radius) return true;
-        else return false;
+        return distToCenter <= radius;
+    }
+
+    /**
+     * Check if a Point is inside the circle
+     * @param p Point
+     * @return Boolean
+     */
+    public boolean isInside(Point p) {
+        return isInside(p.x, p.y);
     }
 
     //-------- Setters

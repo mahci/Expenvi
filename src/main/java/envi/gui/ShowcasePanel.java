@@ -7,6 +7,7 @@ import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
 import envi.tools.Config;
 import envi.tools.Pref;
+import envi.tools.Utils;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -254,7 +255,6 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      */
     private void trialStarted() {
         startPressed = true; // Pressed
-
         repaint();
     }
 
@@ -262,12 +262,17 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      * Click attempted on Target
      */
     private void trialDone() {
-
         startPressed = false; // Reset pressed
-
         setScene();
         repaint();
+    }
 
+    /**
+     * Clicked outside the start
+     */
+    private void trialRepeat() {
+        startPressed = false; // Reset pressed
+        repaint();
     }
 
 
@@ -282,13 +287,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         Point crsPos = getCursorPosition();
 
         // Check where pressed...
-        if (startPressed) { // Target pressing
-            // Log the press
-        } else { // Start pressing
-            if (stacle.isInside(crsPos.x, crsPos.y)) {
-                pressedInsideStart = true;
-            }
-
+        if (!startPressed && stacle.isInside(crsPos)) {
+            pressedInsideStart = true;
             repaint();
         }
     }
@@ -302,10 +302,20 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
         // Check where released...
         if (startPressed) { // Released on the target is clicked => Trial finished
+            // Play error sound if outside the target
+            if (!tarcle.isInside(crsPos)) {
+                Utils.playSound(Pref.TARGET_MISS_ERR_SOUND);
+            }
+
             trialDone();
         } else { // Released from the start
             if (pressedInsideStart && stacle.isInside(crsPos.x, crsPos.y)) {
                 trialStarted();
+            } else {
+                // Play error sound
+                Utils.playSound(Pref.START_MISS_ERR_SOUND);
+
+                trialRepeat();
             }
         }
     }
