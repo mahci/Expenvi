@@ -1,12 +1,11 @@
 package envi.gui;
 
-import envi.connection.MooseServer;
 import envi.experiment.Experiment;
 import envi.experiment.Experimenter;
 import envi.experiment.Mologger;
 import envi.experiment.Practice;
-import envi.tools.Config;
-import envi.tools.Pref;
+import envi.tools.Configs;
+import envi.tools.Prefs;
 import envi.tools.Strs;
 import envi.tools.Utils;
 
@@ -14,8 +13,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 public class StartPanel extends JPanel {
 
@@ -39,7 +36,7 @@ public class StartPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 //            Experimenter.get().start(Experimenter.PHASE.PRACTICE);
-//            Config.updateDisplayValues();
+//            Configs.updateDisplayValues();
 
             MainFrame.get().showPanel(
                     new ExperimentPanel(
@@ -58,11 +55,6 @@ public class StartPanel extends JPanel {
                     new ExperimentPanel(
                     new Experiment(5, 2)));
 
-            // Start the log
-            Mologger.get().logExpStart(
-                    Experimenter.get().getPID(),
-                    Utils.nowDateTime());
-
         }
     };
 
@@ -70,7 +62,15 @@ public class StartPanel extends JPanel {
     /**
      * Constructor
      */
-    public StartPanel(Experimenter.PHASE phase, Config.TECH technique) {
+    public StartPanel(Experimenter.PHASE phase, Configs.TECH technique) {
+        showUI(phase);
+    }
+
+    /**
+     * Show the UI of the panel
+     * @param phase Which PHASE (SHOWCASE, ...)
+     */
+    private void showUI(Experimenter.PHASE phase) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         // Create the generic button
@@ -108,7 +108,7 @@ public class StartPanel extends JPanel {
         // Hint label
         hintLabel.setText(labelText);
         hintLabel.setAlignmentX(CENTER_ALIGNMENT);
-        hintLabel.setFont(Pref.STAT_FONT.deriveFont(16.0F));
+        hintLabel.setFont(Prefs.STAT_FONT.deriveFont(16.0F));
 
         // Adding the components
         this.add(Box.createVerticalStrut(350)); // Top space
@@ -116,7 +116,7 @@ public class StartPanel extends JPanel {
             techLabel = new JLabel("<html>Technique: <B>" +
                     Experimenter.get().getTechnique() +
                     "</B></html>");
-            techLabel.setFont(Pref.STAT_FONT.deriveFont(16.0F));
+            techLabel.setFont(Prefs.STAT_FONT.deriveFont(16.0F));
             techLabel.setAlignmentX(CENTER_ALIGNMENT);
             techLabel.setHorizontalAlignment(SwingConstants.CENTER);
             this.add(techLabel);
@@ -131,15 +131,13 @@ public class StartPanel extends JPanel {
             techLabel = new JLabel("<html>Techniques: <B>" +
                     Experimenter.get().getTechOrderStr() +
                     "</B></html>");
-            techLabel.setFont(Pref.STAT_FONT.deriveFont(12.0F));
+            techLabel.setFont(Prefs.STAT_FONT.deriveFont(12.0F));
             techLabel.setAlignmentX(CENTER_ALIGNMENT);
             techLabel.setHorizontalAlignment(SwingConstants.CENTER);
             this.add(techLabel);
         }
 
         startButton.requestFocusInWindow();
-
-        Config.setFromFile();
     }
 
     /**

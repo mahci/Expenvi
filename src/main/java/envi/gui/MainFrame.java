@@ -1,8 +1,8 @@
 package envi.gui;
 
-import envi.tools.Config;
+import envi.tools.Configs;
 import envi.tools.Pair;
-import envi.tools.Pref;
+import envi.tools.Prefs;
 import envi.tools.Utils;
 
 import javax.swing.*;
@@ -38,16 +38,16 @@ public class MainFrame extends JFrame {
      */
     public Pair<Integer, Integer> getDispArea() {
         return new Pair<>(
-                getWidthMM() - 2 * Pref.WIN_MARG_W_mm,
-                getHeightMM() - 2 * Pref.WIN_MARG_H_mm);
+                getWidthMM() - 2 * Prefs.WIN_MARG_W_mm,
+                getHeightMM() - 2 * Prefs.WIN_MARG_H_mm);
     }
 
     public int getWidthMM() {
-        return px2mm(getWidth());
+        return (int) px2mm(getWidth());
     }
 
     public int getHeightMM() {
-        return px2mm(getHeight());
+        return (int) px2mm(getHeight());
     }
 
     /**
@@ -56,7 +56,7 @@ public class MainFrame extends JFrame {
      * @return Window's coordinates
      */
     public Point dispToWin(Point inPoint) {
-        inPoint.translate(Pref.WIN_MARG_W_mm, Pref.WIN_MARG_H_mm);
+        inPoint.translate(Prefs.WIN_MARG_W_mm, Prefs.WIN_MARG_H_mm);
         return pointMM2Px(inPoint);
     }
 
@@ -65,8 +65,8 @@ public class MainFrame extends JFrame {
      * @param mm Millimeters
      * @return Pixels
      */
-    public int mm2px(int mm) {
-        return (int)((mm / Utils.MM_IN_INCH) * Config._dpi);
+    public static int mm2px(double mm) {
+        return (int)((mm / Utils.MM_IN_INCH) * Configs._dpi);
     }
 
     /**
@@ -74,8 +74,8 @@ public class MainFrame extends JFrame {
      * @param px Pixels
      * @return Millimeters
      */
-    public static int px2mm(int px) {
-        return (int)((px / Config._dpi) * Utils.MM_IN_INCH);
+    public static double px2mm(int px) {
+        return ((double) px / Configs._dpi) * Utils.MM_IN_INCH;
     }
 
     public Point pointMM2Px(Point mmP) {
@@ -108,15 +108,15 @@ public class MainFrame extends JFrame {
             }
         });
 
-        int scrW = Config._scrDims.width;
-        int scrH = Config._scrDims.height;
+        int scrW = Configs._scrDims.width;
+        int scrH = Configs._scrDims.height;
 
         int frW = dialog.getSize().width;
         int frH = dialog.getSize().height;
 
         dialog.setLocation(
-                ((scrW / 2) - (frW / 2)) + Config._scrDims.x,
-                ((scrH / 2) - (frH / 2)) + Config._scrDims.y
+                ((scrW / 2) - (frW / 2)) + Configs._scrDims.x,
+                ((scrH / 2) - (frH / 2)) + Configs._scrDims.y
         );
         dialog.setVisible(true);
     }
@@ -136,15 +136,15 @@ public class MainFrame extends JFrame {
      */
     public void display()
     {
-        int scrW = Config._scrDims.width;
-        int scrH = Config._scrDims.height;
+        int scrW = Configs._scrDims.width;
+        int scrH = Configs._scrDims.height;
 
         int frW = getSize().width;
         int frH = getSize().height;
 
         setLocation(
-                ((scrW / 2) - (frW / 2)) + Config._scrDims.x,
-                ((scrH / 2) - (frH / 2)) + Config._scrDims.y
+                ((scrW / 2) - (frW / 2)) + Configs._scrDims.x,
+                ((scrH / 2) - (frH / 2)) + Configs._scrDims.y
         );
         setVisible(true);
     }

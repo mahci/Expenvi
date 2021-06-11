@@ -3,6 +3,7 @@ package envi.tools;
 import javax.sound.sampled.*;
 import java.applet.Applet;
 import java.applet.AudioClip;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -42,10 +43,10 @@ public class Utils {
 
     /**
      * Get the string of gestures
-     * @param TECH Config.GESTURe
+     * @param TECH Configs.GESTURe
      * @return String
      */
-    public static String interactionString(Config.TECH TECH) {
+    public static String interactionString(Configs.TECH TECH) {
         String result = "";
         switch (TECH) {
         case SWIPE:
@@ -114,8 +115,16 @@ public class Utils {
      * Get the current time up to the seconds
      * @return LocalTime
      */
-    public static LocalTime nowTime() {
+    public static LocalTime nowTimeSec() {
         return LocalTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    /**
+     * Get the current time up to the milliseconds
+     * @return LocalTime
+     */
+    public static LocalTime nowTimeMilli() {
+        return LocalTime.now().truncatedTo(ChronoUnit.MILLIS);
     }
 
     /**
@@ -146,5 +155,14 @@ public class Utils {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * Proper toString for Point
+     * @param p Point
+     * @return String
+     */
+    public static String pointToString(Point p) {
+        return "(" + p.x + "," + p.y + ")";
     }
 }

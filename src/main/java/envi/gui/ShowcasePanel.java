@@ -5,8 +5,8 @@ import envi.connection.MooseServer;
 import envi.experiment.Experimenter;
 import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
-import envi.tools.Config;
-import envi.tools.Pref;
+import envi.tools.Configs;
+import envi.tools.Prefs;
 import envi.tools.Utils;
 
 import javax.swing.*;
@@ -15,8 +15,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ShowcasePanel extends JPanel implements MouseInputListener {
 
@@ -179,48 +177,48 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
         //-- Draw circles
         // Colors
-        Color startColor = startPressed ? Pref.COLOR_START_SEL : Pref.COLOR_START_DEF;
+        Color startColor = startPressed ? Prefs.COLOR_START_SEL : Prefs.COLOR_START_DEF;
 
         // Start circle
         graphics2D.setColor(startColor);
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
 //        if(toLog) System.out.println(TAG + "stacle: " + stacle.tlX + " , " + stacle.tlY);
-        graphics2D.setColor(Pref.COLOR_TEXT);
-        graphics2D.setFont(Pref.S_FONT);
+        graphics2D.setColor(Prefs.COLOR_TEXT);
+        graphics2D.setFont(Prefs.S_FONT);
         graphics2D.drawString("S",
-                stacle.cx - MainFrame.get().mm2px((Pref.S_TEXT_X_OFFSET_mm)),
-                stacle.cy + MainFrame.get().mm2px(Pref.S_TEXT_Y_OFFSET_mm));
+                stacle.cx - MainFrame.get().mm2px((Prefs.S_TEXT_X_OFFSET_mm)),
+                stacle.cy + MainFrame.get().mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
-        graphics2D.setColor(Pref.COLOR_TARGET_DEF);
+        graphics2D.setColor(Prefs.COLOR_TARGET_DEF);
         graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
 
         //--- Draw stat rectangles and stat texts
-        graphics2D.setColor(Pref.COLOR_TEXT);
-        graphics2D.setFont(Pref.STAT_FONT);
+        graphics2D.setColor(Prefs.COLOR_TEXT);
+        graphics2D.setFont(Prefs.STAT_FONT);
 
-        int rect1W = MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm) * 3/4;
-        int rect2W = MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm);
-        int rectH = MainFrame.get().mm2px(Pref.STAT_RECT_HEIGHT_mm);
-        int rect2X = winW - (MainFrame.get().mm2px(Pref.STAT_MARG_X_mm) +
-                MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm));
-        int rect1X = winW - (MainFrame.get().mm2px(Pref.STAT_MARG_X_mm) + rect1W + rect2W);
-        int rect1Y = MainFrame.get().mm2px(Pref.STAT_MARG_Y_mm);
+        int rect1W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm) * 3/4;
+        int rect2W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm);
+        int rectH = MainFrame.get().mm2px(Prefs.STAT_RECT_HEIGHT_mm);
+        int rect2X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) +
+                MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm));
+        int rect1X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) + rect1W + rect2W);
+        int rect1Y = MainFrame.get().mm2px(Prefs.STAT_MARG_Y_mm);
 //        graphics2D.drawRect(rect1X, rect1Y, rect1W, rectH);
         graphics2D.drawRect(rect2X, rect1Y, rect2W, rectH);
 
-        int text1X = rect1X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
-        int text1Y = rect1Y + MainFrame.get().mm2px(Pref.STAT_TEXT_Y_PAD_mm);
-        int text2X = rect2X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
+        int text1X = rect1X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        int text1Y = rect1Y + MainFrame.get().mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
+        int text2X = rect2X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
 //        graphics2D.drawString(trialStatText, text1X, text1Y);
         graphics2D.drawString(blockStatText, text2X, text1Y);
 
         //--- Draw technique text
-        int techTextX = MainFrame.get().mm2px(Pref.STAT_MARG_X_mm);
-        int techTextY = MainFrame.get().mm2px(Pref.STAT_MARG_Y_mm)
-                + MainFrame.get().mm2px(Pref.STAT_TEXT_Y_PAD_mm);
+        int techTextX = MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm);
+        int techTextY = MainFrame.get().mm2px(Prefs.STAT_MARG_Y_mm)
+                + MainFrame.get().mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
         graphics2D.drawString(techStrs[0], techTextX, techTextY);
         graphics2D.drawString(techStrs[1], techTextX + 100, techTextY);
         graphics2D.drawString(techStrs[2], techTextX + 200, techTextY);
@@ -242,7 +240,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         // Create the circles
         stacle = new Circle(
                 MainFrame.get().dispToWin(trial.getStaclePosition()),
-                MainFrame.get().mm2px(Config._stacleRadMM)
+                MainFrame.get().mm2px(Configs._stacleRadMM)
         );
         tarcle = new Circle(
                 MainFrame.get().dispToWin(trial.getTarclePosition()),
@@ -304,7 +302,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         if (startPressed) { // Released on the target is clicked => Trial finished
             // Play error sound if outside the target
             if (!tarcle.isInside(crsPos)) {
-                Utils.playSound(Pref.TARGET_MISS_ERR_SOUND);
+                Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
             }
 
             trialDone();
@@ -313,7 +311,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
                 trialStarted();
             } else {
                 // Play error sound
-                Utils.playSound(Pref.START_MISS_ERR_SOUND);
+                Utils.playSound(Prefs.START_MISS_ERR_SOUND);
 
                 trialRepeat();
             }
@@ -341,13 +339,13 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     @Override
     public void mousePressed(MouseEvent e) {
         if (Experimenter.get().getTechnique()
-                .equals(Config.TECH.MOUSE)) vPressPrimary();
+                .equals(Configs.TECH.MOUSE)) vPressPrimary();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (Experimenter.get().getTechnique()
-                .equals(Config.TECH.MOUSE)) vReleasePrimary();
+                .equals(Configs.TECH.MOUSE)) vReleasePrimary();
         requestFocus();
     }
 

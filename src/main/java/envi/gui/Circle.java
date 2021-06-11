@@ -60,7 +60,16 @@ public class Circle {
      * @return Boolean
      */
     public boolean isInside(Point p) {
-        return isInside(p.x, p.y);
+        return distToCenter(p) <= radius;
+    }
+
+    /**
+     * Calculate distance to the center
+     * @param p Point
+     * @return Double distance
+     */
+    public int distToCenter(Point p) {
+        return (int) sqrt(Math.pow(p.x - cx, 2) + Math.pow(p.y - cy, 2));
     }
 
     //-------- Setters

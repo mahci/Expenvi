@@ -7,15 +7,15 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Config {
+public class Configs {
 
-    private static final String TAG = "[[Config]] ";
+    private static final String TAG = "[[Configs]] ";
     private static final boolean toLog = false;
     // -------------------------------------------------------------------------------
     // Network
     public static int _netPort = 8000;
 
-    // Config file path
+    // Configs file path
     public static final String CONFIG_FILE_PATH = "config.txt";
 
     // Display
@@ -88,8 +88,7 @@ public class Config {
             fileScan.nextLine(); // skip title
 
             // Stacle radius
-            int stRad = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
-            _stacleRadMM = stRad;
+            _stacleRadMM = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
             if (toLog) System.out.println(TAG + "Start R (mm) = " + _stacleRadMM);
             _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));

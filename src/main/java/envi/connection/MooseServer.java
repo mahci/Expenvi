@@ -1,6 +1,6 @@
 package envi.connection;
 
-import envi.tools.Config;
+import envi.tools.Configs;
 import envi.experiment.Experimenter;
 import envi.tools.Strs;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -68,7 +68,7 @@ public class MooseServer {
         try {
             // Open socket
             if (toLog) System.out.println(TAG + "Starting server...");
-            serverSocket = new ServerSocket(Config._netPort);
+            serverSocket = new ServerSocket(Configs._netPort);
             while (true) { // Keep the socket opened (while the programm is running)
                 if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
                 Socket socket = serverSocket.accept();
@@ -100,7 +100,7 @@ public class MooseServer {
 
                     // If interactino is not the Mouse, send actions to the Moose
                     Experimenter.get().getExpSubject().subscribe(state -> { // TODO
-//                        if (Config._technique != Config.TECH.MOUSE) sendMssg(state);
+//                        if (Configs._technique != Configs.TECH.MOUSE) sendMssg(state);
                     });
 
                 }
@@ -116,7 +116,7 @@ public class MooseServer {
      * Disconnect and close the socket (called when closing the application)
      */
     public void close() {
-//        sendMssg(Config.NET_DISCONNECT + "_" + "-");
+//        sendMssg(Configs.NET_DISCONNECT + "_" + "-");
         try {
             serverSocket.close();
         } catch (IOException e) {
@@ -169,9 +169,9 @@ public class MooseServer {
     }
 
     /**
-     * Update the Moose on the new technique (in Config)
+     * Update the Moose on the new technique (in Configs)
      */
-    public void updateTechnique(Config.TECH tech) {
+    public void updateTechnique(Configs.TECH tech) {
         sendMssg(Strs.MSSG_TECHNIQUE, tech.toString());
     }
 

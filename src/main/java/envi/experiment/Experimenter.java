@@ -1,17 +1,12 @@
 package envi.experiment;
 
-import com.google.common.collect.ImmutableList;
 import envi.connection.MooseServer;
 import envi.gui.*;
-import envi.tools.Pair;
+import envi.tools.Configs;
 import envi.tools.Strs;
-import envi.tools.Config;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 
@@ -22,23 +17,6 @@ public class Experimenter {
 
     private static Experimenter self = null; // for singleton
     //------------------------------------------------------------------------------
-
-    // Display
-    int winW, winH, dispW, dispH;
-
-    // Vars
-    private final List<Integer> radList   = new ArrayList<>(); // list of radii in px
-    private final List<Integer> distList  = new ArrayList<>(); // list of dists in px
-    private final List<Integer> dirList   = ImmutableList.of(0, 1); // 0: Left | 1: Right
-    private final List<List<Integer>> expVarList = new ArrayList<>();
-
-    // Blocks
-    private final List<Block> blocks = new ArrayList<>();
-    private int currBlockInd = 0;
-
-    // Trials
-    private int currTrialNum;
-
     // For publishing the state of the experiment
     private final PublishSubject<String> expSubject;
 
@@ -49,19 +27,20 @@ public class Experimenter {
     private long homingStart = 0;
 
     //------------------------------------------------------------------------------
-    private final int participant = 6; // Participant's number
+    private final int participantID = 2; // Participant's number
 
-    private List<Config.TECH[]> techOrderList = new ArrayList<>();
-    private Config.TECH[] techOrder;
+    // Techniques
+    private List<Configs.TECH[]> techOrderList = new ArrayList<>();
+    private Configs.TECH[] techOrder;
+    private int techInd = 0;
 
+    // Phases
     public enum PHASE {
         SHOWCASE,
         PRACTICE,
         EXPERIMENT
     }
     private PHASE phase;
-
-    private int techInd = 0;
 
     //==============================================================================
 
@@ -80,34 +59,24 @@ public class Experimenter {
     private Experimenter() {
         expSubject = PublishSubject.create();
 
-        // set the config from file
-        Config.setFromFile();
-
-        // Generate the order of the techniques
-        genTechOrder();
-
-        // Save radii and distances in px values
-//        for(int rad: Config._targetRadiiMM) {
-//            radList.add(Utils.mm2px(rad));
-//        }
-//        if (toLog) System.out.println(TAG + "Rad list: " + radList);
-//        for(int dist: Config._distancesMM) {
-//            distList.add(Utils.mm2px(dist));
-//        }
-//        if (toLog) System.out.println(TAG + "Dist list: " + distList);
+        Configs.setFromFile(); // Set the config from file
+        genTechOrder(); // Generate the order of the techniques
+        // Start with the logging
+        Mologger.get().participantStart(participantID)
+                .check();
     }
 
     public void genTechOrder() {
         // Setting the techniques orders
-        techOrderList.add(new Config.TECH[] {Config.TECH.TAP, Config.TECH.MOUSE, Config.TECH.SWIPE});
-        techOrderList.add(new Config.TECH[] {Config.TECH.SWIPE, Config.TECH.TAP, Config.TECH.MOUSE});
-        techOrderList.add(new Config.TECH[] {Config.TECH.MOUSE, Config.TECH.SWIPE, Config.TECH.TAP});
-        techOrderList.add(new Config.TECH[] {Config.TECH.TAP, Config.TECH.SWIPE, Config.TECH.MOUSE});
-        techOrderList.add(new Config.TECH[] {Config.TECH.MOUSE, Config.TECH.TAP, Config.TECH.SWIPE});
-        techOrderList.add(new Config.TECH[] {Config.TECH.SWIPE, Config.TECH.MOUSE, Config.TECH.TAP});
+        techOrderList.add(new Configs.TECH[] {Configs.TECH.TAP, Configs.TECH.MOUSE, Configs.TECH.SWIPE});
+        techOrderList.add(new Configs.TECH[] {Configs.TECH.SWIPE, Configs.TECH.TAP, Configs.TECH.MOUSE});
+        techOrderList.add(new Configs.TECH[] {Configs.TECH.MOUSE, Configs.TECH.SWIPE, Configs.TECH.TAP});
+        techOrderList.add(new Configs.TECH[] {Configs.TECH.TAP, Configs.TECH.SWIPE, Configs.TECH.MOUSE});
+        techOrderList.add(new Configs.TECH[] {Configs.TECH.MOUSE, Configs.TECH.TAP, Configs.TECH.SWIPE});
+        techOrderList.add(new Configs.TECH[] {Configs.TECH.SWIPE, Configs.TECH.MOUSE, Configs.TECH.TAP});
 
         // Get the order for the participant
-        techOrder = techOrderList.get(participant % 6);
+        techOrder = techOrderList.get(participantID % 6);
     }
 
     /**
@@ -136,8 +105,11 @@ public class Experimenter {
      */
     public void start(PHASE phase) {
         this.phase = phase;
-        MooseServer.get().updateTechnique(techOrder[techInd]);
 
+        Mologger.get().logPhaseStart(phase, techOrder[techInd]).check(); // Log
+        MooseServer.get().updateTechnique(techOrder[techInd]); // Update server => Moose
+
+        // Start the phase
         switch (phase) {
         case SHOWCASE -> {
             // Disable logging
@@ -147,8 +119,8 @@ public class Experimenter {
                     new StartPanel(PHASE.SHOWCASE, techOrder[techInd]));
         }
         case PRACTICE -> {
-            // Disable logging
-            Mologger.get().setEnabled(false);
+            // Enable logging
+            Mologger.get().setEnabled(true);
             // Show the start panel
             MainFrame.get().showPanel(
                     new StartPanel(PHASE.PRACTICE, techOrder[techInd]));
@@ -217,7 +189,7 @@ public class Experimenter {
         }
     }
 
-    public Config.TECH getTechnique() {
+    public Configs.TECH getTechnique() {
         return techOrder[techInd];
     }
 
@@ -227,92 +199,6 @@ public class Experimenter {
 
     public void setTechInd(int newInd) {
         techInd = newInd;
-    }
-
-    /**
-     * Generate the list of blocks of the trials
-     */
-    private void generateBlocks() {
-        // Create all combinations
-        List<Pair<Integer, Integer>> allRadDists = new ArrayList<>();
-        for (int rad: radList) {
-            for (int dist: distList) {
-                allRadDists.add(new Pair<>(rad, dist));
-            }
-        }
-
-        // Create the 4 pairs of blocks (P1, P2, P3, P4)
-        blocks.clear();
-        for(int pi = 1; pi <= 4; pi++) {
-            Collections.shuffle(allRadDists); // Shuffle the combinations
-
-            // Init blocks
-            Block b1 = new Block(TRIAL_TYPE.FITTS);
-            Block b2 = new Block(TRIAL_TYPE.FITTS);
-
-            // Even ind x R => B1 | Even ind x L => B2
-            // Odd ind x R => B2 | Odd ind x L => B1
-//            for(int ti = 0; ti < allRadDists.size(); ti++) {
-//                if (ti % 2 == 0) { // Even
-//                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 1));
-//                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 0));
-//                } else { // Odd
-//                    b2.addTrial(new FittsTrial(allRadDists.get(ti), 1));
-//                    b1.addTrial(new FittsTrial(allRadDists.get(ti), 0));
-//                }
-//            }
-
-            // Add the blocks to the list of blocks
-            blocks.add(b1.shuffle());
-            blocks.add(b2.shuffle());
-
-        }
-    }
-
-
-
-    /**
-     * Start the experiment
-     */
-    public void startExperiment(boolean isRealExperiment) {
-        if (toLog) System.out.println(TAG + "Experiment started");
-
-        // Set the state
-        realExperiment = isRealExperiment;
-        if (toLog) System.out.println(TAG + "Real Exp? " + realExperiment);
-
-        // Set the display size
-        winW = MainFrame.get().getBounds().width;
-        winH = MainFrame.get().getBounds().height;
-//        dispW = winW - (2 * Config._winWidthMargin);
-//        dispH = winH - (2 * Config._winHeightMargin);
-
-        // participant starts
-        if (realExperiment) {
-
-        }
-
-        // Generate the combinations rad/dist/dir
-//        generateVarList();
-
-        // Generate blocks
-        generateBlocks();
-//        blocks.clear();
-//        for (int bi = 0; bi < Config._nBlocksInExperiment; bi++) {
-//            blocks.add(new Block(TRIAL_TYPE.FITTS)
-//                            .setupFittsTrials(expVarList, dispW, dispH));
-//        }
-//        if (toLog) System.out.println(TAG + blocks.size() + " blocks created");
-
-        // Publish the start of the experiment
-//        if (Config._technique != Config.TECH.MOUSE) {
-//            LocalDateTime startTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-//            expSubject.onNext(Strs.MSSG_BEG_EXP + "-" + Config._technique + "--" + startTime);
-//        }
-
-        // Run the first block
-        currBlockInd = 0;
-//        startBlock(currBlockInd);
     }
 
     // -------------------------------------------------------------------------------
@@ -340,7 +226,7 @@ public class Experimenter {
      * @return Participant's ID
      */
     public int getPID() {
-        return participant;
+        return participantID;
     }
 
     /**
@@ -351,5 +237,4 @@ public class Experimenter {
         return homingStart;
     }
     //endregion
-
 }

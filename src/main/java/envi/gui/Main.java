@@ -1,12 +1,10 @@
 package envi.gui;
 
-import javax.swing.*;
 import java.awt.*;
 
 import envi.experiment.Experimenter;
-import envi.tools.Config;
+import envi.tools.Configs;
 import envi.connection.*;
-import envi.tools.Utils;
 
 
 public class Main {
@@ -21,7 +19,7 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        // Save the screens info (id is set in Config)
+        // Save the screens info (id is set in Configs)
         saveScreenInfo();
 
         // Start the experiment process
@@ -40,11 +38,6 @@ public class Main {
             }
         });
 
-        // Show config.json window
-//        ConfigDialog cfgDialog = new ConfigDialog();
-//        cfgDialog.pack();
-//        cfgDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-//        showDialog(cfgDialog);
     }
 
     /**
@@ -54,8 +47,8 @@ public class Main {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gd = ge.getScreenDevices();
 
-        Config._nScr = gd.length;
-        Config._scrDims = gd[Config._scrId].getDefaultConfiguration().getBounds();
+        Configs._nScr = gd.length;
+        Configs._scrDims = gd[Configs._scrId].getDefaultConfiguration().getBounds();
     }
 
 }

@@ -1,11 +1,7 @@
 package envi.gui;
 
-import envi.tools.Config;
-import envi.tools.Utils;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class ConfigDialog extends JDialog {
 
@@ -17,16 +13,16 @@ public class ConfigDialog extends JDialog {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Limit of radius is Win_Height - 2*Vertical_Margin
-//        int maxRadMM = Utils.px2mm(Config._scrDims.height - (2 * Config._winHeightMargin));
+//        int maxRadMM = Utils.px2mm(Configs._scrDims.height - (2 * Configs._winHeightMargin));
 //        // Limit of distance is Win_Width - (2*Horizontal_Margin + STACLE_R + Max_Radii)
-//        int maxdistMM = Utils.px2mm(Config._scrDims.height - (2 * Config._winHeightMargin));
+//        int maxdistMM = Utils.px2mm(Configs._scrDims.height - (2 * Configs._winHeightMargin));
 //
 //        // Components ------------------------------------
 //        JLabel radiiLabel = new JLabel("Radii (mm):");
 //
 //        JTextField radiiField = new JTextField(15);
 //        radiiField.setText(
-//                Config._targetRadiiMM
+//                Configs._targetRadiiMM
 //                .toString().replaceAll("[\\[\\]]", ""));
 //
 //        JLabel radiiInfo = new JLabel("Max = " + maxRadMM + " mm");
@@ -36,7 +32,7 @@ public class ConfigDialog extends JDialog {
 //
 //        JTextField distField = new JTextField(15);
 //        distField.setText(
-//                Config._distancesMM
+//                Configs._distancesMM
 //                .toString().replaceAll("[\\[\\]]", ""));
 //
 //        JLabel distInfo = new JLabel("Max = " + maxdistMM + " mm");
@@ -58,27 +54,27 @@ public class ConfigDialog extends JDialog {
 //        JLabel stacleRadLabel = new JLabel("Start-circle radius (mm) =");
 //        JSpinner stacleRadSpinner = new JSpinner();
 //        stacleRadSpinner.setPreferredSize(new Dimension(50, 20));
-//        stacleRadSpinner.setValue(Config._stacleRadMM);
+//        stacleRadSpinner.setValue(Configs._stacleRadMM);
 //
 //        JLabel numBlocksLabel = new JLabel("Number of blocks =");
 //        JSpinner numBlocksSpinner = new JSpinner();
 //        numBlocksSpinner.setPreferredSize(new Dimension(50, 20));
-//        numBlocksSpinner.setValue(Config._nBlocksInExperiment);
+//        numBlocksSpinner.setValue(Configs._nBlocksInExperiment);
 //
 //        JButton setConfigButton = new JButton("SET CONFIGURATION");
 //        setConfigButton.setPreferredSize(new Dimension(100, 40));
 //        setConfigButton.addActionListener(e -> {
 //            // Save all the configs -------
-//            Config._targetRadiiMM = new ArrayList<>(Utils.intValues(radiiField.getText(), ","));
-//            Config._distancesMM = new ArrayList<>(Utils.intValues(distField.getText(), ","));
+//            Configs._targetRadiiMM = new ArrayList<>(Utils.intValues(radiiField.getText(), ","));
+//            Configs._distancesMM = new ArrayList<>(Utils.intValues(distField.getText(), ","));
 //
-//            if (swipeRBtn.isSelected()) Config._technique = Config.TECH.SWIPE_LCLICK;
-//            if (tapRBtn.isSelected()) Config._technique = Config.TECH.TAP_LCLICK;
-//            Config._vibrate = vibChBox.isSelected();
+//            if (swipeRBtn.isSelected()) Configs._technique = Configs.TECH.SWIPE_LCLICK;
+//            if (tapRBtn.isSelected()) Configs._technique = Configs.TECH.TAP_LCLICK;
+//            Configs._vibrate = vibChBox.isSelected();
 //
-//            Config._stacleRadMM = (int) stacleRadSpinner.getValue();
-//            Config._stacleRad = Utils.mm2px(Config._stacleRadMM);
-//            Config._nBlocksInExperiment = (int) numBlocksSpinner.getValue();
+//            Configs._stacleRadMM = (int) stacleRadSpinner.getValue();
+//            Configs._stacleRad = Utils.mm2px(Configs._stacleRadMM);
+//            Configs._nBlocksInExperiment = (int) numBlocksSpinner.getValue();
 //
 //            // Close the dialog
 //            setVisible(false);

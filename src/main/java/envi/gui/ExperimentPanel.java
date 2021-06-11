@@ -1,11 +1,11 @@
 package envi.gui;
 
 import envi.experiment.*;
-import envi.tools.Config;
+import envi.tools.Configs;
 import envi.action.Actions;
 import envi.action.VouseEvent;
 import envi.connection.MooseServer;
-import envi.tools.Pref;
+import envi.tools.Prefs;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
@@ -112,10 +112,11 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         subBlockNum = 1;
         trialNum = 1;
 
-        // Log the start of the block
-        Mologger.get().logBlockStart(
-                blockNum,
-                LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
+        // Log the start of the first block
+        Mologger.get().logBlockStart(blockNum).check();
+//        Mologger.get().logBlockStart(
+//                blockNum,
+//                LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
 
@@ -138,50 +139,50 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         //-- Draw circles
         // Colors
-        Color startColor = startPressed ? Pref.COLOR_START_SEL : Pref.COLOR_START_DEF;
+        Color startColor = startPressed ? Prefs.COLOR_START_SEL : Prefs.COLOR_START_DEF;
 
         // Start circle
         graphics2D.setColor(startColor);
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
 //        if(toLog) System.out.println(TAG + "stacle: " + stacle.tlX + " , " + stacle.tlY);
-        graphics2D.setColor(Pref.COLOR_TEXT);
-        graphics2D.setFont(Pref.S_FONT);
+        graphics2D.setColor(Prefs.COLOR_TEXT);
+        graphics2D.setFont(Prefs.S_FONT);
         graphics2D.drawString("S",
-                stacle.cx - MainFrame.get().mm2px((Pref.S_TEXT_X_OFFSET_mm)),
-                stacle.cy + MainFrame.get().mm2px(Pref.S_TEXT_Y_OFFSET_mm));
+                stacle.cx - MainFrame.get().mm2px((Prefs.S_TEXT_X_OFFSET_mm)),
+                stacle.cy + MainFrame.get().mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
-        graphics2D.setColor(Pref.COLOR_TARGET_DEF);
+        graphics2D.setColor(Prefs.COLOR_TARGET_DEF);
         graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
 //        if(toLog) System.out.println(TAG + "tarcle: " + tarcle.tlX + " , " + tarcle.tlY);
 
         //--- Draw stat rectangles and texts
-        graphics2D.setColor(Pref.COLOR_TEXT);
-        graphics2D.setFont(Pref.STAT_FONT);
+        graphics2D.setColor(Prefs.COLOR_TEXT);
+        graphics2D.setFont(Prefs.STAT_FONT);
 
-        int rect1W = MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm) * 3/4;
-        int rect2W = MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm);
-        int rectH = MainFrame.get().mm2px(Pref.STAT_RECT_HEIGHT_mm);
-        int rect2X = winW - (MainFrame.get().mm2px(Pref.STAT_MARG_X_mm) +
-                MainFrame.get().mm2px(Pref.STAT_RECT_WIDTH_mm));
-        int rect1X = winW - (MainFrame.get().mm2px(Pref.STAT_MARG_X_mm) + rect1W + rect2W);
-        int rect1Y = MainFrame.get().mm2px(Pref.STAT_MARG_Y_mm);
+        int rect1W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm) * 3/4;
+        int rect2W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm);
+        int rectH = MainFrame.get().mm2px(Prefs.STAT_RECT_HEIGHT_mm);
+        int rect2X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) +
+                MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm));
+        int rect1X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) + rect1W + rect2W);
+        int rect1Y = MainFrame.get().mm2px(Prefs.STAT_MARG_Y_mm);
         graphics2D.drawRect(rect1X, rect1Y, rect1W, rectH);
         graphics2D.drawRect(rect2X, rect1Y, rect2W, rectH);
 
-        int text1X = rect1X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
-        int text1Y = rect1Y + MainFrame.get().mm2px(Pref.STAT_TEXT_Y_PAD_mm);
-        int text2X = rect2X + MainFrame.get().mm2px(Pref.STAT_TEXT_X_PAD_mm);
-        graphics2D.setFont(Pref.STAT_FONT);
+        int text1X = rect1X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        int text1Y = rect1Y + MainFrame.get().mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
+        int text2X = rect2X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        graphics2D.setFont(Prefs.STAT_FONT);
         graphics2D.drawString(trialStatText, text1X, text1Y);
         graphics2D.drawString(blockStatText, text2X, text1Y);
 
         //--- Show error
         if (!errText.isEmpty()) {
             int errTextX = winW / 2 - 200;
-            graphics2D.setColor(Pref.COLOR_ERROR);
+            graphics2D.setColor(Prefs.COLOR_ERROR);
             graphics2D.drawString(
                     errText,
                     errTextX, text1Y);
@@ -199,12 +200,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 .getBlock(blockNum)
                 .getSubBlock(subBlockNum)
                 .getTrial(trialNum);
+        Point staclePosition = MainFrame.get().dispToWin(trial.getStaclePosition());
+        Point tarclePosition = MainFrame.get().dispToWin(trial.getTarclePosition());
         stacle = new Circle(
-                MainFrame.get().dispToWin(trial.getStaclePosition()),
-                MainFrame.get().mm2px(Config._stacleRadMM)
+                staclePosition,
+                MainFrame.get().mm2px(Configs._stacleRadMM)
         );
         tarcle = new Circle(
-                MainFrame.get().dispToWin(trial.getTarclePosition()),
+                tarclePosition,
                 MainFrame.get().mm2px(trial.getTarWidth())
         );
         if(toLog) System.out.println(trial.getStaclePosition());
@@ -216,6 +219,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 subBlockNum;
         blockStatText = "Block: " + dispBlockNum + " | " + experiment.getTotalNSubBlocks();
         trialStatText = "Trial: " + trialNum;
+
+        // Log
+        Mologger.get().logTrialStart(trialNum, trial);
     }
 
     /**
@@ -240,8 +246,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 .getBlock(blockNum)
                 .getSubBlock(subBlockNum)
                 .hasNext(trialNum)) {
-            Mologger.get().logTrialEnd();
             trialNum++;
+            Mologger.get().logTrialEnd(); // Log
         } else { // Trials in the sub-block finished
             if (experiment
                     .getBlock(blockNum)
@@ -252,11 +258,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             } else { // Sub-blocks finished
                 if (experiment.hasNext(blockNum)) { // Next block
                     breakDialog();
-                    Mologger.get().logBlockEnd(Utils.nowTime());
 
                     blockNum++;
                     subBlockNum = 1;
                     trialNum = 1;
+
+                    Mologger.get().logBlockStart(blockNum); // Log
                 } else {
                     // Experimenter takes control
                     Experimenter.get().endPhase();
@@ -277,6 +284,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 //        errText = Strs.ERR_NOT_INSIDE; // Show error
         startPressed = false; // Reset pressed
 
+        Mologger.get().logTrialRepeat(); // Log
+
         repaint();
     }
 
@@ -288,28 +297,30 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Virtual press of the primary mouse button
      */
     public void vPressPrimary() {
+        errText = ""; // Clear the error
 
-        // Ckear the error
-        errText = "";
-
-        // Position of the curser
-        Point crsPos = getCursorPosition();
+        Point crsPos = getCursorPosition(); // Position of the curser
 
         // Create the VouseEvent
-        VouseEvent ve = new VouseEvent(Actions.ACT.PRESS, crsPos.x, crsPos.y, LocalTime.now());
+        VouseEvent ve = new VouseEvent(
+                Actions.ACT.PRESS,
+                crsPos.x, crsPos.y,
+                LocalTime.now());
 
-        // Log the ve in all
-        Mologger.get().log(ve, Mologger.LOG_LEVEL.ALL);
+        Mologger.get().logAll(ve); // Log all
 
         // Check where pressed...
         if (startPressed) { // Target pressing
-            // Log the press
+            Mologger.get().logTargetEvent(
+                    ve,
+                    MainFrame.px2mm(stacle.distToCenter(crsPos))); // Log
         } else { // Start pressing
+            Mologger.get().logStartEvent(
+                    ve,
+                    MainFrame.px2mm(stacle.distToCenter(crsPos))); // Log
+
             if (stacle.isInside(crsPos)) {
                 pressedInsideStart = true;
-
-                // Log in gen
-                Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
             }
 
             repaint();
@@ -320,44 +331,47 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Virtual release of the primary mouse buttons
      */
     public void vReleasePrimary() {
-        // Postion of the curser
-        Point crsPos = getCursorPosition();
+        Point crsPos = getCursorPosition(); // Curser position
 
         // Create the VouseEvent
-        VouseEvent ve = new VouseEvent(Actions.ACT.RELEASE, crsPos.x, crsPos.y, LocalTime.now());
+        VouseEvent ve = new VouseEvent(
+                Actions.ACT.RELEASE,
+                crsPos.x, crsPos.y,
+                LocalTime.now());
 
-        // Log the ve in all
-        Mologger.get().log(ve, Mologger.LOG_LEVEL.ALL);
+        Mologger.get().logAll(ve); // Log all
 
         // Check where released...
-        if (startPressed) { // Released on the target is clicked => Trial finished
+        if (startPressed) { // Released on the target => Trial finished
+            // Log
+            Mologger.get().logTargetEvent(
+                    ve,
+                    MainFrame.px2mm(tarcle.distToCenter(crsPos)));
 
             // Play error sound if outside the target
             if (!tarcle.isInside(crsPos)) {
-                Utils.playSound(Pref.TARGET_MISS_ERR_SOUND);
+                Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+
+                if (stacle.isInside(crsPos)) { // Double click on Stacle
+                    Mologger.get().logTargetAttempt("MISS", "Double click on Start!");
+                } else {
+                    Mologger.get().logTargetAttempt("MISS", "");
+                }
             }
 
-            // Valid release => Log in gen and spec
-            Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
-            Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
-
+            // Trial is done!
             trialDone();
-        } else { // Released from the start
-            if (pressedInsideStart && stacle.isInside(crsPos)) {
-                // Valid release => log in gen and spec
-                Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
-                Mologger.get().log(ve, Mologger.LOG_LEVEL.SPEC);
 
+        } else { // Released on the start
+            // Log
+            Mologger.get().logStartEvent(
+                    ve,
+                    MainFrame.px2mm(tarcle.distToCenter(crsPos)));
+
+            if (pressedInsideStart && stacle.isInside(crsPos)) { // Inside
                 trialStarted();
-
-            } else { // Repeat trial
-
-                // Play error sound
-                Utils.playSound(Pref.START_MISS_ERR_SOUND);
-
-                // Invalid release => log in only gen
-                Mologger.get().log(ve, Mologger.LOG_LEVEL.GEN);
-
+            } else { // Outside
+                Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
                 trialRepeat();
             }
         }
@@ -386,13 +400,13 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     @Override
     public void mousePressed(MouseEvent e) {
         if (Experimenter.get().getTechnique()
-                .equals(Config.TECH.MOUSE)) vPressPrimary();
+                .equals(Configs.TECH.MOUSE)) vPressPrimary();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (Experimenter.get().getTechnique()
-                .equals(Config.TECH.MOUSE)) vReleasePrimary();
+                .equals(Configs.TECH.MOUSE)) vReleasePrimary();
     }
 
     @Override
@@ -413,20 +427,20 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         // Log every move on all log
-        Mologger.get().log(e, Mologger.LOG_LEVEL.ALL, LocalTime.now());
+        Mologger.get().logAll(e);
 
         // If homing on the mouse, log the homing time
-        if (Experimenter.get().getHomingStart() > 0) {
-            long homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
-            Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
-            Experimenter.get().setHomingStart(0); // Reset the time
-        }
+//        if (Experimenter.get().getHomingStart() > 0) {
+//            long homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
+//            Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
+//            Experimenter.get().setHomingStart(0); // Reset the time
+//        }
 
         // If error is shown, clear it
-        if (!errText.isEmpty()) {
-            errText = "";
-            repaint();
-        }
+//        if (!errText.isEmpty()) {
+//            errText = "";
+//            repaint();
+//        }
     }
 
     //endregion
@@ -437,4 +451,5 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     public void breakDialog() {
         MainFrame.get().showDialog(new BreakDialog());
     }
+
 }

@@ -1,6 +1,6 @@
 package envi.experiment;
 
-import envi.tools.Config;
+import envi.tools.Configs;
 import envi.tools.Utils;
 
 import java.util.Collections;
@@ -40,11 +40,11 @@ public class FittsTuple {
     public static FittsTuple randFittsTuple() {
         FittsTuple result = new FittsTuple();
         result.width = Utils.randInt(
-                Collections.min(Config._widthsMM),
-                Collections.max(Config._widthsMM) + 1);
+                Collections.min(Configs._widthsMM),
+                Collections.max(Configs._widthsMM) + 1);
         result.dist = Utils.randInt(
-                Collections.min(Config._distancesMM),
-                Collections.max(Config._distancesMM) + 1);
+                Collections.min(Configs._distancesMM),
+                Collections.max(Configs._distancesMM) + 1);
         result.leftRight = Utils.randInt(0, 2);
 
         return result;

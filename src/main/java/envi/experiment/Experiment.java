@@ -1,6 +1,6 @@
 package envi.experiment;
 
-import envi.tools.Config;
+import envi.tools.Configs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +42,14 @@ public class Experiment {
     }
 
     /**
-     * Get the combinations from Config
+     * Get the combinations from Configs
      * @return List of combinations (FittsTuble)
      */
     protected List<FittsTuple> getCombinations() {
         List<FittsTuple> result = new ArrayList<>();
 
-        for(int rad : Config._widthsMM) {
-            for(int dist : Config._distancesMM) {
+        for(int rad : Configs._widthsMM) {
+            for(int dist : Configs._distancesMM) {
                 result.add(new FittsTuple(rad, dist, 0));
                 result.add(new FittsTuple(rad, dist, 1));
             }

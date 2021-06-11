@@ -1,8 +1,5 @@
 package envi.experiment;
 
-import envi.tools.Config;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Practice extends Experiment {

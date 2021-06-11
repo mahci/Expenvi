@@ -2,7 +2,7 @@ package envi.tools;
 
 import java.awt.*;
 
-public class Pref {
+public class Prefs {
 
     // COLORS
     public static Color COLOR_TEXT          = Color.BLACK;

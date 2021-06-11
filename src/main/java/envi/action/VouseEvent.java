@@ -29,7 +29,8 @@ public class VouseEvent {
      * @return String
      */
     public String toString() {
-        return String.format("Action=%s - Position=%d,%d - Time=%s - ", action, x, y, time.toString());
+        return String.format("Event{" +
+                "Action=%s, Position=(%d,%d), Time=%s", action, x, y, time.toString());
     }
 
 }
