@@ -48,10 +48,10 @@ public class Experiment {
     protected List<FittsTuple> getCombinations() {
         List<FittsTuple> result = new ArrayList<>();
 
-        for(int rad : Configs._widthsMM) {
-            for(int dist : Configs._distancesMM) {
-                result.add(new FittsTuple(rad, dist, 0));
-                result.add(new FittsTuple(rad, dist, 1));
+        for(double w : Configs._widthsMM) {
+            for(double d : Configs._distancesMM) {
+                result.add(new FittsTuple(w, d, 0));
+                result.add(new FittsTuple(w, d, 1));
             }
         }
 

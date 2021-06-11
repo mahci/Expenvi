@@ -10,6 +10,7 @@ public class Strs {
     public static final String MSSG_CONFIRM     = "CONFIRM";
     public static final String MSSG_TECHNIQUE   = "TECH";
     public static final String MSSG_PID         = "PID";
+    public static final String MSSG_BEG_PHS     = "BEGPHS";
     public static final String MSSG_BEG_EXP     = "BEGEXP";
     public static final String MSSG_END_EXP     = "ENDEXP";
     public static final String MSSG_BEG_BLK     = "BEGBLK";
@@ -29,7 +30,7 @@ public class Strs {
     //region [Dialogs]
     public static final String DLG_BREAK_TITLE  = "Time for a break!";
     public static final String DLG_BREAK_TEXT   =
-            "<html>When ready, press <B>Orange + Blue</B> keys to start the next block</html>";
+            "<html>When ready, press <B>BLUE + RED</B> keys to start the next block</html>";
 
     public static final String DLG_END_TITLE    = "END";
     public static final String DLG_END_TEXT     = "Technique Finished! Thank You!";

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Configs {
 
     private static final String TAG = "[[Configs]] ";
-    private static final boolean toLog = false;
+    private static final boolean toLog = true;
     // -------------------------------------------------------------------------------
     // Network
     public static int _netPort = 8000;
@@ -28,11 +28,16 @@ public class Configs {
     public static Rectangle _scrDims; // Screen dimenstions (px)
 
     // Experiment ==================================================================
-    public static int _stacleRadMM = 8; // Stacle radius (mm)
-    public static int _stacleRad; // Stacle radius (px) Set programmatically
+//    public static int _stacleRadMM = 8; // Stacle radius (mm)
+//    public static int _stacleRad; // Stacle radius (px) Set programmatically
+    public static double _stacleWMM = 16.0;
+//    public static int _stacleW;
 
-    public static List<Integer> _widthsMM = new ArrayList<Integer>(); // Target radii (mm)
-    public static List<Integer> _distancesMM = new ArrayList<Integer>(); // Distances (mm)
+//    public static List<Integer> _widthsMM = new ArrayList<Integer>(); // Target radii (mm)
+//    public static List<Integer> _distancesMM = new ArrayList<Integer>(); // Distances (mm)
+
+    public static List<Double> _widthsMM = new ArrayList<>(); // Target widths [diameter] (mm)
+    public static List<Double> _distancesMM = new ArrayList<>(); // Distances (mm)
 
     public static int _nBlocksInExperiment = 2; // Number of blocks in an experiment
 
@@ -88,24 +93,33 @@ public class Configs {
             fileScan.nextLine(); // skip title
 
             // Stacle radius
-            _stacleRadMM = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+//            _stacleRadMM = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
+            _stacleWMM = Double.parseDouble(Utils.lastPart(fileScan.nextLine()));
 
-            if (toLog) System.out.println(TAG + "Start R (mm) = " + _stacleRadMM);
+            if (toLog) System.out.println(TAG + "Start W (mm) = " + _stacleWMM);
             _nBlocksInExperiment = Integer.parseInt(Utils.lastPart(fileScan.nextLine()));
 
             // Target radii
+//            _widthsMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
+//                    .split(","))
+//                    .map(String::trim)
+//                    .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
             _widthsMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
                     .split(","))
                     .map(String::trim)
-                    .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
+                    .mapToDouble(Double::parseDouble).boxed().collect(Collectors.toList());
 
             // Target distances
-            if (toLog) System.out.println(TAG + "Target Rs = " + _widthsMM);
+            if (toLog) System.out.println(TAG + "Target Ws = " + _widthsMM);
 
+//            _distancesMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
+//                    .split(","))
+//                    .map(String::trim)
+//                    .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
             _distancesMM = Arrays.stream(Utils.lastPart(fileScan.nextLine())
                     .split(","))
                     .map(String::trim)
-                    .mapToInt(Integer::parseInt).boxed().collect(Collectors.toList());
+                    .mapToDouble(Double::parseDouble).boxed().collect(Collectors.toList());
 
             _vibrate = Boolean.parseBoolean(Utils.lastPart(fileScan.nextLine()));
 
@@ -117,7 +131,7 @@ public class Configs {
         if (toLog) {
             System.out.println(TAG + "_minTarRadMM = " + _minTarRadMM);
             System.out.println(TAG + "_dispHRatioToMaxRad = " + _dispHRatioToMaxRad);
-            System.out.println(TAG + "_stacleRadMM = " + _stacleRadMM);
+            System.out.println(TAG + "_stacleWMM = " + _stacleWMM);
             System.out.println(TAG + "_nBlocksInExperiment = " + _nBlocksInExperiment);
             System.out.println(TAG + "_targetRadiiMM = " + _widthsMM);
             System.out.println(TAG + "_distancesMM = " + _distancesMM);

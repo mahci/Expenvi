@@ -108,15 +108,21 @@ public class Mologger {
      * @param pID Participant's ID
      * @return STATUS
      */
-    public STATUS participantStart(int pID) {
+    public STATUS logParticipant(int pID) {
         // Create a directory for the participant (if not already existing)
         String ptcDirPath = logDirPath + "/" + PTC_FILE_PFX + pID;
         if (createDir(ptcDirPath) == 0) {
             participDir = ptcDirPath;
+
+            // Send log command to the Moose
+            MooseServer.get().sendMssg(Strs.MSSG_PID, String.valueOf(pID));
+
             return STATUS.SUCCESS;
         } else {
             return STATUS.ERR_PARTICIP_DIR;
         }
+
+
     }
 
     /**
@@ -133,6 +139,10 @@ public class Mologger {
                 Utils.nowDateTime();
         if (createDir(phaseDirPath) == 0) {
             phaseDir = phaseDirPath;
+
+            // Send log command to the Moose
+            MooseServer.get().sendMssg(Strs.MSSG_BEG_PHS, phase.name());
+
             return STATUS.SUCCESS;
         } else {
             return STATUS.ERR_PHASE_DIR;
@@ -225,8 +235,10 @@ public class Mologger {
         if (!enabled) return STATUS.CANCELLED;
 
         try {
-            blkStrLog = new PrintWriter(new FileWriter(
-                    blkStrLogPath, true));
+            if (blkStrLog == null) {
+                blkStrLog = new PrintWriter(new FileWriter(
+                        blkStrLogPath, true));
+            }
             blkStrLog.println(ve);
             blkStrLog.println(String.format("Dist to center = %.2f", d));
             blkStrLog.flush();
@@ -286,6 +298,23 @@ public class Mologger {
         }
     }
 
+    public STATUS logHomingTime(long hTime) {
+        if (!enabled) return STATUS.CANCELLED;
+
+        try {
+            blkStrLog = new PrintWriter(new FileWriter(
+                    blkStrLogPath, true));
+            blkTrgLog.println("--- Homing time = " + hTime);
+            blkTrgLog.flush();
+            blkTrgLog.close();
+
+            return STATUS.SUCCESS;
+
+        } catch (NullPointerException | IOException e) {
+            return STATUS.ERR_BLOCK_FILES;
+        }
+    }
+
     /**
      * Log everything!
      * @param me MouseEvent
@@ -295,8 +324,10 @@ public class Mologger {
         if (!enabled) return STATUS.CANCELLED;
 
         try {
-            blkAllLog = new PrintWriter(new FileWriter(
-                    blkAllLogPath, true));
+            if (blkAllLog == null) {
+                blkAllLog = new PrintWriter(new FileWriter(
+                        blkAllLogPath, true));
+            }
             blkAllLog.println(me);
             blkAllLog.flush();
 

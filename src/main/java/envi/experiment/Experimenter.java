@@ -4,6 +4,7 @@ import envi.connection.MooseServer;
 import envi.gui.*;
 import envi.tools.Configs;
 import envi.tools.Strs;
+import envi.tools.Utils;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
@@ -27,7 +28,7 @@ public class Experimenter {
     private long homingStart = 0;
 
     //------------------------------------------------------------------------------
-    private final int participantID = 2; // Participant's number
+    private final int participantID = 0; // Participant's number
 
     // Techniques
     private List<Configs.TECH[]> techOrderList = new ArrayList<>();
@@ -62,7 +63,7 @@ public class Experimenter {
         Configs.setFromFile(); // Set the config from file
         genTechOrder(); // Generate the order of the techniques
         // Start with the logging
-        Mologger.get().participantStart(participantID)
+        Mologger.get().logParticipant(participantID)
                 .check();
     }
 
@@ -145,6 +146,7 @@ public class Experimenter {
         case SHOWCASE -> {
             // Start from the first technique for this participant
             techInd = 0;
+            MainFrame.get().removePanels();
             start(PHASE.PRACTICE);
         }
         case PRACTICE -> {
@@ -208,9 +210,10 @@ public class Experimenter {
      * Set the homing start time
      * @param t Long time
      */
-    public void setHomingStart(long t) {
-        homingStart = t;
+    public void startHoming() {
+        homingStart = Utils.nowInMillis();
     }
+
 
     /**
      * Get the PublishSubject to subscribe to

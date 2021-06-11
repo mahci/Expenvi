@@ -7,6 +7,7 @@ import envi.action.VouseEvent;
 import envi.connection.MooseServer;
 import envi.tools.Prefs;
 import envi.tools.Utils;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 import javax.swing.*;
@@ -16,11 +17,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ExperimentPanel]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     // Circles to draw
@@ -38,13 +40,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     // Publishing all the movements
     private static PublishSubject<MouseEvent> mouseSubject;
+    private Disposable disposable;
 
     // [JFT] For faster testing the trials
     private final Action nextTrial = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(toLog) System.out.println(TAG + "SPACE Performed");
-            trialDone();
+//            if(toLog) System.out.println(TAG + "SPACE Performed");
+//            trialDone();
         }
     };
 
@@ -55,6 +58,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private int blockNum;
     private int subBlockNum;
     private int trialNum;
+
+    // Break flag (for homing time)
+    private boolean inBreak;
 
     // ===============================================================================
 
@@ -77,8 +83,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         mouseSubject = PublishSubject.create();
 
         // Subscribe to the actions Publisher from MooseServer
-        MooseServer.get().actionSubject.subscribe(action -> {
-            System.out.println(TAG + " <- " + action);
+        disposable = MooseServer.get().actionSubject.subscribe(action -> {
+            if (toLog) System.out.println(TAG + " <- " + action);
             switch (action) {
                 case Actions.ACT_CLICK:
                     vPressPrimary();
@@ -149,8 +155,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(Prefs.COLOR_TEXT);
         graphics2D.setFont(Prefs.S_FONT);
         graphics2D.drawString("S",
-                stacle.cx - MainFrame.get().mm2px((Prefs.S_TEXT_X_OFFSET_mm)),
-                stacle.cy + MainFrame.get().mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
+                stacle.cx - MainFrame.mm2px((Prefs.S_TEXT_X_OFFSET_mm)),
+                stacle.cy + MainFrame.mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
         graphics2D.setColor(Prefs.COLOR_TARGET_DEF);
@@ -162,22 +168,30 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(Prefs.COLOR_TEXT);
         graphics2D.setFont(Prefs.STAT_FONT);
 
-        int rect1W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm) * 3/4;
-        int rect2W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm);
-        int rectH = MainFrame.get().mm2px(Prefs.STAT_RECT_HEIGHT_mm);
-        int rect2X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) +
-                MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm));
-        int rect1X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) + rect1W + rect2W);
-        int rect1Y = MainFrame.get().mm2px(Prefs.STAT_MARG_Y_mm);
+        int rect1W = MainFrame.mm2px(Prefs.STAT_RECT_WIDTH_mm) * 3/4;
+        int rect2W = MainFrame.mm2px(Prefs.STAT_RECT_WIDTH_mm);
+        int rectH = MainFrame.mm2px(Prefs.STAT_RECT_HEIGHT_mm);
+        int rect2X = winW - (MainFrame.mm2px(Prefs.STAT_MARG_X_mm) +
+                MainFrame.mm2px(Prefs.STAT_RECT_WIDTH_mm));
+        int rect1X = winW - (MainFrame.mm2px(Prefs.STAT_MARG_X_mm) + rect1W + rect2W);
+        int rect1Y = MainFrame.mm2px(Prefs.STAT_MARG_Y_mm);
         graphics2D.drawRect(rect1X, rect1Y, rect1W, rectH);
         graphics2D.drawRect(rect2X, rect1Y, rect2W, rectH);
 
-        int text1X = rect1X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
-        int text1Y = rect1Y + MainFrame.get().mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
-        int text2X = rect2X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        int text1X = rect1X + MainFrame.mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        int text1Y = rect1Y + MainFrame.mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
+        int text2X = rect2X + MainFrame.mm2px(Prefs.STAT_TEXT_X_PAD_mm);
         graphics2D.setFont(Prefs.STAT_FONT);
         graphics2D.drawString(trialStatText, text1X, text1Y);
         graphics2D.drawString(blockStatText, text2X, text1Y);
+
+        //--- Draw technique text
+        int techTextX = MainFrame.mm2px(Prefs.STAT_MARG_X_mm);
+        int techTextY = MainFrame.mm2px(Prefs.STAT_MARG_Y_mm)
+                + MainFrame.mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
+        graphics2D.drawString(
+                "Technique: " + Experimenter.get().getTechnique().toString(),
+                techTextX, techTextY);
 
         //--- Show error
         if (!errText.isEmpty()) {
@@ -195,25 +209,19 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Set the scene for painting
      */
     private void setScene() {
-        System.out.println(TAG + blockNum + " | " + subBlockNum + " | " + trialNum);
+        if (toLog) System.out.println(TAG + blockNum + " | " + subBlockNum + " | " + trialNum);
         FittsTrial trial = experiment
                 .getBlock(blockNum)
                 .getSubBlock(subBlockNum)
                 .getTrial(trialNum);
         Point staclePosition = MainFrame.get().dispToWin(trial.getStaclePosition());
         Point tarclePosition = MainFrame.get().dispToWin(trial.getTarclePosition());
-        stacle = new Circle(
-                staclePosition,
-                MainFrame.get().mm2px(Configs._stacleRadMM)
-        );
-        tarcle = new Circle(
-                tarclePosition,
-                MainFrame.get().mm2px(trial.getTarWidth())
-        );
-        if(toLog) System.out.println(trial.getStaclePosition());
-        if(toLog) System.out.println(trial.getTarWidth());
-        if(toLog) System.out.println(stacle);
-        if(toLog) System.out.println(tarcle);
+        stacle = new Circle(staclePosition, trial.getStRad());
+        tarcle = new Circle(tarclePosition, trial.getTarRad());
+//        if(toLog) System.out.println(TAG + trial.getStaclePosition());
+//        if(toLog) System.out.println(TAG + trial.getTarRad());
+//        if(toLog) System.out.println(TAG + stacle);
+//        if(toLog) System.out.println(TAG + tarcle);
         // Texts
         int dispBlockNum = (blockNum - 1) * experiment.getNSubInBlock() +
                 subBlockNum;
@@ -266,6 +274,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                     Mologger.get().logBlockStart(blockNum); // Log
                 } else {
                     // Experimenter takes control
+                    if (disposable != null) disposable.dispose();
                     Experimenter.get().endPhase();
                 }
             }
@@ -350,13 +359,18 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
             // Play error sound if outside the target
             if (!tarcle.isInside(crsPos)) {
-                Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+                // Only play sound if in focus
+                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+                    Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+                }
 
                 if (stacle.isInside(crsPos)) { // Double click on Stacle
                     Mologger.get().logTargetAttempt("MISS", "Double click on Start!");
                 } else {
                     Mologger.get().logTargetAttempt("MISS", "");
                 }
+            } else {
+                Mologger.get().logTargetAttempt("HIT", "");
             }
 
             // Trial is done!
@@ -371,7 +385,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             if (pressedInsideStart && stacle.isInside(crsPos)) { // Inside
                 trialStarted();
             } else { // Outside
-                Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
+                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+                    Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
+                }
+
                 trialRepeat();
             }
         }
@@ -430,11 +447,11 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         Mologger.get().logAll(e);
 
         // If homing on the mouse, log the homing time
-//        if (Experimenter.get().getHomingStart() > 0) {
-//            long homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
-//            Mologger.get().log(homingTime, "Homing Time", Mologger.LOG_LEVEL.GEN);
-//            Experimenter.get().setHomingStart(0); // Reset the time
-//        }
+        if (inBreak) {
+            long homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
+            Mologger.get().logHomingTime(homingTime);
+            inBreak = false;
+        }
 
         // If error is shown, clear it
 //        if (!errText.isEmpty()) {
@@ -449,6 +466,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Show the break dialog (between blocks)
      */
     public void breakDialog() {
+        inBreak = true;
         MainFrame.get().showDialog(new BreakDialog());
     }
 

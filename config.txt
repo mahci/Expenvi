@@ -2,8 +2,8 @@
 Minimum Target Radius (mm) = 5
 Window's Height / Max Target Radius = 6
 ----- Experiment -----
-Start Radius (mm) = 8
+Start W (mm) = 16.0
 Number of Blocks = 2
-Target Radii (mm) = 1,2,5,10
-Target Distances (mm) = 75,150,300
+Target W (mm) = 2.0,4.0,10.0,20.0
+Target D (mm) = 75.0,150.0,300.0
 Vibrate = false

@@ -8,6 +8,7 @@ import envi.experiment.FittsTuple;
 import envi.tools.Configs;
 import envi.tools.Prefs;
 import envi.tools.Utils;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -15,11 +16,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Objects;
 
 public class ShowcasePanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ShowcasePanel]] ";
-    private final boolean toLog = false;
+    private final boolean toLog = true;
     // -------------------------------------------------------------------------------
 
     // Circles to draw
@@ -36,6 +38,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private boolean pressedInsideStart = false;
     private int techNum = 0;
 
+    private Disposable disposable;
 
     // Keys
     private final String SPACE = "SPACE";
@@ -48,6 +51,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             Experimenter.get().end(Experimenter.PHASE.SHOWCASE);
+            if (disposable != null) disposable.dispose();
             setVisible(false);
         }
     };
@@ -93,7 +97,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
 
         // Subscribe to the actions Publisher from MooseServer
-        MooseServer.get().actionSubject.subscribe(action -> {
+        disposable = MooseServer.get().actionSubject.subscribe(action -> {
             System.out.println(TAG + " <- " + action);
             switch (action) {
             case Actions.ACT_CLICK:
@@ -183,12 +187,12 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(startColor);
         graphics2D.drawOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
         graphics2D.fillOval(stacle.tlX, stacle.tlY, stacle.getSide(), stacle.getSide());
-//        if(toLog) System.out.println(TAG + "stacle: " + stacle.tlX + " , " + stacle.tlY);
+        if(toLog) System.out.println(TAG + "stacle: " + stacle.tlX + " , " + stacle.tlY);
         graphics2D.setColor(Prefs.COLOR_TEXT);
         graphics2D.setFont(Prefs.S_FONT);
         graphics2D.drawString("S",
-                stacle.cx - MainFrame.get().mm2px((Prefs.S_TEXT_X_OFFSET_mm)),
-                stacle.cy + MainFrame.get().mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
+                stacle.cx - MainFrame.mm2px((Prefs.S_TEXT_X_OFFSET_mm)),
+                stacle.cy + MainFrame.mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
         graphics2D.setColor(Prefs.COLOR_TARGET_DEF);
@@ -199,26 +203,26 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         graphics2D.setColor(Prefs.COLOR_TEXT);
         graphics2D.setFont(Prefs.STAT_FONT);
 
-        int rect1W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm) * 3/4;
-        int rect2W = MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm);
-        int rectH = MainFrame.get().mm2px(Prefs.STAT_RECT_HEIGHT_mm);
-        int rect2X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) +
-                MainFrame.get().mm2px(Prefs.STAT_RECT_WIDTH_mm));
-        int rect1X = winW - (MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm) + rect1W + rect2W);
-        int rect1Y = MainFrame.get().mm2px(Prefs.STAT_MARG_Y_mm);
+        int rect1W = MainFrame.mm2px(Prefs.STAT_RECT_WIDTH_mm) * 3/4;
+        int rect2W = MainFrame.mm2px(Prefs.STAT_RECT_WIDTH_mm);
+        int rectH = MainFrame.mm2px(Prefs.STAT_RECT_HEIGHT_mm);
+        int rect2X = winW - (MainFrame.mm2px(Prefs.STAT_MARG_X_mm) +
+                MainFrame.mm2px(Prefs.STAT_RECT_WIDTH_mm));
+        int rect1X = winW - (MainFrame.mm2px(Prefs.STAT_MARG_X_mm) + rect1W + rect2W);
+        int rect1Y = MainFrame.mm2px(Prefs.STAT_MARG_Y_mm);
 //        graphics2D.drawRect(rect1X, rect1Y, rect1W, rectH);
         graphics2D.drawRect(rect2X, rect1Y, rect2W, rectH);
 
-        int text1X = rect1X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
-        int text1Y = rect1Y + MainFrame.get().mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
-        int text2X = rect2X + MainFrame.get().mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        int text1X = rect1X + MainFrame.mm2px(Prefs.STAT_TEXT_X_PAD_mm);
+        int text1Y = rect1Y + MainFrame.mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
+        int text2X = rect2X + MainFrame.mm2px(Prefs.STAT_TEXT_X_PAD_mm);
 //        graphics2D.drawString(trialStatText, text1X, text1Y);
         graphics2D.drawString(blockStatText, text2X, text1Y);
 
         //--- Draw technique text
-        int techTextX = MainFrame.get().mm2px(Prefs.STAT_MARG_X_mm);
-        int techTextY = MainFrame.get().mm2px(Prefs.STAT_MARG_Y_mm)
-                + MainFrame.get().mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
+        int techTextX = MainFrame.mm2px(Prefs.STAT_MARG_X_mm);
+        int techTextY = MainFrame.mm2px(Prefs.STAT_MARG_Y_mm)
+                + MainFrame.mm2px(Prefs.STAT_TEXT_Y_PAD_mm);
         graphics2D.drawString(techStrs[0], techTextX, techTextY);
         graphics2D.drawString(techStrs[1], techTextX + 100, techTextY);
         graphics2D.drawString(techStrs[2], techTextX + 200, techTextY);
@@ -238,14 +242,19 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         FittsTrial trial = new FittsTrial(FittsTuple.randFittsTuple());
 
         // Create the circles
-        stacle = new Circle(
-                MainFrame.get().dispToWin(trial.getStaclePosition()),
-                MainFrame.get().mm2px(Configs._stacleRadMM)
-        );
-        tarcle = new Circle(
-                MainFrame.get().dispToWin(trial.getTarclePosition()),
-                MainFrame.get().mm2px(trial.getTarWidth())
-        );
+        Point staclePosition = MainFrame.get().dispToWin(trial.getStaclePosition());
+        Point tarclePosition = MainFrame.get().dispToWin(trial.getTarclePosition());
+        stacle = new Circle(staclePosition, trial.getStRad());
+        tarcle = new Circle(tarclePosition, trial.getTarRad());
+
+        if(toLog) System.out.println(TAG + staclePosition);
+        if(toLog) System.out.println(TAG + tarclePosition);
+        if(toLog) System.out.println(TAG + trial.getStaclePosition());
+        if(toLog) System.out.println(TAG + trial.getTarclePosition());
+        if(toLog) System.out.println(TAG + trial.getStRad());
+        if(toLog) System.out.println(TAG + trial.getTarRad());
+        if(toLog) System.out.println(TAG + stacle);
+        if(toLog) System.out.println(TAG + tarcle);
     }
 
     /**
@@ -302,7 +311,10 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         if (startPressed) { // Released on the target is clicked => Trial finished
             // Play error sound if outside the target
             if (!tarcle.isInside(crsPos)) {
-                Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+                if (toLog) System.out.println(TAG + "Outside Target");
+                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+                    Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+                }
             }
 
             trialDone();
@@ -310,8 +322,11 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
             if (pressedInsideStart && stacle.isInside(crsPos.x, crsPos.y)) {
                 trialStarted();
             } else {
+                if (toLog) System.out.println(TAG + "Outside Start");
                 // Play error sound
-                Utils.playSound(Prefs.START_MISS_ERR_SOUND);
+                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+                    Utils.playSound(Prefs.START_MISS_ERR_SOUND);
+                }
 
                 trialRepeat();
             }

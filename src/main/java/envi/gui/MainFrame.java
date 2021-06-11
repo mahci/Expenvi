@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 public class MainFrame extends JFrame {
 
@@ -36,10 +37,17 @@ public class MainFrame extends JFrame {
      * Return the display area (removing the margins)
      * @return Display area
      */
-    public Pair<Integer, Integer> getDispArea() {
+    public Pair<Integer, Integer> getDispAreaMM() {
         return new Pair<>(
                 getWidthMM() - 2 * Prefs.WIN_MARG_W_mm,
                 getHeightMM() - 2 * Prefs.WIN_MARG_H_mm);
+    }
+
+    public Pair<Integer, Integer> getDispArea() {
+        return new Pair<>(
+                getWidth() - 2 * mm2px(Prefs.WIN_MARG_W_mm),
+                getHeight() - 2 * mm2px(Prefs.WIN_MARG_H_mm)
+        );
     }
 
     public int getWidthMM() {
@@ -55,9 +63,16 @@ public class MainFrame extends JFrame {
      * @param inPoint Point in display area
      * @return Window's coordinates
      */
+//    public Point dispToWinMM(Point inPoint) {
+//        inPoint.translate(Prefs.WIN_MARG_W_mm, Prefs.WIN_MARG_H_mm);
+//        return pointMM2Px(inPoint);
+//    }
+
     public Point dispToWin(Point inPoint) {
-        inPoint.translate(Prefs.WIN_MARG_W_mm, Prefs.WIN_MARG_H_mm);
-        return pointMM2Px(inPoint);
+        inPoint.translate(
+                mm2px(Prefs.WIN_MARG_W_mm),
+                mm2px(Prefs.WIN_MARG_H_mm));
+        return inPoint;
     }
 
     /**
@@ -88,9 +103,31 @@ public class MainFrame extends JFrame {
      */
     public void showPanel(JPanel panel) {
         getContentPane().removeAll();
+        revalidate();
         add(panel);
+        getContentPane().invalidate();
+        getContentPane().validate();
 //        pack();
         display();
+    }
+
+    public void removePanels() {
+        for (Component c : getAllComponents(this)) {
+            c.disable();
+        }
+        getContentPane().removeAll();
+        revalidate();
+    }
+
+    public java.util.List<Component> getAllComponents(final Container c) {
+        Component[] comps = c.getComponents();
+        java.util.List<Component> compList = new ArrayList<Component>();
+        for (Component comp : comps) {
+            compList.add(comp);
+            if (comp instanceof Container)
+                compList.addAll(getAllComponents((Container) comp));
+        }
+        return compList;
     }
 
     /**

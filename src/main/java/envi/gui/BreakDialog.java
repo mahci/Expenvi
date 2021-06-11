@@ -2,7 +2,6 @@ package envi.gui;
 
 import envi.experiment.Experimenter;
 import envi.tools.Strs;
-import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,7 +47,7 @@ public class BreakDialog extends JDialog implements KeyListener {
             setVisible(false);
 //            Experimenter.get().nextBlock();
             // Set the start of homing
-//            Experimenter.get().setHomingStart(Utils.now());
+            Experimenter.get().startHoming();
         }
     }
 

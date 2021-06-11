@@ -96,6 +96,10 @@ public class Utils {
         return ThreadLocalRandom.current().nextInt(min, bound);
     }
 
+    public static double randDouble(double min, double bound) {
+        return ThreadLocalRandom.current().nextDouble(min, bound);
+    }
+
     /**
      * Generate a random permutation of {0, 1, ..., len - 1}
      * @param len Length of the permutation
@@ -146,14 +150,15 @@ public class Utils {
             URI uri = soundFile.toURI();
             URL url = uri.toURL();
             AudioClip clip = Applet.newAudioClip(url);
-            AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+//            AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
             clip.play();
-        } catch ( UnsupportedAudioFileException
-                | NullPointerException
+
+        } catch ( NullPointerException
                 | IOException e
                 ) {
             e.printStackTrace();
         }
+
 
     }
 

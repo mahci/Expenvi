@@ -9,8 +9,8 @@ import java.util.Collections;
  * FittsTuple class to hold one combination of values
  */
 public class FittsTuple {
-    public int width; // Target width
-    public int dist; // Target Distance
+    public double width; // Target width (mm)
+    public double dist; // Target Distance (mm)
     public int leftRight; // Left = 0 / Right = 1
     //==============================================================================
 
@@ -27,7 +27,7 @@ public class FittsTuple {
      * @param d Distance
      * @param lr LeftRight
      */
-    public FittsTuple(int w, int d, int lr) {
+    public FittsTuple(double w, double d, int lr) {
         this.width = w;
         this.dist = d;
         this.leftRight = lr;
@@ -39,10 +39,10 @@ public class FittsTuple {
      */
     public static FittsTuple randFittsTuple() {
         FittsTuple result = new FittsTuple();
-        result.width = Utils.randInt(
+        result.width = Utils.randDouble(
                 Collections.min(Configs._widthsMM),
                 Collections.max(Configs._widthsMM) + 1);
-        result.dist = Utils.randInt(
+        result.dist = Utils.randDouble(
                 Collections.min(Configs._distancesMM),
                 Collections.max(Configs._distancesMM) + 1);
         result.leftRight = Utils.randInt(0, 2);
