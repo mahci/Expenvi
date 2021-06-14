@@ -416,14 +416,18 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (Experimenter.get().getTechnique()
-                .equals(Configs.TECH.MOUSE)) vPressPrimary();
+        if (Experimenter.get().isTechnique(Configs.TECH.MOUSE) &&
+                e.getButton() == MouseEvent.BUTTON1) {
+            vPressPrimary();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (Experimenter.get().getTechnique()
-                .equals(Configs.TECH.MOUSE)) vReleasePrimary();
+        if (Experimenter.get().isTechnique(Configs.TECH.MOUSE) &&
+                e.getButton() == MouseEvent.BUTTON1) {
+            vReleasePrimary();
+        }
     }
 
     @Override

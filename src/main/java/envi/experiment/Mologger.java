@@ -141,7 +141,8 @@ public class Mologger {
             phaseDir = phaseDirPath;
 
             // Send log command to the Moose
-            MooseServer.get().sendMssg(Strs.MSSG_BEG_PHS, phase.name());
+            MooseServer.get().sendMssg(Strs.MSSG_TECHNIQUE, technique.toString());
+            MooseServer.get().sendMssg(Strs.MSSG_BEG_PHS, phase.toString());
 
             return STATUS.SUCCESS;
         } else {
@@ -180,6 +181,9 @@ public class Mologger {
             blkTrgLog.println(Utils.nowTimeMilli());
             blkTrgLog.println(blkSep);
             blkTrgLog.flush();
+
+            // Sync the Moose
+            MooseServer.get().sendMssg(Strs.MSSG_BEG_BLK, String.valueOf(blkNum));
 
             return STATUS.SUCCESS;
 

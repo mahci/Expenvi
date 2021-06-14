@@ -155,7 +155,7 @@ public class MooseServer {
             outPW.flush();
             if (toLog) System.out.println(TAG + mssg + " sent");
         } else {
-            System.out.println(TAG + "Output PrintWriter not available!");
+            if (toLog) System.out.println(TAG + "Output PrintWriter not available!");
         }
     }
 

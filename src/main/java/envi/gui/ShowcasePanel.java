@@ -7,6 +7,7 @@ import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
 import envi.tools.Configs;
 import envi.tools.Prefs;
+import envi.tools.Strs;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -159,6 +160,9 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         techStrs[0] = "[1] " + Experimenter.get().getTech(0);
         techStrs[1] = "[2] " + Experimenter.get().getTech(1);
         techStrs[2] = "[3] " + Experimenter.get().getTech(2);
+
+        // Update the technique on Moose
+        MooseServer.get().sendMssg(Strs.MSSG_TECHNIQUE, Experimenter.get().getTech(0));
 
     }
 
@@ -353,15 +357,18 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (Experimenter.get().getTechnique()
-                .equals(Configs.TECH.MOUSE)) vPressPrimary();
+        if (Experimenter.get().isTechnique(Configs.TECH.MOUSE) &&
+                e.getButton() == MouseEvent.BUTTON1) {
+            vPressPrimary();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (Experimenter.get().getTechnique()
-                .equals(Configs.TECH.MOUSE)) vReleasePrimary();
-        requestFocus();
+        if (Experimenter.get().isTechnique(Configs.TECH.MOUSE) &&
+                e.getButton() == MouseEvent.BUTTON1) {
+            vReleasePrimary();
+        }
     }
 
     @Override

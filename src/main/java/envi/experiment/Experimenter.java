@@ -91,16 +91,6 @@ public class Experimenter {
     }
 
     /**
-     * Get the technique from an index
-     * @param ind Index
-     * @return Technique
-     */
-    public String getTech(int ind) {
-        if (ind < 3) return techOrder[ind].toString();
-        else return "";
-    }
-
-    /**
      * Start a phase
      * @param phase PHASE
      */
@@ -195,6 +185,25 @@ public class Experimenter {
         return techOrder[techInd];
     }
 
+    /**
+     * Get the technique from an index
+     * @param ind Index
+     * @return Technique
+     */
+    public String getTech(int ind) {
+        if (ind < 3) return techOrder[ind].toString();
+        else return "";
+    }
+
+    /**
+     * Check the current technique against a given technique
+     * @param tech TECH to check
+     * @return Boolean
+     */
+    public boolean isTechnique(Configs.TECH tech) {
+        return Objects.equals(tech, techOrder[techInd]);
+    }
+
     public PHASE getPhase() {
         return phase;
     }
@@ -208,7 +217,6 @@ public class Experimenter {
     //region [Getters & Setters]
     /**
      * Set the homing start time
-     * @param t Long time
      */
     public void startHoming() {
         homingStart = Utils.nowInMillis();
