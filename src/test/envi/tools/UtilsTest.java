@@ -1,5 +1,7 @@
 package envi.tools;
 
+import envi.experiment.Experimenter;
+
 public class UtilsTest {
 
     @org.junit.jupiter.api.Test
@@ -43,6 +45,13 @@ public class UtilsTest {
 
     @org.junit.jupiter.api.Test
     void playSound() {
-        Utils.playSound("err2.wav");
+//        Utils.playSound("err2.wav");
+    }
+
+    @org.junit.jupiter.api.Test
+    void time() {
+//        System.out.println(Utils.nowDateTime());
+//        System.out.println(Experimenter.PHASE.EXPERIMENT.ordinal());
+        System.out.println(Utils.double3Dec(8.120));
     }
 }

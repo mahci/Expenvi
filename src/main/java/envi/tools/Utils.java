@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -18,6 +19,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Utils {
 
     public static final double MM_IN_INCH = 25.4;
+    private static String TAG = "[[Utils]] ";
+    private boolean toLog = false;
 
     // ==============================================================================
 
@@ -93,11 +96,21 @@ public class Utils {
      * @return Random int
      */
     public static int randInt(int min, int bound) {
-        return ThreadLocalRandom.current().nextInt(min, bound);
+        try {
+            return ThreadLocalRandom.current().nextInt(min, bound);
+        } catch (IllegalArgumentException e) {
+            System.out.println(TAG + "ERROR: randInt() min > bound");
+            return 0;
+        }
     }
 
     public static double randDouble(double min, double bound) {
-        return ThreadLocalRandom.current().nextDouble(min, bound);
+        try {
+            return ThreadLocalRandom.current().nextDouble(min, bound);
+        } catch (IllegalArgumentException e) {
+            System.out.println(TAG + "ERROR: randDouble() min > bound");
+            return 0;
+        }
     }
 
     /**
@@ -135,8 +148,9 @@ public class Utils {
      * Get the current date+time up to minutes
      * @return LocalDateTime
      */
-    public static LocalDateTime nowDateTime() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    public static String nowDateTime() {
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy_hh-mm");
+        return format.format(Calendar.getInstance().getTime());
     }
 
     /**
@@ -169,5 +183,14 @@ public class Utils {
      */
     public static String pointToString(Point p) {
         return "(" + p.x + "," + p.y + ")";
+    }
+
+    /**
+     * Get the double String in 3 decimal places
+     * @param input Double
+     * @return String (#.###)
+     */
+    public static String double3Dec(double input) {
+        return String.format("%.3f", input);
     }
 }

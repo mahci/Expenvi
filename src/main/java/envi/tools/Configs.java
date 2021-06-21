@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Configs {
 
     private static final String TAG = "[[Configs]] ";
-    private static final boolean toLog = true;
+    private static final boolean toLog = false;
     // -------------------------------------------------------------------------------
     // Network
     public static int _netPort = 8000;

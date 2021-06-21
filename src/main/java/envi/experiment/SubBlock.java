@@ -14,7 +14,6 @@ public class SubBlock {
     }
 
     public SubBlock(List<FittsTuple> combinations) {
-        System.out.println("Cmb size = " + combinations.size());
         for (FittsTuple cmb : combinations) {
             addTrial(new FittsTrial(cmb));
         }

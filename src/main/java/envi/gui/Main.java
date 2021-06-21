@@ -3,6 +3,7 @@ package envi.gui;
 import java.awt.*;
 
 import envi.experiment.Experimenter;
+import envi.experiment.Mologger;
 import envi.tools.Configs;
 import envi.connection.*;
 
@@ -28,13 +29,14 @@ public class Main {
         // Start the server
         MooseServer.get().start();
 
-        // Close the server on close
+        // Actions on close
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
             @Override
             public void run()
             {
                 MooseServer.get().close();
+                Mologger.get().finishLogs();
             }
         });
 
@@ -48,7 +50,11 @@ public class Main {
         GraphicsDevice[] gd = ge.getScreenDevices();
 
         Configs._nScr = gd.length;
-        Configs._scrDims = gd[Configs._scrId].getDefaultConfiguration().getBounds();
+        if (Configs._scrId < Configs._nScr) {
+            Configs._scrDims = gd[Configs._scrId].getDefaultConfiguration().getBounds();
+        } else {
+            Configs._scrDims = gd[0].getDefaultConfiguration().getBounds();
+        }
     }
 
 }

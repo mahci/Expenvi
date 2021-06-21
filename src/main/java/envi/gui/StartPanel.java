@@ -20,6 +20,11 @@ public class StartPanel extends JPanel {
     JButton startButton = new JButton();
     JLabel hintLabel = new JLabel();
     JLabel techLabel = new JLabel();
+
+    // Variables
+    private Configs.TECH technique;
+    private Experimenter.PHASE phase;
+
     // -------------------------------------------------------------------------------
 
     //--- Actions to perform on click of the button
@@ -39,8 +44,7 @@ public class StartPanel extends JPanel {
 //            Configs.updateDisplayValues();
 
             MainFrame.get().showPanel(
-                    new ExperimentPanel(
-                            new Practice(1, 3)));
+                    new ExperimentPanel(new Practice(1, 3), technique, phase));
 //
 //            Experimenter.get().startExperiment(false);
         }
@@ -52,8 +56,7 @@ public class StartPanel extends JPanel {
 
             // Show experiment panel
             MainFrame.get().showPanel(
-                    new ExperimentPanel(
-                    new Experiment(5, 2)));
+                    new ExperimentPanel(new Experiment(5, 2), technique, phase));
 
         }
     };
@@ -63,6 +66,9 @@ public class StartPanel extends JPanel {
      * Constructor
      */
     public StartPanel(Experimenter.PHASE phase, Configs.TECH technique) {
+        this.technique = technique;
+        this.phase = phase;
+
         showUI(phase);
     }
 

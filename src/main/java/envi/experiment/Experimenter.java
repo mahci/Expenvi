@@ -186,6 +186,22 @@ public class Experimenter {
     }
 
     /**
+     * Return the ordinal of the current technique
+     * @return int
+     */
+    public int getTechOrdinal() {
+        return techOrder[techInd].ordinal();
+    }
+
+    /**
+     * Return the ordinal of the current phase
+     * @return int
+     */
+    public int getPhaseOrdinal() {
+        return phase.ordinal();
+    }
+
+    /**
      * Get the technique from an index
      * @param ind Index
      * @return Technique

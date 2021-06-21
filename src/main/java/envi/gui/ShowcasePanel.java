@@ -5,6 +5,7 @@ import envi.connection.MooseServer;
 import envi.experiment.Experimenter;
 import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
+import envi.experiment.Mologger;
 import envi.tools.Configs;
 import envi.tools.Prefs;
 import envi.tools.Strs;
@@ -35,9 +36,11 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private String[] techStrs = new String[3];
 
     // Experiment vars
-    private boolean startPressed = false;
-    private boolean pressedInsideStart = false;
     private int techNum = 0;
+
+    private boolean startPressed = false;
+    private boolean startClicked = false;
+    private boolean targetPressed = false;
 
     private Disposable disposable;
 
@@ -64,6 +67,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
             Experimenter.get().setTechInd(0);
             MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
             techNum = 0;
+            resetState();
             repaint();
         }
     };
@@ -73,6 +77,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
             Experimenter.get().setTechInd(1);
             MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
             techNum = 1;
+            resetState();
             repaint();
         }
     };
@@ -82,6 +87,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
             Experimenter.get().setTechInd(2);
             MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
             techNum = 2;
+            resetState();
             repaint();
         }
     };
@@ -99,11 +105,9 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
         // Subscribe to the actions Publisher from MooseServer
         disposable = MooseServer.get().actionSubject.subscribe(action -> {
-            System.out.println(TAG + " <- " + action);
             switch (action) {
             case Actions.ACT_CLICK:
-                vPressPrimary();
-                vReleasePrimary();
+                vClickPrimary();
                 break;
             case Actions.ACT_PRESS_PRI:
                 vPressPrimary();
@@ -123,6 +127,14 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         requestFocusInWindow();
 
 //        setFocusable(true);
+    }
+
+    /**
+     * Reset the state
+     */
+    private void resetState() {
+        startPressed = targetPressed = false;
+        startClicked = false;
     }
 
     private void setActions() {
@@ -185,7 +197,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
 
         //-- Draw circles
         // Colors
-        Color startColor = startPressed ? Prefs.COLOR_START_SEL : Prefs.COLOR_START_DEF;
+        Color startColor = Prefs.COLOR_START_DEF;
+        if (startPressed || startClicked) startColor = Prefs.COLOR_START_SEL;
 
         // Start circle
         graphics2D.setColor(startColor);
@@ -251,21 +264,22 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         stacle = new Circle(staclePosition, trial.getStRad());
         tarcle = new Circle(tarclePosition, trial.getTarRad());
 
-        if(toLog) System.out.println(TAG + staclePosition);
-        if(toLog) System.out.println(TAG + tarclePosition);
-        if(toLog) System.out.println(TAG + trial.getStaclePosition());
-        if(toLog) System.out.println(TAG + trial.getTarclePosition());
-        if(toLog) System.out.println(TAG + trial.getStRad());
-        if(toLog) System.out.println(TAG + trial.getTarRad());
-        if(toLog) System.out.println(TAG + stacle);
-        if(toLog) System.out.println(TAG + tarcle);
+//        if(toLog) System.out.println(TAG + staclePosition);
+//        if(toLog) System.out.println(TAG + tarclePosition);
+//        if(toLog) System.out.println(TAG + trial.getStaclePosition());
+//        if(toLog) System.out.println(TAG + trial.getTarclePosition());
+//        if(toLog) System.out.println(TAG + trial.getStRad());
+//        if(toLog) System.out.println(TAG + trial.getTarRad());
+//        if(toLog) System.out.println(TAG + stacle);
+//        if(toLog) System.out.println(TAG + tarcle);
     }
 
     /**
      * Start is clicked
      */
     private void trialStarted() {
-        startPressed = true; // Pressed
+        System.out.println(TAG + "trialStarted");
+        startClicked = true;
         repaint();
     }
 
@@ -273,7 +287,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      * Click attempted on Target
      */
     private void trialDone() {
-        startPressed = false; // Reset pressed
+        System.out.println(TAG + "trialDone");
+        startClicked = false;
         setScene();
         repaint();
     }
@@ -282,7 +297,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      * Clicked outside the start
      */
     private void trialRepeat() {
-        startPressed = false; // Reset pressed
+        System.out.println(TAG + "trialRepeat");
+        startClicked = false;
         repaint();
     }
 
@@ -293,48 +309,98 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      * Virtual press of the primary mouse button
      */
     public void vPressPrimary() {
-
-        // Position of the curser
-        Point crsPos = getCursorPosition();
+        System.out.println(TAG + "Press");
+        System.out.println(TAG + "StartClicked= " + startClicked);
+        Point crsPos = getCursorPosition(); // Position of the curser
 
         // Check where pressed...
-        if (!startPressed && stacle.isInside(crsPos)) {
-            pressedInsideStart = true;
+        if (startClicked) { // Target pressing
+            // Target is pressed
+            targetPressed = true;
+        } else { // Start pressing
+            if (stacle.isInside(crsPos)) {
+                startPressed = true;
+            }
             repaint();
         }
+
     }
 
     /**
      * Virtual release of the primary mouse buttons
      */
     public void vReleasePrimary() {
-        // Postion of the curser
-        Point crsPos = getCursorPosition();
+        System.out.println(TAG + "Release");
+        System.out.println(TAG + "targetPressed= " + targetPressed);
+        Point crsPos = getCursorPosition(); // Curser position
 
-        // Check where released...
-        if (startPressed) { // Released on the target is clicked => Trial finished
+        // Check where released (doesn't matter where the press was)
+        if (startClicked) { // Releasing inside/outside target
+            targetPressed = false;
+
             // Play error sound if outside the target
             if (!tarcle.isInside(crsPos)) {
-                if (toLog) System.out.println(TAG + "Outside Target");
+                // Only play sound if in focus
                 if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+                    Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+                }
+
+            }
+
+            trialDone(); // Trial is done
+
+        } else { // Releasing on the start
+            startPressed = false;
+
+            if (stacle.isInside(crsPos)) { // Release is also inside
+                System.out.println(TAG + "inside start");
+                startClicked = true;
+                trialStarted();
+            } else { // Outside
+                System.out.println(TAG + "outside start");
+                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+                    Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
+                }
+
+                trialRepeat(); // Repeat the trial
+            }
+        }
+    }
+
+    public void vClickPrimary() {
+        System.out.println(TAG + "Click");
+        Point crsPos = getCursorPosition(); // Position of the curser
+
+        if (startClicked) { // Clicking on the target => Trial finished
+
+            // Play error sound if outside the target (window in focus)
+            if (!tarcle.isInside(crsPos)) {
+                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) { // Miss
                     Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
                 }
             }
 
+            // Trial is done!
             trialDone();
-        } else { // Released from the start
-            if (pressedInsideStart && stacle.isInside(crsPos.x, crsPos.y)) {
+
+        } else { // Clicking on the start
+
+            if (stacle.isInside(crsPos)) { // Inside
+                System.out.println(TAG + "inside start");
+                startClicked = true;
                 trialStarted();
-            } else {
-                if (toLog) System.out.println(TAG + "Outside Start");
-                // Play error sound
+            } else { // Outside
+                System.out.println(TAG + "outside start");
                 if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
-                    Utils.playSound(Prefs.START_MISS_ERR_SOUND);
+                    Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
                 }
 
                 trialRepeat();
             }
+
         }
+
+
     }
 
     /**
@@ -381,7 +447,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     public void mouseDragged(MouseEvent e) { }
 
     @Override
-    public void mouseMoved(MouseEvent e) { }
+    public void mouseMoved(MouseEvent e) {
+    }
 
     //endregion
 
