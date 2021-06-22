@@ -3,10 +3,8 @@ package envi.gui;
 import envi.experiment.*;
 import envi.tools.Configs;
 import envi.action.Actions;
-import envi.action.VouseEvent;
 import envi.connection.MooseServer;
 import envi.tools.Prefs;
-import envi.tools.STATUS;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -16,7 +14,6 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.time.LocalTime;
 import java.util.Objects;
 
 public class ExperimentPanel extends JPanel implements MouseInputListener {
@@ -57,7 +54,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private int technique; // Technique of the experiment (ordinal)
     private int phase; // Which phase? (ordinal)
 
-    // Indexes
+    // Indexesx
     private int blockNum;
     private int subBlockNum;
     private int overallSBlockNum;
@@ -90,7 +87,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private int tgHit; // Hit = 1, miss = 0, start double click = -1xxz
 
     // Dummy Component for logging
-    Button btn = new Button();
+    private Button btn = new Button();
 
     // ===============================================================================
 
@@ -154,12 +151,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // Save the start time
         triallBeginTime = Utils.nowInMillis();
         sBlockBeginTime = Utils.nowInMillis();
-
-        // Log the start of the first block
-//        Mologger.get().logBlockStart(blockNum).check();
-//        Mologger.get().logBlockStart(
-//                blockNum,
-//                LocalTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
 
@@ -172,6 +163,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         Graphics2D graphics2D = (Graphics2D) graphics;
 
+        // Widtd/height of the window
         int winW = this.getWidth();
         int winH = this.getHeight();
 
@@ -231,16 +223,13 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 "Technique: " + Experimenter.get().getTechnique().toString(),
                 techTextX, techTextY);
 
-        //--- Show error
-        if (!errText.isEmpty()) {
-            int errTextX = winW / 2 - 200;
-            graphics2D.setColor(Prefs.COLOR_ERROR);
-            graphics2D.drawString(
-                    errText,
-                    errTextX, text1Y);
+        //--- Show colorful rectangle (of on break)
+        if (inBreak) {
+            graphics2D.setColor(Prefs.COLOR_BREAK_BACK);
+            graphics2D.fillRect(0, 0, winW, winH);
         }
 
-        requestFocus();
+//        requestFocus();
     }
 
     /**
@@ -269,6 +258,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if (inBreak) sBlockBeginTime = Utils.nowInMillis();
 
 //        Mologger.get().logTrialStart(trialNum, trial);
+        repaint();
     }
 
     /**
@@ -288,48 +278,54 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         logTrial(); // Log all the trial info
 
-        // Next step
-        if (experiment
-                .getBlock(blockNum)
-                .getSubBlock(subBlockNum)
-                .hasNext(trialNum)) { // Next trial
-            trialNum++;
+        //-- Next step:
+        if (experiment.getBlock(blockNum).getSubBlock(subBlockNum).hasNext(trialNum)) { // More trials
+//            trialNum++;
+            nextTrial();
         } else { // Trials in the sub-block finished
-            if (experiment
-                    .getBlock(blockNum)
-                    .hasNext(subBlockNum)) { // Next sub-block
-                sBlockEndTime = Utils.nowInMillis();
-                logSBlock();
+            // Log the subblock
+            sBlockEndTime = Utils.nowInMillis();
+            logSBlock();
 
-                breakDialog();
-                subBlockNum++;
-                overallSBlockNum++;
-                trialNum = 1;
-            } else { // Sub-blocks finished
-                if (experiment.hasNext(blockNum)) { // Next block
-                    sBlockEndTime = Utils.nowInMillis();
-                    logSBlock();
+            // Was it the last subblock?
+            if (experiment.isFinished(overallSBlockNum)) {
+                // Finish alll the logs
+                Mologger.get().finishLogs();
 
-                    breakDialog();
-                    blockNum++;
-                    subBlockNum = 1;
-                    overallSBlockNum++;
-                    trialNum = 1;
-                } else {
-                    logSBlock(); // Log the last sBlock
-
-                    // Finish alll the logs
-                    Mologger.get().finishLogs();
-
-                    // Experimenter takes control
-                    if (disposable != null) disposable.dispose();
-                    Experimenter.get().endPhase();
-                }
+                // Experimenter takes control
+                if (disposable != null) disposable.dispose();
+                Experimenter.get().endPhase();
+            } else {
+                showBreak();
             }
+
+//            if (experiment.getBlock(blockNum).hasNext(subBlockNum)) { // More subblocks
+//                breakDialog();
+//                nextSubblock();
+////                subBlockNum++;
+////                overallSBlockNum++;
+////                trialNum = 1;
+//            } else { // Sub-blocks finished
+//                if (experiment.hasNext(blockNum)) { // More blocks
+//                    breakDialog();
+//                    nextBlock();
+////                    blockNum++;
+////                    subBlockNum = 1;
+////                    overallSBlockNum++;
+////                    trialNum = 1;
+//                } else {
+//                    // Finish alll the logs
+//                    Mologger.get().finishLogs();
+//
+//                    // Experimenter takes control
+//                    if (disposable != null) disposable.dispose();
+//                    Experimenter.get().endPhase();
+//                }
+//            }
         }
 
-        setScene();
-        repaint();
+//        setScene();
+//        repaint();
 
     }
 
@@ -344,6 +340,32 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         repaint();
     }
+
+    /**
+     * Go to the next trial (trial, block, ...)
+     */
+    public void nextTrial() {
+        trialNum++;
+        setScene();
+    }
+
+    /**
+     * Go to the next subblock (may be the next block)
+     */
+    public void nextSubblock() {
+        // Check if more subblocks from the same block or we should go to the next
+        if (experiment.getBlock(blockNum).hasNext(subBlockNum)) {
+            subBlockNum++;
+        } else {
+            blockNum++;
+            subBlockNum = 1;
+        }
+
+        overallSBlockNum++;
+        trialNum = 1;
+        setScene();
+    }
+
 
     /**
      * Log all the trial info
@@ -609,13 +631,13 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     public void mouseMoved(MouseEvent e) {
         // Log EVENT
         Mologger.get().logEvent(technique, phase, overallSBlockNum, trialNum, e);
-//        Mologger.get().logMotion(overallSBlockNum, trialNum, e);
 
         // If homing on the mouse, log the homing time
-        if (inBreak) {
+        if (Experimenter.get().getHomingStart() > 0) {
             homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
-//            Mologger.get().logHomingTime(homingTime);
-            inBreak = false;
+            Experimenter.get().resetHoming();
+//            inBreak = false;
+//            repaint();
         }
 
     }
@@ -625,9 +647,14 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     /**
      * Show the break dialog (between blocks)
      */
-    public void breakDialog() {
+    public void showBreak() {
         inBreak = true;
+        repaint();
         MainFrame.get().showDialog(new BreakDialog());
+
+        // Back from the dialog
+        inBreak = false;
+        nextSubblock();
     }
 
 }

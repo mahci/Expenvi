@@ -5,6 +5,9 @@ import java.util.List;
 
 public class SubBlock {
 
+    private String TAG = "[[Subblock]] ";
+    private boolean toLog = false;
+
     private ArrayList<FittsTrial> trials = new ArrayList<>(); // List of trials
 
     // ===============================================================================
@@ -28,7 +31,7 @@ public class SubBlock {
     }
 
     public boolean hasNext(int trNum) {
-        System.out.println("Subblock: " + trNum + " / " + trials.size());
+        if (toLog) System.out.println(TAG + "Subblock: " + trNum + " / " + trials.size());
         return trials.size() - trNum > 0;
     }
 

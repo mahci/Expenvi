@@ -106,4 +106,12 @@ public class Experiment {
         return blocks.size() - bNum > 0;
     }
 
+    /**
+     * Check whether the Experiment is finished
+     * @param overallSblkNum The overall number of subblocks
+     * @return boolean
+     */
+    public boolean isFinished(int overallSblkNum) {
+        return overallSblkNum == getTotalNSubBlocks();
+    }
 }

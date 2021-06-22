@@ -13,6 +13,8 @@ public class Prefs {
     public static Color COLOR_START_SEL     = Color.decode("#3D6E3B");
     public static Color COLOR_TARGET_DEF    = Color.decode("#1E90FF");
 
+    public static Color COLOR_BREAK_BACK    = Color.decode("#7B1FA2");
+
     // DIMENSIONS & MARGINS
     public static int WIN_MARG_H_mm         = 30; // Window top & down margin (mm)
     public static int WIN_MARG_W_mm         = 70; // Window left & right margin (mm)

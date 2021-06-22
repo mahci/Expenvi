@@ -137,7 +137,7 @@ public class Block {
      * @return FittsTrial
      */
     public FittsTrial getTrial(int trInd) {
-        System.out.println("Number of trials = " + trials.size());
+        System.out.println(TAG + "Number of trials = " + trials.size());
         if (trInd < trials.size()) return trials.get(trInd);
         else return null;
     }

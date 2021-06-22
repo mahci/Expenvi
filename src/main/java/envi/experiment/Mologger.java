@@ -294,7 +294,7 @@ public class Mologger {
     }
 
     public STATUS logTime(int technique, int phase, int sbNum, long sbDT, long homingTime) {
-        System.out.println("Log TIME");
+        System.out.println(TAG + "Log TIME");
         if (!enabled) return STATUS.LOG_DISABLED;
 
         try {
