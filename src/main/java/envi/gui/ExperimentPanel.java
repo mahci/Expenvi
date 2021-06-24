@@ -5,6 +5,7 @@ import envi.tools.Configs;
 import envi.action.Actions;
 import envi.connection.MooseServer;
 import envi.tools.Prefs;
+import envi.tools.Strs;
 import envi.tools.Utils;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -148,6 +149,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         overallSBlockNum = 1;
         trialNum = 1;
 
+        // Sync with the Moose
+        MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, overallSBlockNum);
+        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
+
         // Save the start time
         triallBeginTime = Utils.nowInMillis();
         sBlockBeginTime = Utils.nowInMillis();
@@ -229,7 +234,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             graphics2D.fillRect(0, 0, winW, winH);
         }
 
-//        requestFocus();
+        requestFocus();
     }
 
     /**
@@ -273,7 +278,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Click attempted on Target
      */
     private void trialDone() {
-        if(toLog) System.out.println(TAG + "TrialDone");
+        if (toLog) System.out.println(TAG + "TrialDone");
         startClicked = false;
 
         logTrial(); // Log all the trial info
@@ -347,6 +352,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     public void nextTrial() {
         trialNum++;
         setScene();
+
+        // Sync with the Moose
+        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
     }
 
     /**
@@ -364,6 +372,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         overallSBlockNum++;
         trialNum = 1;
         setScene();
+
+        // Sync with the Moose
+        MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, overallSBlockNum);
+        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
     }
 
 

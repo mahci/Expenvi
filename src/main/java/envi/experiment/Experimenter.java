@@ -28,7 +28,7 @@ public class Experimenter {
     private long homingStart = 0;
 
     //------------------------------------------------------------------------------
-    private final int participantID = 2; // Participant's number
+    private final int participantID = 0; // Participant's number
 
     // Techniques
     private List<Configs.TECH[]> techOrderList = new ArrayList<>();
@@ -97,17 +97,21 @@ public class Experimenter {
     public void start(PHASE phase) {
         this.phase = phase;
 
-        Mologger.get().logPhaseStart(phase, techOrder[techInd]).check(); // Log
-        MooseServer.get().updateTechnique(techOrder[techInd]); // Update server => Moose
+        // Send phase and technique to the Moose
+        MooseServer.get().sendMssg(Strs.MSSG_BEG_PHS, phase.ordinal());
+        MooseServer.get().syncTechnique(techOrder[techInd]);
 
         // Start the phase
         switch (phase) {
         case SHOWCASE -> {
+            System.out.println(TAG + "Showcase!");
             // Disable logging
             Mologger.get().setEnabled(false);
             // Show the start panel
             MainFrame.get().showPanel(
                     new StartPanel(PHASE.SHOWCASE, techOrder[techInd]));
+            // Login the participant on the Moose
+            MooseServer.get().syncParticipant(participantID);
         }
         case PRACTICE -> {
             // Enable logging
@@ -148,7 +152,7 @@ public class Experimenter {
                 start(PHASE.PRACTICE); // Start with the next technique
             } else { // All the techniques are tested
                 // Tell teh Moose about the end of the experiment
-                MooseServer.get().sendMssg(Strs.MSSG_END_EXP);
+                MooseServer.get().sendMssg(Strs.MSSG_END_EXP, "");
                 // Show the end dialog
                 endDialog();
             }

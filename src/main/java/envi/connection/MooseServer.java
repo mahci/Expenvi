@@ -19,7 +19,7 @@ import java.util.Objects;
 public class MooseServer {
 
     private String TAG = "[[MooseServer]] ";
-    private boolean toLog = false;
+    private boolean toLog = true;
     // -------------------------------------------------------------------------------
 
     private static MooseServer self; // for singleton
@@ -80,11 +80,13 @@ public class MooseServer {
 
                 // Get connection request from the Moose
                 String line = inBR.readLine();
-                if(toLog) System.out.println(TAG + "First Moose message: " + line);
+                if (toLog) System.out.println(TAG + "First Moose message: " + line);
 
                 if (Objects.equals(line, Strs.MSSG_MOOSE)) { // Correct message
-                    // Send the techniqe (as confirmation)
+
+                    // Confirm
                     sendMssg(Strs.MSSG_CONFIRM);
+
                     if (toLog) {
                         System.out.println(TAG + "Moose connected! Receiving actions...");
                         System.out.println("------------------------------------------");
@@ -94,6 +96,9 @@ public class MooseServer {
 
                     // Send the participants ID
                     sendMssg(Strs.MSSG_PID + "-" + Experimenter.get().getPID());
+
+                    // Update the techniqe
+//                    syncTechnique(Experimenter.get().getTechnique());
 
                     // Start listening to incoming messages from the Moose
                     listenerObservable().subscribe();
@@ -125,31 +130,64 @@ public class MooseServer {
     }
 
     /**
-     * Create bbservable for input commands from Moose
+     * Create observable for input commands from Moose
      * @return An Observable that publishes the received action
      */
     private @NonNull Observable<Object> listenerObservable() {
         return Observable.fromAction(() -> {
             // Continously read lines from the Moose until get disconnected
             String line;
-            do {
+            while(inBR != null && isConnected) {
                 if (toLog) System.out.println(TAG + "Getting Moose commands...");
                 line = inBR.readLine();
+
                 if (line != null) {
                     // publish the action
                     actionSubject.onNext(line);
 
                     if (toLog) System.out.println(TAG + line + " recieved");
                 }
-            } while(inBR != null && isConnected);
+            }
+//            do {
+//                if (toLog) System.out.println(TAG + "Getting Moose commands...");
+//                line = inBR.readLine();
+//
+//                if (line != null) {
+//                    // publish the action
+//                    actionSubject.onNext(line);
+//
+//                    if (toLog) System.out.println(TAG + line + " recieved");
+//                }
+//            } while(inBR != null && isConnected);
         }).subscribeOn(Schedulers.io());
     }
+
+    /**
+     * Standard way to send a message with params
+     * @param type Type of the message
+     * @param param String
+     */
+    public void sendMssg(String type, String param) {
+        if (!Objects.equals(param, "")) sendMssg(type + "-" + param);
+        else sendMssg(type);
+    }
+
+    /**
+     * Standard way to send a message with params
+     * @param type Type of the message
+     * @param param int
+     */
+    public void sendMssg(String type, int param) {
+        if (!Objects.equals(param, "")) sendMssg(type + "-" + param);
+        else sendMssg(type);
+    }
+
 
     /**
      * Send messages to the Moose
      * @param mssg Message
      */
-    public void sendMssg(String mssg) {
+    private void sendMssg(String mssg) {
         if (outPW != null) {
             outPW.println(mssg);
             outPW.flush();
@@ -160,19 +198,19 @@ public class MooseServer {
     }
 
     /**
-     * Standar way to send a message with params
-     * @param type Type of the message
-     * @param param Params
+     * Update the Moose on the new technique
      */
-    public void sendMssg(String type, String param) {
-        sendMssg(type + "-" + param);
+    public void syncTechnique(Configs.TECH tech) {
+        sendMssg(Strs.MSSG_TECHNIQUE, tech.toString());
     }
 
     /**
-     * Update the Moose on the new technique (in Configs)
+     * Sync the participant id with the Moose
+     * @param pid int Participant ID
      */
-    public void updateTechnique(Configs.TECH tech) {
-        sendMssg(Strs.MSSG_TECHNIQUE, tech.toString());
+    public void syncParticipant(int pid) {
+        System.out.println(TAG + "Sync PID");
+        sendMssg(Strs.MSSG_PID + "-" + pid);
     }
 
 }

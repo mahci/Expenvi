@@ -5,7 +5,6 @@ import envi.connection.MooseServer;
 import envi.experiment.Experimenter;
 import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
-import envi.experiment.Mologger;
 import envi.tools.Configs;
 import envi.tools.Prefs;
 import envi.tools.Strs;
@@ -65,7 +64,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             Experimenter.get().setTechInd(0);
-            MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
+            MooseServer.get().syncTechnique(Experimenter.get().getTechnique());
             techNum = 0;
             resetState();
             repaint();
@@ -75,7 +74,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             Experimenter.get().setTechInd(1);
-            MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
+            MooseServer.get().syncTechnique(Experimenter.get().getTechnique());
             techNum = 1;
             resetState();
             repaint();
@@ -85,7 +84,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             Experimenter.get().setTechInd(2);
-            MooseServer.get().updateTechnique(Experimenter.get().getTechnique());
+            MooseServer.get().syncTechnique(Experimenter.get().getTechnique());
             techNum = 2;
             resetState();
             repaint();

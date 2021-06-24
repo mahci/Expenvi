@@ -13,6 +13,8 @@ public class Strs {
     public static final String MSSG_BEG_PHS     = "BEGPHS";
     public static final String MSSG_BEG_EXP     = "BEGEXP";
     public static final String MSSG_END_EXP     = "ENDEXP";
+    public static final String MSSG_SUBBLOCK    = "SBLK";
+    public static final String MSSG_TRIAL       = "TRL";
     public static final String MSSG_BEG_BLK     = "BEGBLK";
     public static final String MSSG_END_BLK     = "ENDBLK";
     public static final String MSSG_END_TRL     = "ENDTRL";
