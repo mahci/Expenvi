@@ -234,7 +234,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             graphics2D.fillRect(0, 0, winW, winH);
         }
 
-        requestFocus();
+//        requestFocus();
     }
 
     /**
@@ -663,8 +663,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         inBreak = true;
         repaint();
         MainFrame.get().showDialog(new BreakDialog());
+//        MainFrame.get().showBreak();
 
         // Back from the dialog
+        System.out.println(TAG + "Back from the break");
         inBreak = false;
         nextSubblock();
     }

@@ -138,12 +138,13 @@ public class MainFrame extends JFrame {
     {
         dialog.pack();
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-//                showPanel(new StartPanel());
-            }
-        });
+
+//        dialog.addWindowListener(new WindowAdapter() {
+//            @Override
+//            public void windowClosed(WindowEvent e) {
+////                showPanel(new StartPanel());
+//            }
+//        });
 
         int scrW = Configs._scrDims.width;
         int scrH = Configs._scrDims.height;
@@ -157,6 +158,25 @@ public class MainFrame extends JFrame {
         );
         dialog.setVisible(true);
     }
+
+//    public void showBreak() {
+//        BreakDialog dialog = new BreakDialog(this);
+//
+//        dialog.pack();
+//        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+//
+//        int scrW = Configs._scrDims.width;
+//        int scrH = Configs._scrDims.height;
+//
+//        int frW = dialog.getSize().width;
+//        int frH = dialog.getSize().height;
+//
+//        dialog.setLocation(
+//                ((scrW / 2) - (frW / 2)) + Configs._scrDims.x,
+//                ((scrH / 2) - (frH / 2)) + Configs._scrDims.y
+//        );
+//        dialog.setVisible(true);
+//    }
 
     /**
      * Show a message dialog

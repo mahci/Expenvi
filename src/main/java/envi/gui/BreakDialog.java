@@ -10,13 +10,16 @@ import java.awt.event.KeyListener;
 
 public class BreakDialog extends JDialog implements KeyListener {
 
+    private final String TAG = "[[BreakDialog]] ";
+    private final boolean toLog = true;
+    // -------------------------------------------------------------------------------
+
     public BreakDialog() {
         setTitle("Break!");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(600, 300));
         setUndecorated(true);
 
-        //-----------------------------------------
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -37,18 +40,23 @@ public class BreakDialog extends JDialog implements KeyListener {
 
         add(panel);
         addKeyListener(this);
+
     }
+
 
     //region [Overrides]
     @Override
     public synchronized void keyPressed(KeyEvent e) {
-        // Close on Ctrl + DEL
+        if (toLog) System.out.println(TAG + "keyPressed");
+        // Close on Shift + \
         if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_BACK_SLASH) {
-            setVisible(false);
-//            Experimenter.get().nextBlock();
+            if (toLog) System.out.println(TAG + "Keys pressed");
             // Set the start of homing
             Experimenter.get().startHoming();
+
+            setVisible(false);
         }
+
     }
 
     @Override

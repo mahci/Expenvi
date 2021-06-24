@@ -21,7 +21,7 @@ import java.time.LocalTime;
 public class Mologger {
 
     private final String TAG = "[[Mologger]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     private static Mologger self; // Singleton
