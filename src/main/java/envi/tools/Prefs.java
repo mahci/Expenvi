@@ -12,6 +12,7 @@ public class Prefs {
     public static Color COLOR_START_DEF     = Color.decode("#3DCF38");
     public static Color COLOR_START_SEL     = Color.decode("#3D6E3B");
     public static Color COLOR_TARGET_DEF    = Color.decode("#1E90FF");
+    public static Color COLOR_TARGET_SEL    = Color.decode("#1E20FF");
 
     public static Color COLOR_BREAK_BACK    = Color.decode("#7B1FA2");
 
@@ -42,6 +43,7 @@ public class Prefs {
     // Sounds
     public static String START_MISS_ERR_SOUND   = "err1.wav";
     public static String TARGET_MISS_ERR_SOUND  = "err2.wav";
+    public static String TARGET_HIT_SOUND       = "hit.wav";
     public static String START_DOUBLE_ERR_SOUND = "err3.wav";
 
 }

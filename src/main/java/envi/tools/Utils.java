@@ -163,6 +163,7 @@ public class Utils {
             File soundFile = new File(classLoader.getResource(resFileName).getFile());
             URI uri = soundFile.toURI();
             URL url = uri.toURL();
+
             AudioClip clip = Applet.newAudioClip(url);
 //            AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
             clip.play();

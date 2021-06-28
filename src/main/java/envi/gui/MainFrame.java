@@ -6,10 +6,17 @@ import envi.tools.Prefs;
 import envi.tools.Utils;
 
 import javax.swing.*;
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainFrame extends JFrame {
 
@@ -204,6 +211,29 @@ public class MainFrame extends JFrame {
                 ((scrH / 2) - (frH / 2)) + Configs._scrDims.y
         );
         setVisible(true);
+    }
+
+    public void playSound(String resFileName) {
+//        if (Objects.equals(getFocusOwner(), this)) {
+//            Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+//        }
+
+        try {
+            ClassLoader classLoader = MainFrame.class.getClassLoader();
+            File soundFile = new File(classLoader.getResource(resFileName).getFile());
+            URI uri = soundFile.toURI();
+            URL url = uri.toURL();
+
+            AudioClip clip = Applet.newAudioClip(url);
+//            AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+            clip.play();
+
+        } catch ( NullPointerException
+                | IOException e
+        ) {
+            e.printStackTrace();
+        }
+
     }
 
 }

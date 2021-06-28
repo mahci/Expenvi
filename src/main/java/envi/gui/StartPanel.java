@@ -1,5 +1,6 @@
 package envi.gui;
 
+import envi.connection.MooseServer;
 import envi.experiment.Experiment;
 import envi.experiment.Experimenter;
 import envi.experiment.Mologger;
@@ -32,7 +33,8 @@ public class StartPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
 //            ShowCaser.get().startShowCase();
-            MainFrame.get().showPanel(new ShowcasePanel());
+            MainFrame.get().showPanel(new ShowcasePanel()); // Show panel
+            MooseServer.get().syncPhase(Experimenter.PHASE.SHOWCASE); // Sync the phase
 //            Experimenter.get().start(Experimenter.PHASE.SHOWCASE);
         }
     };
@@ -46,6 +48,8 @@ public class StartPanel extends JPanel {
             MainFrame.get().showPanel(
                     new ExperimentPanel(new Practice(1, 3), technique, phase));
 //
+            MooseServer.get().syncPhase(Experimenter.PHASE.PRACTICE); // Sync the phase
+
 //            Experimenter.get().startExperiment(false);
         }
     };
@@ -57,6 +61,8 @@ public class StartPanel extends JPanel {
             // Show experiment panel
             MainFrame.get().showPanel(
                     new ExperimentPanel(new Experiment(5, 2), technique, phase));
+
+            MooseServer.get().syncPhase(Experimenter.PHASE.EXPERIMENT); // Sync the phase
 
         }
     };

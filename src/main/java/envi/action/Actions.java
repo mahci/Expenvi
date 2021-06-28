@@ -7,6 +7,7 @@ public class Actions {
     public static final String ACT_PRESS_SEC    = "PRESS_SEC";
     public static final String ACT_RELEASE_PRI  = "RELEASE_PRI";
     public static final String ACT_RELEASE_SEC  = "RELEASE_SEC";
+    public static final String ACT_CANCEL       = "CANCEL";
 
     // ===============================================================================
 

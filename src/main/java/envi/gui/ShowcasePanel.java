@@ -40,6 +40,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private boolean startPressed = false;
     private boolean startClicked = false;
     private boolean targetPressed = false;
+    private boolean inTarget = false;
 
     private Disposable disposable;
 
@@ -113,6 +114,9 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
                 break;
             case Actions.ACT_RELEASE_PRI:
                 vReleasePrimary();
+                break;
+            case Actions.ACT_CANCEL:
+                vCancel();
                 break;
             case Actions.ACT_PRESS_SEC:
             case Actions.ACT_RELEASE_SEC:
@@ -198,6 +202,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         // Colors
         Color startColor = Prefs.COLOR_START_DEF;
         if (startPressed || startClicked) startColor = Prefs.COLOR_START_SEL;
+        Color targetColor = Prefs.COLOR_TARGET_DEF;
+        if (inTarget) targetColor = Prefs.COLOR_TARGET_SEL;
 
         // Start circle
         graphics2D.setColor(startColor);
@@ -211,7 +217,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
                 stacle.cy + MainFrame.mm2px(Prefs.S_TEXT_Y_OFFSET_mm));
 
         //  Target circle
-        graphics2D.setColor(Prefs.COLOR_TARGET_DEF);
+        graphics2D.setColor(targetColor);
         graphics2D.drawOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
         graphics2D.fillOval(tarcle.tlX, tarcle.tlY, tarcle.getSide(), tarcle.getSide());
 
@@ -316,12 +322,17 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         if (startClicked) { // Target pressing
             // Target is pressed
             targetPressed = true;
+
+            if (tarcle.isInside(crsPos)) {
+                inTarget = true;
+            }
         } else { // Start pressing
             if (stacle.isInside(crsPos)) {
                 startPressed = true;
             }
-            repaint();
         }
+
+        repaint();
 
     }
 
@@ -336,6 +347,7 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         // Check where released (doesn't matter where the press was)
         if (startClicked) { // Releasing inside/outside target
             targetPressed = false;
+            inTarget = false;
 
             // Play error sound if outside the target
             if (!tarcle.isInside(crsPos)) {
@@ -344,6 +356,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
                     Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
                 }
 
+            } else {
+                Utils.playSound(Prefs.TARGET_HIT_SOUND);
             }
 
             trialDone(); // Trial is done
@@ -400,6 +414,18 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         }
 
 
+    }
+
+    /**
+     * Virtual cancelling of the action
+     */
+    public void vCancel() {
+        if (startPressed) startPressed = false;
+
+        if (inTarget) inTarget = false;
+
+        MainFrame.get().playSound(Prefs.START_MISS_ERR_SOUND); // Play start miss sound (repeat trial error)
+        trialRepeat();
     }
 
     /**

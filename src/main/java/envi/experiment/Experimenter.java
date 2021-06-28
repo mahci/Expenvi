@@ -98,7 +98,6 @@ public class Experimenter {
         this.phase = phase;
 
         // Send phase and technique to the Moose
-        MooseServer.get().sendMssg(Strs.MSSG_BEG_PHS, phase.ordinal());
         MooseServer.get().syncTechnique(techOrder[techInd]);
 
         // Start the phase

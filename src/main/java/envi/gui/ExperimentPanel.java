@@ -123,6 +123,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 case Actions.ACT_RELEASE_PRI:
                     vReleasePrimary();
                     break;
+                case Actions.ACT_CANCEL:
+                    vCancel();
+                    break;
                 case Actions.ACT_PRESS_SEC:
             case Actions.ACT_RELEASE_SEC:
                 break;
@@ -586,6 +589,18 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 trialRepeat();
             }
 
+        }
+    }
+
+    public void vCancel() {
+        if (startPressed) {
+            startPressed = false;
+            trialRepeat();
+        }
+
+        if (targetPressed) {
+            targetPressed = false;
+            trialDone();
         }
     }
 

@@ -213,4 +213,13 @@ public class MooseServer {
         sendMssg(Strs.MSSG_PID + "-" + pid);
     }
 
+    /**
+     * Sync the phase ordinal with the Moose
+     * @param phase PHASE
+     */
+    public void syncPhase(Experimenter.PHASE phase) {
+        System.out.println(TAG + "Sync phase");
+        sendMssg(Strs.MSSG_BEG_PHS + "-" + phase.ordinal());
+    }
+
 }
