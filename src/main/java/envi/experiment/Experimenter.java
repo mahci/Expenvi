@@ -28,7 +28,7 @@ public class Experimenter {
     private long homingStart = 0;
 
     //------------------------------------------------------------------------------
-    private final int participantID = 0; // Participant's number
+    private final int participantID = 2; // Participant's number
 
     // Techniques
     private List<Configs.TECH[]> techOrderList = new ArrayList<>();

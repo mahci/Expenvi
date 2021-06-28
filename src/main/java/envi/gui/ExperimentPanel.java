@@ -72,6 +72,15 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private long tgReleaseTime;
     private long sBlockEndTime;
     private long homingTime;
+
+    private long startExitTime;
+    private Point startExitPoint;
+
+    private long targetFirstEntryTime;
+    private Point targetFirstEntryPoint;
+    private long targetLastEntryTime;
+    private Point targetLastEntryPoint;
+    private int nTargetEntries = 0;
     
     private Point stPressPoint;
     private double stPressDist;
@@ -86,6 +95,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private double tgReleaseDist;
 
     private int tgHit; // Hit = 1, miss = 0, start double click = -1xxz
+
+    private boolean startExited = false;
+    private boolean targetEntered = false;
 
     // Dummy Component for logging
     private Button btn = new Button();
@@ -283,6 +295,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private void trialDone() {
         if (toLog) System.out.println(TAG + "TrialDone");
         startClicked = false;
+        startExited = false;
 
         logTrial(); // Log all the trial info
 
@@ -306,34 +319,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             } else {
                 showBreak();
             }
-
-//            if (experiment.getBlock(blockNum).hasNext(subBlockNum)) { // More subblocks
-//                breakDialog();
-//                nextSubblock();
-////                subBlockNum++;
-////                overallSBlockNum++;
-////                trialNum = 1;
-//            } else { // Sub-blocks finished
-//                if (experiment.hasNext(blockNum)) { // More blocks
-//                    breakDialog();
-//                    nextBlock();
-////                    blockNum++;
-////                    subBlockNum = 1;
-////                    overallSBlockNum++;
-////                    trialNum = 1;
-//                } else {
-//                    // Finish alll the logs
-//                    Mologger.get().finishLogs();
-//
-//                    // Experimenter takes control
-//                    if (disposable != null) disposable.dispose();
-//                    Experimenter.get().endPhase();
-//                }
-//            }
         }
-
-//        setScene();
-//        repaint();
 
     }
 
@@ -343,6 +329,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private void trialRepeat() {
         if(toLog) System.out.println(TAG + "TrialRepeat");
         startClicked = false;
+        startExited = false;
 
         logTrial(); // Log the trial info
 
@@ -667,6 +654,51 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 //            repaint();
         }
 
+        // Log Start exits, Target entries
+        logExitEnter(getCursorPosition());
+
+    }
+
+    /**
+     * Log the START exit and TARGET entries
+     * @param crsPosition Point - cursor position
+     */
+    private void logExitEnter(Point crsPosition) {
+
+        if (startClicked) { // It only matter after the start is clicked
+
+            // Log start exit
+            if (!startExited && !stacle.isInside(crsPosition)) {
+                startExitPoint = crsPosition;
+                startExitTime = Utils.nowInMillis();
+
+                startExited = true;
+            }
+
+            // Log target entries
+            if (!targetEntered) {
+
+                if (tarcle.isInside(crsPosition)) { // Went inside
+                    if (nTargetEntries == 0) { // First time
+                        targetFirstEntryPoint = crsPosition;
+                        targetFirstEntryTime = Utils.nowInMillis();
+                    } else { // More times (always keep the last one)
+                        targetLastEntryPoint = crsPosition;
+                        targetLastEntryTime = Utils.nowInMillis();
+                    }
+
+                    targetEntered = true;
+                    nTargetEntries++;
+
+                }
+
+            } else { // Already entered => Look for exits
+                if (!tarcle.isInside(crsPosition)) {
+                    targetEntered = false;
+                }
+            }
+
+        }
     }
 
     //endregion
