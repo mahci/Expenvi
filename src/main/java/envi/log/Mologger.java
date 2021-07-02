@@ -1,22 +1,14 @@
-package envi.experiment;
+package envi.log;
 
-import envi.action.Actions;
-import envi.action.VouseEvent;
-import envi.connection.MooseServer;
-import envi.tools.Configs;
+import envi.tools.Prefs;
 import envi.tools.STATUS;
-import envi.tools.Strs;
 import envi.tools.Utils;
 
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public class Mologger {
 
@@ -79,16 +71,17 @@ public class Mologger {
     private String metaLogPath;
     private PrintWriter metaLogFile;
 
+    private String trialLogPath;
+    private PrintWriter trialLogFile;
+
+    private String instantLogPath;
+    private PrintWriter instantLogFile;
+
     private String timeLogPath;
     private PrintWriter timeLogFile;
 
     private String eventLogPath;
     private PrintWriter eventLogFile;
-
-    private String motionLogPath;
-    private PrintWriter motionLogFile;
-
-
 
     // ===============================================================================
 
@@ -130,11 +123,21 @@ public class Mologger {
     public STATUS logParticipant(int pID) {
 
         try {
-            // Create the META and ALL files for the participant
-            metaLogPath = logDirPath +
+            // Create log files for the participant
+            trialLogPath = logDirPath +
                     PI + pID + "_" +
                     Utils.nowDateTime() + "_" +
-                    "META.txt";
+                    "TRIAL.txt";
+
+            instantLogPath = logDirPath +
+                    PI + pID + "_" +
+                    Utils.nowDateTime() + "_" +
+                    "INSTANT.txt";
+
+//            metaLogPath = logDirPath +
+//                    PI + pID + "_" +
+//                    Utils.nowDateTime() + "_" +
+//                    "META.txt";
 
             timeLogPath = logDirPath +
                     PI + pID + "_" +
@@ -146,31 +149,37 @@ public class Mologger {
                     Utils.nowDateTime() + "_" +
                     "EVENT.txt";
 
-//            motionLogPath = logDirPath +
-//                    PI + pID + "_" +
-//                    Utils.nowDateTime() + "_" +
-//                    "MOTION.txt";
 
             // Open META file and write the column headers
-            metaLogFile = new PrintWriter(new FileWriter(metaLogPath));
-            metaLogFile.println(metaLogHeader());
-            metaLogFile.flush();
+//            metaLogFile = new PrintWriter(new FileWriter(metaLogPath));
+//            metaLogFile.println(metaLogHeader());
+//            metaLogFile.flush();
+
+            // Open TRIAL file and write the column headers
+            trialLogFile = new PrintWriter(new FileWriter(trialLogPath));
+            trialLogFile.println(
+                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                            TrialLogInfo.getLogHeader());
+            trialLogFile.flush();
+
+            // Open INSTANT file and write the column headers
+            instantLogFile = new PrintWriter(new FileWriter(instantLogPath));
+            instantLogFile.println(
+                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    InstantsLogInfo.getLogHeader());
+            instantLogFile.flush();
 
             // Open TIME file and write the column headers
             timeLogFile = new PrintWriter(new FileWriter(timeLogPath));
-            timeLogFile.println(timeLogHeader());
+            timeLogFile.println(
+                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    TimesLogInfo.getLogHeader());
             timeLogFile.flush();
 
             // Open EVENT file and write the column headers
             eventLogFile = new PrintWriter(new FileWriter(eventLogPath));
             eventLogFile.println(eventLogHeader());
             eventLogFile.flush();
-
-            // Open MOTION file and write the column headers
-//            motionLogFile = new PrintWriter(new FileWriter(motionLogPath));
-//            motionLogFile.println(motionLogHeader());
-//            motionLogFile.flush();
-
 
             return STATUS.SUCCESS;
 
@@ -224,6 +233,60 @@ public class Mologger {
 //        }
 
 
+    }
+
+    /**
+     * Log info of the experiment
+     * @param generalLogInfo GeneralLogInfo - general info
+     * @param trialLogInfo TrialLogInfo - experiment info
+     * @return STATUS
+     */
+    public STATUS logTrial(GeneralLogInfo generalLogInfo, TrialLogInfo trialLogInfo) {
+        System.out.println(TAG + "Log META");
+        if (!enabled) return STATUS.LOG_DISABLED;
+
+        try {
+            if (trialLogFile == null) { // Open only if not opened before
+                trialLogFile = new PrintWriter(new FileWriter(trialLogPath, true));
+            }
+
+            trialLogFile.println(generalLogInfo.toLogString() + Prefs.SEP + trialLogInfo.toLogString());
+            trialLogFile.flush();
+//            metaLogFile.close();
+
+            return STATUS.SUCCESS;
+
+        } catch (IOException | NullPointerException e) {
+            return STATUS.ERR_LOG_FILES;
+        }
+
+    }
+
+
+
+    /**
+     * Log info of intants
+     * @param generalLogInfo GeneralLogInfo - general info
+     * @param instantsLogInfo InstantsLogInfo - instant info
+     * @return STATUS
+     */
+    public STATUS logInst(GeneralLogInfo generalLogInfo, InstantsLogInfo instantsLogInfo) {
+        System.out.println(TAG + "Log INST");
+        if (!enabled) return STATUS.LOG_DISABLED;
+
+        try {
+            if (instantLogFile == null) { // Open only if not opened before
+                instantLogFile = new PrintWriter(new FileWriter(instantLogPath, true));
+            }
+
+            instantLogFile.println(generalLogInfo.toLogString() + Prefs.SEP + instantsLogInfo.toLogString());
+            instantLogFile.flush();
+
+            return STATUS.SUCCESS;
+
+        } catch (NullPointerException | IOException e) {
+            return STATUS.ERR_LOG_FILES;
+        }
     }
 
     /**
@@ -302,7 +365,7 @@ public class Mologger {
      * @param homingTime Homing time
      * @return STATUS
      */
-    public STATUS logTime(int technique, int phase, int sbNum, long sbDT, long homingTime) {
+    public STATUS logTime(GeneralLogInfo generalLogInfo, TimesLogInfo timesLogInfo) {
         System.out.println(TAG + "Log TIME");
         if (!enabled) return STATUS.LOG_DISABLED;
 
@@ -311,14 +374,10 @@ public class Mologger {
                 timeLogFile = new PrintWriter(new FileWriter(timeLogPath, true));
             }
 
-            // Create and write the log
-            String logStr = technique + SEP +
-                    phase + SEP +
-                    sbNum + SEP +
-                    sbDT + SEP +
-                    homingTime;
-
-            timeLogFile.println(logStr);
+            timeLogFile.println(
+                    generalLogInfo.toLogString() +
+                    Prefs.SEP +
+                    timesLogInfo.toLogString());
             timeLogFile.flush();
 //            timeLogFile.close();
 
@@ -337,7 +396,7 @@ public class Mologger {
      * @param me MouseEvent (either real or dummy)
      * @return STATUS
      */
-    public STATUS logEvent(int technique, int phase, int subBlockNum, int trialNum, MouseEvent me) {
+    public STATUS logEvent(GeneralLogInfo generalLogInfo, MouseEvent me) {
         if (!enabled) return STATUS.LOG_DISABLED;
 
         try {
@@ -345,15 +404,10 @@ public class Mologger {
                 eventLogFile = new PrintWriter(new FileWriter(eventLogPath, true));
             }
 
-            // Create and write the log
-            String logStr =
-                    technique + SEP +
-                    phase + SEP +
-                    subBlockNum + SEP +
-                    trialNum + SEP +
-                    mouseEventToString(me);
-
-            eventLogFile.println(logStr);
+            eventLogFile.println(
+                    generalLogInfo.toLogString() +
+                    Prefs.SEP +
+                    mouseEventToString(me));
             eventLogFile.flush();
 //            eventLogFile.close();
 
@@ -370,10 +424,11 @@ public class Mologger {
      */
     public STATUS finishLogs() {
         try {
+            if (trialLogFile != null) trialLogFile.close();
+            if (instantLogFile != null) instantLogFile.close();
+            if (timeLogFile != null) timeLogFile.close();
             if (metaLogFile != null) metaLogFile.close();
-            if (motionLogFile != null) motionLogFile.close();
             if (eventLogFile != null) eventLogFile.close();
-            if (motionLogFile != null) motionLogFile.close();
 
             return STATUS.SUCCESS;
 

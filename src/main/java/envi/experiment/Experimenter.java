@@ -2,6 +2,9 @@ package envi.experiment;
 
 import envi.connection.MooseServer;
 import envi.gui.*;
+import envi.log.GeneralLogInfo;
+import envi.log.Mologger;
+import envi.log.TimesLogInfo;
 import envi.tools.Configs;
 import envi.tools.Strs;
 import envi.tools.Utils;
@@ -21,14 +24,17 @@ public class Experimenter {
     // For publishing the state of the experiment
     private final PublishSubject<String> expSubject;
 
-    // Warm-up or real experiment? (Only log if real experiment)
-    public boolean realExperiment = false;
-
     // Timers
     private long homingStart = 0;
 
+    // Log
+    private GeneralLogInfo mGeneralLogInfo = new GeneralLogInfo();
+    private TimesLogInfo mTimesLogInfo = new TimesLogInfo();
+    private long phaseStartTime;
+    private long expStartTime;
+
     //------------------------------------------------------------------------------
-    private final int participantID = 2; // Participant's number
+    private final int participantID = 1; // Participant's number
 
     // Techniques
     private List<Configs.TECH[]> techOrderList = new ArrayList<>();
@@ -100,6 +106,11 @@ public class Experimenter {
         // Send phase and technique to the Moose
         MooseServer.get().syncTechnique(techOrder[techInd]);
 
+        // Save the log info
+        mGeneralLogInfo.technique = techOrder[techInd];
+        mGeneralLogInfo.phase = phase;
+        phaseStartTime = Utils.nowInMillis();
+
         // Start the phase
         switch (phase) {
         case SHOWCASE -> {
@@ -118,6 +129,8 @@ public class Experimenter {
             // Show the start panel
             MainFrame.get().showPanel(
                     new StartPanel(PHASE.PRACTICE, techOrder[techInd]));
+            // Save log info
+            expStartTime = Utils.nowInMillis();
         }
         case EXPERIMENT -> {
             // Enable logging
@@ -135,6 +148,12 @@ public class Experimenter {
      * @param phase PHASE
      */
     public void end(PHASE phase) {
+
+        // Log the phase
+        mTimesLogInfo.phaseTime = (int) (Utils.nowInMillis() - phaseStartTime);
+        Mologger.get().logTime(mGeneralLogInfo, mTimesLogInfo);
+
+        // Next phase?
         switch (phase) {
         case SHOWCASE -> {
             // Start from the first technique for this participant
@@ -152,8 +171,12 @@ public class Experimenter {
             } else { // All the techniques are tested
                 // Tell teh Moose about the end of the experiment
                 MooseServer.get().sendMssg(Strs.MSSG_END_EXP, "");
+                // Save log info
+                mTimesLogInfo.experimentTime = (int) (Utils.nowInMillis() - expStartTime) / 1000; // in seconds
+                Mologger.get().logTime(mGeneralLogInfo, mTimesLogInfo);
                 // Show the end dialog
                 endDialog();
+
             }
         }
         }

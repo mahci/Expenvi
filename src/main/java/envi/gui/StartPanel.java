@@ -3,12 +3,10 @@ package envi.gui;
 import envi.connection.MooseServer;
 import envi.experiment.Experiment;
 import envi.experiment.Experimenter;
-import envi.experiment.Mologger;
 import envi.experiment.Practice;
 import envi.tools.Configs;
 import envi.tools.Prefs;
 import envi.tools.Strs;
-import envi.tools.Utils;
 
 import javax.swing.*;
 import java.awt.*;

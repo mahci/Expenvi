@@ -154,6 +154,10 @@ public class FittsTrial {
         return tarRad;
     }
 
+    public FittsTuple getVars() {
+        return vars;
+    }
+
     /**
      * Get the string of the FittsTrial
      * @return String of the parameters

@@ -1,6 +1,7 @@
 package envi.experiment;
 
 import envi.tools.Configs;
+import envi.tools.Prefs;
 import envi.tools.Utils;
 
 import java.util.Collections;
@@ -50,6 +51,16 @@ public class FittsTuple {
         return result;
     }
 
+    /**
+     * Get the header for logging
+     * @return String
+     */
+    public static String getLogHeader() {
+        return "width" + Prefs.SEP +
+                "dist" + Prefs.SEP +
+                "l_r";
+    }
+
     @Override
     public String toString() {
         return "FittsTuple{" +
@@ -57,5 +68,15 @@ public class FittsTuple {
                 ", dist=" + dist +
                 ", leftRight=" + leftRight +
                 '}';
+    }
+
+    /**
+     * Get the String for logging
+     * @return String
+     */
+    public String toLogString() {
+        return width + Prefs.SEP +
+                dist + Prefs.SEP +
+                leftRight + Prefs.SEP;
     }
 }

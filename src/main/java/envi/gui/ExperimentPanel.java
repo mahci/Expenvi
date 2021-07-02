@@ -1,6 +1,7 @@
 package envi.gui;
 
 import envi.experiment.*;
+import envi.log.*;
 import envi.tools.Configs;
 import envi.action.Actions;
 import envi.connection.MooseServer;
@@ -15,6 +16,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ExperimentPanel extends JPanel implements MouseInputListener {
@@ -102,6 +104,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     // Dummy Component for logging
     private Button btn = new Button();
 
+    // Log info
+    GeneralLogInfo mGeneralLogInfo = new GeneralLogInfo();
+    TrialLogInfo mTrialLogInfo = new TrialLogInfo();
+    InstantsLogInfo mInstantsLogInfo = new InstantsLogInfo();
+    TimesLogInfo mTimesLogInfo = new TimesLogInfo();
+
     // ===============================================================================
 
     /**
@@ -149,6 +157,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         technique = tech.ordinal();
         phase = phs.ordinal();
 
+        // Set log vars
+        mGeneralLogInfo.phase = phs;
+        mGeneralLogInfo.technique = tech;
+
         init();
         setScene();
 
@@ -164,6 +176,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         overallSBlockNum = 1;
         trialNum = 1;
 
+        // Set log vars
+        mGeneralLogInfo.subBlockNum = 1;
+        mGeneralLogInfo.trialNum = 1;
+
         // Sync with the Moose
         MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, overallSBlockNum);
         MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
@@ -171,6 +187,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // Save the start time
         triallBeginTime = Utils.nowInMillis();
         sBlockBeginTime = Utils.nowInMillis();
+
     }
 
 
@@ -261,8 +278,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 .getBlock(blockNum)
                 .getSubBlock(subBlockNum)
                 .getTrial(trialNum);
+
         Point staclePosition = MainFrame.get().dispToWin(trial.getStaclePosition());
         Point tarclePosition = MainFrame.get().dispToWin(trial.getTarclePosition());
+
         stacle = new Circle(staclePosition, trial.getStRad());
         tarcle = new Circle(tarclePosition, trial.getTarRad());
 //        if(toLog) System.out.println(TAG + trial.getStaclePosition());
@@ -276,6 +295,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         // Set the start time
         triallBeginTime = Utils.nowInMillis();
         if (inBreak) sBlockBeginTime = Utils.nowInMillis();
+
+        // Update log info
+        mTrialLogInfo.fittsTuple = trial.getVars();
+        mTrialLogInfo.startPosition = staclePosition;
+        mTrialLogInfo.targetPosition = tarclePosition;
+        mInstantsLogInfo.trialShowInst = Utils.nowInMillis();
 
 //        Mologger.get().logTrialStart(trialNum, trial);
         repaint();
@@ -331,7 +356,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         startClicked = false;
         startExited = false;
 
-        logTrial(); // Log the trial info
+        logTrial();
 
         repaint();
     }
@@ -345,6 +370,9 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
         // Sync with the Moose
         MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
+
+        // Update the log info
+        mGeneralLogInfo.trialNum = trialNum;
     }
 
     /**
@@ -363,6 +391,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         trialNum = 1;
         setScene();
 
+        // Update the log info
+        mGeneralLogInfo.subBlockNum = overallSBlockNum;
+        mGeneralLogInfo.trialNum = trialNum;
+
         // Sync with the Moose
         MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, overallSBlockNum);
         MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
@@ -373,6 +405,15 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
      * Log all the trial info
      */
     private void logTrial() {
+
+        // Add the trial time to the list
+        mTimesLogInfo.trialTimes.add((int) (Utils.nowInMillis() - mInstantsLogInfo.trialShowInst));
+
+        // Log and reset the trial info
+        Mologger.get().logTrial(mGeneralLogInfo, mTrialLogInfo);
+        Mologger.get().logInst(mGeneralLogInfo, mInstantsLogInfo);
+        mTrialLogInfo.reset();
+
 //        long stPressDT = stPressTime - triallBeginTime;
 //        long stReleaseDT = stReleaseTime - stPressTime;
 //        long tgPressDT = tgPressTime - stReleaseTime;
@@ -381,21 +422,24 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         if (tgPressPoint == null) tgPressPoint = new Point(-1, -1);
         if (tgReleasePoint == null) tgReleasePoint = new Point(-1, -1);
 
-        Mologger.get().logMeta(technique, phase, overallSBlockNum, trialNum,
-                trial.vars.width, trial.vars.dist, trial.vars.leftRight,
-                stacle.cx, stacle.cy,
-                tgPressPoint.x, tgPressPoint.y, tgPressDist, tgPressTime,
-                tgReleasePoint.x, tgReleasePoint.y, tgReleaseDist, tgReleaseDT, tgHit)
-                .check();
+//        Mologger.get().logMeta(technique, phase, overallSBlockNum, trialNum,
+//                trial.vars.width, trial.vars.dist, trial.vars.leftRight,
+//                stacle.cx, stacle.cy,
+//                tgPressPoint.x, tgPressPoint.y, tgPressDist, tgPressTime,
+//                tgReleasePoint.x, tgReleasePoint.y, tgReleaseDist, tgReleaseDT, tgHit)
+//                .check();
+
+
     }
 
     /**
      * Log all the subBlock info
      */
     private void logSBlock() {
-        long sbDT = sBlockEndTime - sBlockBeginTime;
-
-        Mologger.get().logTime(technique, phase, overallSBlockNum, sbDT, homingTime);
+        // Log the subblock and reset the trial times
+        mTimesLogInfo.subblockTime = (int) (sBlockEndTime - sBlockBeginTime);
+        Mologger.get().logTime(mGeneralLogInfo, mTimesLogInfo);
+        mTimesLogInfo.trialTimes = new ArrayList<>();
     }
 
     //region [Setters]
@@ -431,23 +475,35 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         MouseEvent vMouseEvent = new MouseEvent(
                 btn, MouseEvent.MOUSE_PRESSED, Utils.nowInMillis(),
                 0, crsPos.x, crsPos.y, 0, false);
-        Mologger.get().logEvent(technique, phase, overallSBlockNum, trialNum, vMouseEvent);
+        Mologger.get().logEvent(mGeneralLogInfo, vMouseEvent);
 
         // Check where pressed...
         if (startClicked) { // Target pressing
+
+            // Save log infos
+            mInstantsLogInfo.targetPressInst = Utils.nowInMillis();
+            mTrialLogInfo.targetPressPoint = crsPos;
+            mTrialLogInfo.targetPressDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
+
             // Save the position, distance, and time of press (for log)
-            tgPressPoint = crsPos;
-            tgPressTime = Utils.nowInMillis();
-            tgPressDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
+//            tgPressPoint = crsPos;
+//            tgPressTime = Utils.nowInMillis();
+//            tgPressDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
 
             // Target is pressed
             targetPressed = true;
 
         } else { // Start pressing
+
+            // Save log infos
+            mInstantsLogInfo.startPressInst = Utils.nowInMillis();
+            mTrialLogInfo.startPressPoint = crsPos;
+            mTrialLogInfo.startPressDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+
             // Save the position, distance, and time of press (for log)
-            stPressPoint = crsPos;
-            stPressTime = Utils.nowInMillis();
-            stPressDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+//            stPressPoint = crsPos;
+//            stPressTime = Utils.nowInMillis();
+//            stPressDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
 
             if (stacle.isInside(crsPos)) {
                 startPressed = true;
@@ -467,14 +523,20 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         MouseEvent vMouseEvent = new MouseEvent(
                 btn, MouseEvent.MOUSE_RELEASED, Utils.nowInMillis(),
                 0, crsPos.x, crsPos.y, 0, false);
-        Mologger.get().logEvent(technique, phase, overallSBlockNum, trialNum, vMouseEvent);
+        Mologger.get().logEvent(mGeneralLogInfo, vMouseEvent);
 
         // Check where released (doesn't matter where the press was)
         if (startClicked) { // Releasing inside/outside target
+
+            // Save log infos
+            mInstantsLogInfo.targetReleaseInst = Utils.nowInMillis();
+            mTrialLogInfo.targetReleasePoint = crsPos;
+            mTrialLogInfo.targetReleaseDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
+
             // Save the position, distance, and time of press (for log)
-            tgReleasePoint = crsPos;
-            tgReleaseTime = Utils.nowInMillis();
-            tgReleaseDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
+//            tgReleasePoint = crsPos;
+//            tgReleaseTime = Utils.nowInMillis();
+//            tgReleaseDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
 
             targetPressed = false;
 
@@ -486,21 +548,31 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                 }
 
                 if (stacle.isInside(crsPos)) { // Double click on Stacle
-                    tgHit = -1;
+//                    tgHit = -1;
+                    mTrialLogInfo.result = -1;
                 } else { // Miss
-                    tgHit = 0;
+//                    tgHit = 0;
+                    mTrialLogInfo.result = 0;
                 }
             } else { // Hit
-                tgHit = 1;
+//                tgHit = 1;
+                mTrialLogInfo.result = 1;
             }
 
             trialDone(); // Trial is done
 
         } else { // Releasing on the start
+
+            // Save log info
+            mInstantsLogInfo.startReleaseInst = Utils.nowInMillis();
+            mTrialLogInfo.startReleasePoint = crsPos;
+            mTrialLogInfo.startReleaseDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+
+
             // Save the position, distance, and time of press (for log)
-            stReleasePoint = crsPos;
-            stReleaseTime = Utils.nowInMillis();
-            stReleaseDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+//            stReleasePoint = crsPos;
+//            stReleaseTime = Utils.nowInMillis();
+//            stReleaseDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
 
             startPressed = false;
 
@@ -530,7 +602,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         MouseEvent vMouseEvent = new MouseEvent(
                 btn, MouseEvent.MOUSE_CLICKED, Utils.nowInMillis(),
                 0, crsPos.x, crsPos.y, 0, false);
-        Mologger.get().logEvent(technique, phase, overallSBlockNum, trialNum, vMouseEvent);
+        Mologger.get().logEvent(mGeneralLogInfo, vMouseEvent);
 
         if (startClicked) { // Clicking on the target => Trial finished
             // Save the position, distance, and time of press (for log)
@@ -579,15 +651,38 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         }
     }
 
+    /**
+     * Virtual cancel
+     */
     public void vCancel() {
-        if (startPressed) {
+        Point crsPos = getCursorPosition(); // Curser position
+
+        // Log EVENT (EXITED = CANCELLED!)
+        MouseEvent vMouseEvent = new MouseEvent(
+                btn, MouseEvent.MOUSE_EXITED, Utils.nowInMillis(),
+                0, crsPos.x, crsPos.y, 0, false);
+        Mologger.get().logEvent(mGeneralLogInfo, vMouseEvent);
+
+        if (startPressed) { // Cancel on start
+            // Save log info
+            mInstantsLogInfo.startCancelInst = Utils.nowInMillis();
+            mTrialLogInfo.startCancelPoint = crsPos;
+            mTrialLogInfo.startCancelDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+
             startPressed = false;
             trialRepeat();
         }
 
-        if (targetPressed) {
+        if (targetPressed) { // Cancel on target
+            // Save log info
+            mInstantsLogInfo.targetCancelInst = Utils.nowInMillis();
+            mTrialLogInfo.targetCancelPoint = crsPos;
+            mTrialLogInfo.targetCancelDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+
+
             targetPressed = false;
-            trialDone();
+//            trialDone();
+            trialRepeat();
         }
     }
 
@@ -644,11 +739,12 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         // Log EVENT
-        Mologger.get().logEvent(technique, phase, overallSBlockNum, trialNum, e);
+        Mologger.get().logEvent(mGeneralLogInfo, e);
 
         // If homing on the mouse, log the homing time
         if (Experimenter.get().getHomingStart() > 0) {
-            homingTime = Utils.nowInMillis() - Experimenter.get().getHomingStart();
+            // Save homing time
+            mTimesLogInfo.homingTime = (int) (Utils.nowInMillis() - Experimenter.get().getHomingStart());
             Experimenter.get().resetHoming();
 //            inBreak = false;
 //            repaint();
@@ -669,8 +765,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
             // Log start exit
             if (!startExited && !stacle.isInside(crsPosition)) {
-                startExitPoint = crsPosition;
-                startExitTime = Utils.nowInMillis();
+                mTrialLogInfo.startExitPoint = crsPosition;
+                mInstantsLogInfo.startExitInst = Utils.nowInMillis();
+//                startExitPoint = crsPosition;
+//                startExitTime = Utils.nowInMillis();
 
                 startExited = true;
             }
@@ -680,15 +778,20 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
                 if (tarcle.isInside(crsPosition)) { // Went inside
                     if (nTargetEntries == 0) { // First time
-                        targetFirstEntryPoint = crsPosition;
-                        targetFirstEntryTime = Utils.nowInMillis();
+                        mTrialLogInfo.targetFirstEntyPoint = crsPosition;
+                        mInstantsLogInfo.targetFirstEntryInst = Utils.nowInMillis();
+//                        targetFirstEntryPoint = crsPosition;
+//                        targetFirstEntryTime = Utils.nowInMillis();
                     } else { // More times (always keep the last one)
-                        targetLastEntryPoint = crsPosition;
-                        targetLastEntryTime = Utils.nowInMillis();
+                        mTrialLogInfo.targetLastEntyPoint = crsPosition;
+                        mInstantsLogInfo.targetLastEntryInst = Utils.nowInMillis();
+//                        targetLastEntryPoint = crsPosition;
+//                        targetLastEntryTime = Utils.nowInMillis();
                     }
 
                     targetEntered = true;
-                    nTargetEntries++;
+//                    nTargetEntries++;
+                    mTrialLogInfo.nTargetEntries++;
 
                 }
 

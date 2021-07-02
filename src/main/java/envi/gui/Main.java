@@ -3,7 +3,7 @@ package envi.gui;
 import java.awt.*;
 
 import envi.experiment.Experimenter;
-import envi.experiment.Mologger;
+import envi.log.Mologger;
 import envi.tools.Configs;
 import envi.connection.*;
 
