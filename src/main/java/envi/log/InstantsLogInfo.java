@@ -29,7 +29,7 @@ public class InstantsLogInfo {
                 "target_lastEntry_inst" + Prefs.SEP +
                 "target_press_inst" + Prefs.SEP +
                 "target_release_inst" + Prefs.SEP +
-                "target_cancel_inst" + Prefs.SEP;
+                "target_cancel_inst";
     }
     
     /**

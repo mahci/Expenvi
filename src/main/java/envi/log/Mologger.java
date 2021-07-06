@@ -15,62 +15,16 @@ public class Mologger {
     private final String TAG = "[[Mologger]] ";
     private final boolean toLog = false;
     // -------------------------------------------------------------------------------
-
     private static Mologger self; // Singleton
-
-    private static String PTC_FILE_PFX = "PTC";
-    private static String EXP_FILE_PFX = "EXP";
-    private static String BLK_FILE_PFX = "BLK";
 
     private static String PI = "P";
     private static String SEP = ";";
 
-    private String blkSep = "==============================================================";
-    private String trlSep = "--------------------------------------------------------------";
+    private boolean enabled = false; // To log or not to log...
 
-    // Experiment
-    private boolean enabled = false;
+    private static String logDirPath; // Main path for logs
 
-    private String participDir;
-    private String phaseDir;
-
-    private String blkStrLogPath;
-    private String blkTrgLogPath;
-    private String blkAllLogPath;
-
-    private PrintWriter blkStrLog;
-    private PrintWriter blkTrgLog;
-    private PrintWriter blkAllLog;
-
-    // Naming
-    private static String SPEC_LOGS_DIR;
-    private static String GEN_LOGS_DIR;
-    private static String ALL_LOGS_DIR;
-
-    private static String logDirPath;
-
-    // Paths to keep the current dirc
-    private String spcLogDirPath;
-    private String genLogDirPath;
-    private String allLogDirPath;
-
-    private PrintWriter blockLogFile;
-
-    private PrintWriter spcBlockLogFile;
-    private PrintWriter genBlockLogFile;
-    private PrintWriter allBlockLogFile;
-
-    // Log level
-    public enum LOG_LEVEL {
-        SPEC,
-        GEN,
-        ALL
-    }
-
-    // META and ALL log files
-    private String metaLogPath;
-    private PrintWriter metaLogFile;
-
+    // Different log files
     private String trialLogPath;
     private PrintWriter trialLogFile;
 
@@ -134,11 +88,6 @@ public class Mologger {
                     Utils.nowDateTime() + "_" +
                     "INSTANT.txt";
 
-//            metaLogPath = logDirPath +
-//                    PI + pID + "_" +
-//                    Utils.nowDateTime() + "_" +
-//                    "META.txt";
-
             timeLogPath = logDirPath +
                     PI + pID + "_" +
                     Utils.nowDateTime() + "_" +
@@ -149,17 +98,11 @@ public class Mologger {
                     Utils.nowDateTime() + "_" +
                     "EVENT.txt";
 
-
-            // Open META file and write the column headers
-//            metaLogFile = new PrintWriter(new FileWriter(metaLogPath));
-//            metaLogFile.println(metaLogHeader());
-//            metaLogFile.flush();
-
             // Open TRIAL file and write the column headers
             trialLogFile = new PrintWriter(new FileWriter(trialLogPath));
             trialLogFile.println(
                     GeneralLogInfo.getLogHeader() + Prefs.SEP +
-                            TrialLogInfo.getLogHeader());
+                    TrialLogInfo.getLogHeader());
             trialLogFile.flush();
 
             // Open INSTANT file and write the column headers
@@ -176,10 +119,6 @@ public class Mologger {
                     TimesLogInfo.getLogHeader());
             timeLogFile.flush();
 
-            // Open EVENT file and write the column headers
-            eventLogFile = new PrintWriter(new FileWriter(eventLogPath));
-            eventLogFile.println(eventLogHeader());
-            eventLogFile.flush();
 
             return STATUS.SUCCESS;
 
@@ -187,51 +126,6 @@ public class Mologger {
             e.printStackTrace();
             return STATUS.ERR_LOG_FILES;
         }
-//        try {
-//            blkAllLogPath = blkStr + "ALL.txt";
-//            blkAllLog = new PrintWriter(new FileWriter(
-//                    blkAllLogPath, true));
-//            blkAllLog.println(Utils.nowTimeMilli());
-//            blkAllLog.println(blkSep);
-//            blkAllLog.flush();
-//
-//            blkStrLogPath = blkStr + "STR.txt";
-//            blkStrLog = new PrintWriter(new FileWriter(
-//                    blkStrLogPath, true));
-//            blkStrLog.println(Utils.nowTimeMilli());
-//            blkStrLog.println(blkSep);
-//            blkStrLog.flush();
-//
-//            blkTrgLogPath = blkStr + "TRG.txt";
-//            blkTrgLog = new PrintWriter(new FileWriter(
-//                    blkTrgLogPath, true));
-//            blkTrgLog.println(Utils.nowTimeMilli());
-//            blkTrgLog.println(blkSep);
-//            blkTrgLog.flush();
-//
-//            // Sync the Moose
-//            MooseServer.get().sendMssg(Strs.MSSG_BEG_BLK, String.valueOf(blkNum));
-//
-//            return STATUS.SUCCESS;
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return STATUS.ERR_BLOCK_FILES;
-//        }
-
-        // Create a directory for the participant (if not already existing)
-//        String ptcDirPath = logDirPath + "/" + PTC_FILE_PFX + pID;
-//        if (createDir(ptcDirPath) == 0) {
-//            participDir = ptcDirPath;
-//
-//            // Send log command to the Moose
-//            MooseServer.get().sendMssg(Strs.MSSG_PID, String.valueOf(pID));
-//
-//            return STATUS.SUCCESS;
-//        } else {
-//            return STATUS.ERR_PARTICIP_DIR;
-//        }
-
 
     }
 
@@ -262,8 +156,6 @@ public class Mologger {
 
     }
 
-
-
     /**
      * Log info of intants
      * @param generalLogInfo GeneralLogInfo - general info
@@ -290,79 +182,9 @@ public class Mologger {
     }
 
     /**
-     * Log a row in the META file
-     * @param technique
-     * @param phase
-     * @param subblock_num
-     * @param trial_num
-     * @param target_width
-     * @param target_dist
-     * @param target_dir
-     * @param start_pos_x
-     * @param start_pos_y
-     * @param target_press_x
-     * @param target_press_y
-     * @param target_press_dist
-     * @param target_press_time
-     * @param target_release_x
-     * @param target_release_y
-     * @param target_release_dist
-     * @param target_release_time
-     * @param target_hit
-     * @return
-     */
-    public STATUS logMeta(int technique, int phase, int subblock_num, int trial_num,
-                          double target_width, double target_dist, int target_dir, int start_pos_x, int start_pos_y,
-                          int target_press_x, int target_press_y, double target_press_dist, long target_press_time,
-                          int target_release_x, int target_release_y, double target_release_dist, long target_release_time,
-                          int target_hit) {
-        System.out.println(TAG + "Log META");
-        if (!enabled) return STATUS.LOG_DISABLED;
-
-        try {
-            if (metaLogFile == null) { // Open only if not opened before
-                metaLogFile = new PrintWriter(new FileWriter(metaLogPath, true));
-            }
-
-            // Create and write the log
-            String logStr = technique + SEP +
-                    phase + SEP +
-                    subblock_num + SEP +
-                    trial_num + SEP +
-                    Utils.double3Dec(target_width) + SEP +
-                    Utils.double3Dec(target_dist) + SEP +
-                    target_dir + SEP +
-                    start_pos_x + SEP +
-                    start_pos_y + SEP +
-                    target_press_x + SEP +
-                    target_press_y + SEP +
-                    Utils.double3Dec(target_press_dist) + SEP +
-                    target_press_time + SEP +
-                    target_release_x + SEP +
-                    target_release_y + SEP +
-                    Utils.double3Dec(target_release_dist) + SEP +
-                    target_release_time + SEP +
-                    target_hit + SEP;
-
-            metaLogFile.println(logStr);
-            metaLogFile.flush();
-//            metaLogFile.close();
-
-            return STATUS.SUCCESS;
-
-        } catch (IOException | NullPointerException e) {
-            return STATUS.ERR_LOG_FILES;
-        }
-
-    }
-
-    /**
      * Log different times
-     * @param technique TECH
-     * @param phase PHASE
-     * @param sbNum Subblock number
-     * @param sbDT subblock duration
-     * @param homingTime Homing time
+     * @param generalLogInfo GeneralLogInfo - general info
+     * @param timesLogInfo TimesLogInfo - info about time
      * @return STATUS
      */
     public STATUS logTime(GeneralLogInfo generalLogInfo, TimesLogInfo timesLogInfo) {
@@ -370,16 +192,13 @@ public class Mologger {
         if (!enabled) return STATUS.LOG_DISABLED;
 
         try {
-            if (timeLogFile == null) { // Open only if not opened before
-                timeLogFile = new PrintWriter(new FileWriter(timeLogPath, true));
-            }
-
+            timeLogFile = new PrintWriter(new FileWriter(timeLogPath, true));
             timeLogFile.println(
                     generalLogInfo.toLogString() +
                     Prefs.SEP +
                     timesLogInfo.toLogString());
             timeLogFile.flush();
-//            timeLogFile.close();
+            timeLogFile.close();
 
             return STATUS.SUCCESS;
 
@@ -391,9 +210,7 @@ public class Mologger {
 
     /**
      * Log an event
-     * @param subBlockNum Subblock number
-     * @param trialNum Trial number
-     * @param me MouseEvent (either real or dummy)
+     * @param generalLogInfo GeneralLogInfo - general info
      * @return STATUS
      */
     public STATUS logEvent(GeneralLogInfo generalLogInfo, MouseEvent me) {
@@ -422,12 +239,11 @@ public class Mologger {
      * Close all logs
      * @return STATUS
      */
-    public STATUS finishLogs() {
+    public STATUS closeLogs() {
         try {
             if (trialLogFile != null) trialLogFile.close();
             if (instantLogFile != null) instantLogFile.close();
             if (timeLogFile != null) timeLogFile.close();
-            if (metaLogFile != null) metaLogFile.close();
             if (eventLogFile != null) eventLogFile.close();
 
             return STATUS.SUCCESS;
@@ -437,72 +253,6 @@ public class Mologger {
         }
     }
 
-
-    /**
-     * Get the header for the META file
-     * @return String log header
-     */
-    private String metaLogHeader() {
-        return "technique" + SEP +
-                "phase" + SEP +
-                "subblock_num" + SEP +
-                "trial_num" + SEP +
-                "target_width" + SEP +
-                "target_dist" + SEP +
-                "target_dir" + SEP +
-                "start_position_x" + SEP +
-                "start_psition_y" + SEP +
-
-                "target_press_x" + SEP +
-                "target_press_y" + SEP +
-                "target_press_dist" + SEP +
-                "target_press_time" + SEP +
-                "target_release_x" + SEP +
-                "target_release_y" + SEP +
-                "target_release_dist" + SEP +
-                "target_release_time" + SEP +
-                "target_hit" + SEP;
-    }
-
-    /**
-     * Get the header for the TIME file
-     * @return String log header
-     */
-    private String timeLogHeader() {
-        return "technique" + SEP +
-                "phase" + SEP +
-                "subblock_num" + SEP +
-                "subblock_dur" + SEP +
-                "homing_time" + SEP;
-    }
-
-    /**
-     * Get the header for the EVENT file
-     * @return String log header
-     */
-    private String eventLogHeader() {
-        return "technique" + SEP +
-                "phase" + SEP +
-                "subblock_num" + SEP +
-                "trial_num" + SEP +
-                "action" + SEP +
-                "cursor_pos_X" + SEP +
-                "cursor_pos_Y" + SEP +
-                "timestamp";
-    }
-
-    /**
-     * Get the header for the MOTION file
-     * @return String log header
-     */
-    private String motionLogHeader() {
-        return "technique" + SEP +
-                "phase" + SEP +
-                "subblock_num" + SEP +
-                "trial_num" + SEP +
-                "mouse_event" + SEP +
-                "timestamp";
-    }
 
     /**
      * Create a directory
@@ -532,7 +282,6 @@ public class Mologger {
                 me.getY() + SEP +
                 me.getWhen();
     }
-
 
 
 }

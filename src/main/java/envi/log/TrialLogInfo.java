@@ -157,7 +157,7 @@ public class TrialLogInfo {
                 pointToLogString(targetLastEntyPoint) + Prefs.SEP +
 
                 selectionTime + Prefs.SEP +
-                result + Prefs.SEP;
+                result;
     }
 
     /**

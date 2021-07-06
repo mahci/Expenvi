@@ -17,7 +17,7 @@ import java.util.List;
 public class Experimenter {
 
     private String TAG = "[[Experimenter]] ";
-    private boolean toLog = false;
+    private boolean toLog = true;
 
     private static Experimenter self = null; // for singleton
     //------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public class Experimenter {
      */
     public void start(PHASE phase) {
         this.phase = phase;
-
+        if (toLog) System.out.println(TAG + "Start Phase: " + phase.name());
         // Send phase and technique to the Moose
         MooseServer.get().syncTechnique(techOrder[techInd]);
 
@@ -148,7 +148,7 @@ public class Experimenter {
      * @param phase PHASE
      */
     public void end(PHASE phase) {
-
+        if (toLog) System.out.println(TAG + "End Phase: " + phase.name());
         // Log the phase
         mTimesLogInfo.phaseTime = (int) (Utils.nowInMillis() - phaseStartTime);
         Mologger.get().logTime(mGeneralLogInfo, mTimesLogInfo);

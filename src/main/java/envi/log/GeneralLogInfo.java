@@ -18,7 +18,7 @@ public class GeneralLogInfo {
         return "technique" + Prefs.SEP +
                 "phase" + Prefs.SEP +
                 "subblock_num" + Prefs.SEP +
-                "trial_num" + Prefs.SEP;
+                "trial_num";
     }
 
     /**

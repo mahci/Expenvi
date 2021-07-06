@@ -36,7 +36,7 @@ public class Main {
             public void run()
             {
                 MooseServer.get().close();
-                Mologger.get().finishLogs();
+                Mologger.get().closeLogs();
             }
         });
 
