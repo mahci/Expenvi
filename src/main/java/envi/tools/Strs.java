@@ -35,7 +35,7 @@ public class Strs {
             "<html>When ready, press <B>BLUE + RED</B> keys to start the next block</html>";
 
     public static final String DLG_END_TITLE    = "END";
-    public static final String DLG_END_TEXT     = "Technique Finished! Thank You!";
+    public static final String DLG_END_TEXT     = "Experiment Finished! Thank You!";
     //endregion
 
     //region [Errors]

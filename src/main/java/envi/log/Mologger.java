@@ -119,6 +119,13 @@ public class Mologger {
                     TimesLogInfo.getLogHeader());
             timeLogFile.flush();
 
+            // Open EVENT file and write the column headers
+            eventLogFile = new PrintWriter(new FileWriter(eventLogPath));
+            eventLogFile.println(
+                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    eventHeader());
+            eventLogFile.flush();
+
 
             return STATUS.SUCCESS;
 
@@ -283,5 +290,15 @@ public class Mologger {
                 me.getWhen();
     }
 
+    /**
+     * The header for EVENT file
+     * @return String - header
+     */
+    private String eventHeader() {
+        return "id" + SEP +
+                "x" + SEP +
+                "y" + SEP +
+                "time";
+    }
 
 }

@@ -129,8 +129,9 @@ public class Experimenter {
             // Show the start panel
             MainFrame.get().showPanel(
                     new StartPanel(PHASE.PRACTICE, techOrder[techInd]));
-            // Save log info
-            expStartTime = Utils.nowInMillis();
+
+            // Start timing the experiment
+            if (techInd == 0) expStartTime = Utils.nowInMillis();
         }
         case EXPERIMENT -> {
             // Enable logging
@@ -174,6 +175,10 @@ public class Experimenter {
                 // Save log info
                 mTimesLogInfo.experimentTime = (int) (Utils.nowInMillis() - expStartTime) / 1000; // in seconds
                 Mologger.get().logTime(mGeneralLogInfo, mTimesLogInfo);
+
+                // Finish alll the logs
+                Mologger.get().closeLogs();
+
                 // Show the end dialog
                 endDialog();
 

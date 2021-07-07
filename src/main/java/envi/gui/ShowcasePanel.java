@@ -5,6 +5,7 @@ import envi.connection.MooseServer;
 import envi.experiment.Experimenter;
 import envi.experiment.FittsTrial;
 import envi.experiment.FittsTuple;
+import envi.log.Mologger;
 import envi.tools.Configs;
 import envi.tools.Prefs;
 import envi.tools.Strs;
@@ -41,6 +42,8 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private boolean startClicked = false;
     private boolean targetPressed = false;
     private boolean inTarget = false;
+    private boolean trialStarted = false;
+    private boolean pressed;
 
     private Disposable disposable;
 
@@ -201,9 +204,9 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         //-- Draw circles
         // Colors
         Color startColor = Prefs.COLOR_START_DEF;
-        if (startPressed || startClicked) startColor = Prefs.COLOR_START_SEL;
+        if (startPressed || trialStarted) startColor = Prefs.COLOR_START_SEL;
         Color targetColor = Prefs.COLOR_TARGET_DEF;
-        if (inTarget) targetColor = Prefs.COLOR_TARGET_SEL;
+        if (targetPressed) targetColor = Prefs.COLOR_TARGET_SEL;
 
         // Start circle
         graphics2D.setColor(startColor);
@@ -293,7 +296,10 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      */
     private void trialDone() {
         System.out.println(TAG + "trialDone");
-        startClicked = false;
+        trialStarted = false;
+        startPressed = false;
+        targetPressed = false;
+
         setScene();
         repaint();
     }
@@ -304,6 +310,18 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
     private void trialRepeat() {
         System.out.println(TAG + "trialRepeat");
         startClicked = false;
+        repaint();
+    }
+
+    /**
+     * Trial is cancelled on the start => no change on the numbers, just reset the colors
+     */
+    private void trialStartOver() {
+        if(toLog) System.out.println(TAG + "trialRepaint");
+        trialStarted = false;
+        startPressed = false;
+        targetPressed = false;
+
         repaint();
     }
 
@@ -319,14 +337,13 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         Point crsPos = getCursorPosition(); // Position of the curser
 
         // Check where pressed...
-        if (startClicked) { // Target pressing
-            // Target is pressed
-            targetPressed = true;
+        if (trialStarted) { // Target pressing
+            // Where did the press happened?
+            if (tarcle.isInside(crsPos)) targetPressed = true;
+            else pressed = true;
 
-            if (tarcle.isInside(crsPos)) {
-                inTarget = true;
-            }
         } else { // Start pressing
+            // Was the press inside Start?
             if (stacle.isInside(crsPos)) {
                 startPressed = true;
             }
@@ -345,37 +362,30 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
         Point crsPos = getCursorPosition(); // Curser position
 
         // Check where released (doesn't matter where the press was)
-        if (startClicked) { // Releasing inside/outside target
-            targetPressed = false;
-            inTarget = false;
+        if (trialStarted) { // Releasing inside/outside target
+            pressed = false; // No longer pressed
 
-            // Play error sound if outside the target
-            if (!tarcle.isInside(crsPos)) {
-                // Only play sound if in focus
-                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
-                    Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
-                }
+            if (!tarcle.isInside(crsPos)) { // Released outside the target
 
-            } else {
+                Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND); // Target MISS error
+
+            } else { // Released inside the Target => HIT
                 Utils.playSound(Prefs.TARGET_HIT_SOUND);
             }
 
-            trialDone(); // Trial is done
+            trialDone(); // Trial is done (in any way)
 
         } else { // Releasing on the start
             startPressed = false;
 
-            if (stacle.isInside(crsPos)) { // Release is also inside
-                System.out.println(TAG + "inside start");
-                startClicked = true;
-                trialStarted();
-            } else { // Outside
-                System.out.println(TAG + "outside start");
-                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
-                    Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
-                }
-
-                trialRepeat(); // Repeat the trial
+            if (stacle.isInside(crsPos)) { // Released inside Start
+                System.out.println(TAG + "Released inside start");
+                trialStarted = true;
+                repaint();
+            } else { // Released outside Start
+                System.out.println(TAG + "Released outside start");
+                Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
+                trialStartOver(); // Start over
             }
         }
     }
@@ -420,12 +430,30 @@ public class ShowcasePanel extends JPanel implements MouseInputListener {
      * Virtual cancelling of the action
      */
     public void vCancel() {
-        if (startPressed) startPressed = false;
+        Point crsPos = getCursorPosition(); // Curser position
 
-        if (inTarget) inTarget = false;
+        if (startPressed) { // Cancel on start
 
-        MainFrame.get().playSound(Prefs.START_MISS_ERR_SOUND); // Play start miss sound (repeat trial error)
-        trialRepeat();
+            Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
+
+            startPressed = false;
+            repaint();
+        }
+
+        if (trialStarted) { // User is going for the Target
+
+            if (targetPressed) { // Cancel on target
+
+                Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+
+                targetPressed = false;
+                trialDone();
+
+            }
+
+            // If cancelled in between, ignore it
+
+        }
     }
 
     /**

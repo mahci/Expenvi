@@ -21,7 +21,7 @@ import java.util.Objects;
 public class ExperimentPanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ExperimentPanel]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     // Circles to draw
@@ -331,8 +331,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
 
             // Was it the last subblock?
             if (experiment.isFinished(overallSBlockNum)) {
-                // Finish alll the logs
-                Mologger.get().closeLogs();
 
                 // Experimenter takes control
                 if (disposable != null) disposable.dispose();
@@ -772,6 +770,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
                     if (mTrialLogInfo.nTargetEntries == 0) { // First time
                         mTrialLogInfo.targetFirstEntyPoint = crsPosition;
                         mInstantsLogInfo.targetFirstEntryInst = Utils.nowInMillis();
+
+                        // For only one entry => first = last
+                        mTrialLogInfo.targetLastEntyPoint = mTrialLogInfo.targetFirstEntyPoint;
+                        mInstantsLogInfo.targetLastEntryInst = mInstantsLogInfo.targetFirstEntryInst;
 
                     } else { // More times (always keep the last one)
                         mTrialLogInfo.targetLastEntyPoint = crsPosition;

@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Objects;
 
 public class MooseServer {
@@ -31,7 +32,7 @@ public class MooseServer {
 
     public PublishSubject<String> actionSubject; // For publishing the actions
 
-    private @NonNull Observable<String> listenerObserver;
+//    private @NonNull Observable<String> listenerObserver;
 
     // ===============================================================================
 
@@ -50,15 +51,15 @@ public class MooseServer {
     private MooseServer() {
         actionSubject = PublishSubject.create();
 
-        listenerObserver = Observable.fromAction(() -> {
-            // Continously read lines from the Moose until get disconnected
-            String line;
-            do {
-                line = inBR.readLine();
-                // publish the action
-                actionSubject.onNext(line);
-            } while(isConnected);
-        });
+//        listenerObserver = Observable.fromAction(() -> {
+//            // Continously read lines from the Moose until get disconnected
+//            String line;
+//            do {
+//                line = inBR.readLine();
+//                // publish the action
+//                actionSubject.onNext(line);
+//            } while(isConnected);
+//        });
     }
 
     /**
@@ -68,9 +69,12 @@ public class MooseServer {
         try {
             // Open socket
             if (toLog) System.out.println(TAG + "Starting server...");
+
             serverSocket = new ServerSocket(Configs._netPort);
+
             while (true) { // Keep the socket opened (while the programm is running)
                 if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
+
                 Socket socket = serverSocket.accept();
                 if (toLog) System.out.println(TAG + "Connection accepted!");
 
@@ -84,8 +88,7 @@ public class MooseServer {
 
                 if (Objects.equals(line, Strs.MSSG_MOOSE)) { // Correct message
 
-                    // Confirm
-                    sendMssg(Strs.MSSG_CONFIRM);
+                    sendInit(); // Send init messages to the Moose
 
                     if (toLog) {
                         System.out.println(TAG + "Moose connected! Receiving actions...");
@@ -94,24 +97,11 @@ public class MooseServer {
 
                     isConnected = true;
 
-                    // Send the participants ID
-                    sendMssg(Strs.MSSG_PID + "-" + Experimenter.get().getPID());
-
-                    // Update the techniqe
-//                    syncTechnique(Experimenter.get().getTechnique());
-
-                    // Start listening to incoming messages from the Moose
-                    listenerObservable().subscribe();
-
-                    // If interactino is not the Mouse, send actions to the Moose
-                    Experimenter.get().getExpSubject().subscribe(state -> { // TODO
-//                        if (Configs._technique != Configs.TECH.MOUSE) sendMssg(state);
-                    });
-
+                    listenerObservable().subscribe(); // Start listening to incoming messages from the Moose
                 }
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Problem in starting the server: " + e);
 //            e.printStackTrace();
         }
@@ -138,27 +128,23 @@ public class MooseServer {
             // Continously read lines from the Moose until get disconnected
             String line;
             while(inBR != null && isConnected) {
-                if (toLog) System.out.println(TAG + "Getting Moose commands...");
-                line = inBR.readLine();
+                try {
+                    if (toLog) System.out.println(TAG + "Getting Moose commands...");
+                    line = inBR.readLine();
+                    if (toLog) System.out.println(TAG + "line: " + line);
 
-                if (line != null) {
-                    // publish the action
-                    actionSubject.onNext(line);
+                    if (line != null) {
 
-                    if (toLog) System.out.println(TAG + line + " recieved");
+                        if (Objects.equals(line, Strs.MSSG_MOOSE)) { // Connection was reset, got MOOSE
+                            sendInit();
+                        } else { // Continuing commands
+                            actionSubject.onNext(line);
+                        }
+                    }
+                } catch (SocketException se) {
+                    start();
                 }
             }
-//            do {
-//                if (toLog) System.out.println(TAG + "Getting Moose commands...");
-//                line = inBR.readLine();
-//
-//                if (line != null) {
-//                    // publish the action
-//                    actionSubject.onNext(line);
-//
-//                    if (toLog) System.out.println(TAG + line + " recieved");
-//                }
-//            } while(inBR != null && isConnected);
         }).subscribeOn(Schedulers.io());
     }
 
@@ -195,6 +181,15 @@ public class MooseServer {
         } else {
 //            if (toLog) System.out.println(TAG + "Output PrintWriter not available!");
         }
+    }
+
+    /**
+     * Send the init messages to the Moose to get it up to speed
+     */
+    private void sendInit() {
+        sendMssg(Strs.MSSG_CONFIRM); // Confirm
+        syncParticipant(Experimenter.get().getPID());
+        syncTechnique(Experimenter.get().getTechnique());
     }
 
     /**

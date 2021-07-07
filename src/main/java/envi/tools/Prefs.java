@@ -43,7 +43,7 @@ public class Prefs {
     // Sounds
     public static String START_MISS_ERR_SOUND   = "err1.wav";
     public static String TARGET_MISS_ERR_SOUND  = "err2.wav";
-    public static String TARGET_HIT_SOUND       = "hit.wav";
+    public static String TARGET_HIT_SOUND       = "levelup.wav";
     public static String START_DOUBLE_ERR_SOUND = "err3.wav";
 
     // Log
