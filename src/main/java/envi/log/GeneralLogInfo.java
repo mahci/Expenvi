@@ -15,9 +15,9 @@ public class GeneralLogInfo {
      * @return String - header with the names of the vars
      */
     public static String getLogHeader() {
-        return "technique" + Prefs.SEP +
-                "phase" + Prefs.SEP +
-                "subblock_num" + Prefs.SEP +
+        return "technique" + Prefs.DELIM +
+                "phase" + Prefs.DELIM +
+                "subblock_num" + Prefs.DELIM +
                 "trial_num";
     }
 
@@ -26,9 +26,9 @@ public class GeneralLogInfo {
      * @return String - ';'-delimited
      */
     public String toLogString() {
-        return technique.ordinal() + Prefs.SEP +
-                phase.ordinal() + Prefs.SEP +
-                subBlockNum + Prefs.SEP +
+        return technique.ordinal() + Prefs.DELIM +
+                phase.ordinal() + Prefs.DELIM +
+                subBlockNum + Prefs.DELIM +
                 trialNum;
     }
 }

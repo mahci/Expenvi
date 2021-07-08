@@ -37,6 +37,8 @@ public class Mologger {
     private String eventLogPath;
     private PrintWriter eventLogFile;
 
+    public String expLogID;
+
     // ===============================================================================
 
     /**
@@ -77,52 +79,40 @@ public class Mologger {
     public STATUS logParticipant(int pID) {
 
         try {
+            // Create the expLogID (used here and also on the Moose)
+            expLogID = PI + pID + "_" + Utils.nowDateTime();
+
             // Create log files for the participant
-            trialLogPath = logDirPath +
-                    PI + pID + "_" +
-                    Utils.nowDateTime() + "_" +
-                    "TRIAL.txt";
-
-            instantLogPath = logDirPath +
-                    PI + pID + "_" +
-                    Utils.nowDateTime() + "_" +
-                    "INSTANT.txt";
-
-            timeLogPath = logDirPath +
-                    PI + pID + "_" +
-                    Utils.nowDateTime() + "_" +
-                    "TIME.txt";
-
-            eventLogPath = logDirPath +
-                    PI + pID + "_" +
-                    Utils.nowDateTime() + "_" +
-                    "EVENT.txt";
+            trialLogPath = logDirPath + expLogID + "_" + "TRIAL.txt";
+            instantLogPath = logDirPath + expLogID + "_" + "INSTANT.txt";
+            timeLogPath = logDirPath + expLogID + "_" + "TIME.txt";
+            eventLogPath = logDirPath + expLogID + "_" + "EVENT.txt";
 
             // Open TRIAL file and write the column headers
             trialLogFile = new PrintWriter(new FileWriter(trialLogPath));
             trialLogFile.println(
-                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    GeneralLogInfo.getLogHeader() + Prefs.DELIM +
                     TrialLogInfo.getLogHeader());
             trialLogFile.flush();
 
             // Open INSTANT file and write the column headers
             instantLogFile = new PrintWriter(new FileWriter(instantLogPath));
             instantLogFile.println(
-                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    GeneralLogInfo.getLogHeader() + Prefs.DELIM +
                     InstantsLogInfo.getLogHeader());
             instantLogFile.flush();
 
             // Open TIME file and write the column headers
             timeLogFile = new PrintWriter(new FileWriter(timeLogPath));
             timeLogFile.println(
-                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    GeneralLogInfo.getLogHeader() + Prefs.DELIM +
                     TimesLogInfo.getLogHeader());
             timeLogFile.flush();
 
             // Open EVENT file and write the column headers
             eventLogFile = new PrintWriter(new FileWriter(eventLogPath));
             eventLogFile.println(
-                    GeneralLogInfo.getLogHeader() + Prefs.SEP +
+                    GeneralLogInfo.getLogHeader() + Prefs.DELIM +
                     eventHeader());
             eventLogFile.flush();
 
@@ -151,7 +141,7 @@ public class Mologger {
                 trialLogFile = new PrintWriter(new FileWriter(trialLogPath, true));
             }
 
-            trialLogFile.println(generalLogInfo.toLogString() + Prefs.SEP + trialLogInfo.toLogString());
+            trialLogFile.println(generalLogInfo.toLogString() + Prefs.DELIM + trialLogInfo.toLogString());
             trialLogFile.flush();
 //            metaLogFile.close();
 
@@ -178,7 +168,7 @@ public class Mologger {
                 instantLogFile = new PrintWriter(new FileWriter(instantLogPath, true));
             }
 
-            instantLogFile.println(generalLogInfo.toLogString() + Prefs.SEP + instantsLogInfo.toLogString());
+            instantLogFile.println(generalLogInfo.toLogString() + Prefs.DELIM + instantsLogInfo.toLogString());
             instantLogFile.flush();
 
             return STATUS.SUCCESS;
@@ -202,7 +192,7 @@ public class Mologger {
             timeLogFile = new PrintWriter(new FileWriter(timeLogPath, true));
             timeLogFile.println(
                     generalLogInfo.toLogString() +
-                    Prefs.SEP +
+                    Prefs.DELIM +
                     timesLogInfo.toLogString());
             timeLogFile.flush();
             timeLogFile.close();
@@ -230,7 +220,7 @@ public class Mologger {
 
             eventLogFile.println(
                     generalLogInfo.toLogString() +
-                    Prefs.SEP +
+                    Prefs.DELIM +
                     mouseEventToString(me));
             eventLogFile.flush();
 //            eventLogFile.close();

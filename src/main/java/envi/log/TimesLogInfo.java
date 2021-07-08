@@ -1,10 +1,6 @@
 package envi.log;
 
-import envi.experiment.FittsTuple;
 import envi.tools.Prefs;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TimesLogInfo {
 //    public List<Integer> trialTimes = new ArrayList<>(); // List of trial times for each subblock
@@ -19,10 +15,10 @@ public class TimesLogInfo {
      * @return String - header with the names of the vars
      */
     public static String getLogHeader() {
-        return "trial_time" + Prefs.SEP +
-                "subblock_time" + Prefs.SEP +
-                "homing_time" + Prefs.SEP +
-                "phase_time" + Prefs.SEP +
+        return "trial_time" + Prefs.DELIM +
+                "subblock_time" + Prefs.DELIM +
+                "homing_time" + Prefs.DELIM +
+                "phase_time" + Prefs.DELIM +
                 "experiment_time";
     }
     
@@ -31,10 +27,10 @@ public class TimesLogInfo {
      * @return String - ';'-delimited
      */
     public String toLogString() {
-        return trialTime + Prefs.SEP +
-                subblockTime + Prefs.SEP +
-                homingTime + Prefs.SEP +
-                phaseTime + Prefs.SEP +
+        return trialTime + Prefs.DELIM +
+                subblockTime + Prefs.DELIM +
+                homingTime + Prefs.DELIM +
+                phaseTime + Prefs.DELIM +
                 experimentTime;
     }
 }

@@ -47,6 +47,9 @@ public class Prefs {
     public static String START_DOUBLE_ERR_SOUND = "err3.wav";
 
     // Log
-    public static String SEP = ";";
+    public static String DELIM = ";";
+
+    // Network
+    public static String SEP = "--";
 
 }

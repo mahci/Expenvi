@@ -1,7 +1,10 @@
 package envi.connection;
 
+import envi.gui.ExperimentPanel;
+import envi.log.Mologger;
 import envi.tools.Configs;
 import envi.experiment.Experimenter;
+import envi.tools.Prefs;
 import envi.tools.Strs;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
@@ -136,7 +139,10 @@ public class MooseServer {
                     if (line != null) {
 
                         if (Objects.equals(line, Strs.MSSG_MOOSE)) { // Connection was reset, got MOOSE
-                            sendInit();
+                            sendInit(); // Send init messages
+                            // Sync technique and phase
+                            syncTechnique(Experimenter.get().getTechnique());
+                            syncPhase(Experimenter.get().getPhase());
                         } else { // Continuing commands
                             actionSubject.onNext(line);
                         }
@@ -154,7 +160,7 @@ public class MooseServer {
      * @param param String
      */
     public void sendMssg(String type, String param) {
-        if (!Objects.equals(param, "")) sendMssg(type + "-" + param);
+        if (!Objects.equals(param, "")) sendMssg(type + Prefs.SEP + param);
         else sendMssg(type);
     }
 
@@ -164,7 +170,7 @@ public class MooseServer {
      * @param param int
      */
     public void sendMssg(String type, int param) {
-        if (!Objects.equals(param, "")) sendMssg(type + "-" + param);
+        if (!Objects.equals(param, "")) sendMssg(type + Prefs.SEP + param);
         else sendMssg(type);
     }
 
@@ -188,8 +194,15 @@ public class MooseServer {
      */
     private void sendInit() {
         sendMssg(Strs.MSSG_CONFIRM); // Confirm
-        syncParticipant(Experimenter.get().getPID());
-        syncTechnique(Experimenter.get().getTechnique());
+//        syncParticipant(Experimenter.get().getPID());
+        syncExpLogId();
+    }
+
+    /**
+     * Sync the ExpLogId for the logs to be the same on desktop/device
+     */
+    public void syncExpLogId() {
+        sendMssg(Strs.MSSG_EXP_ID, Mologger.get().expLogID);
     }
 
     /**
@@ -203,10 +216,10 @@ public class MooseServer {
      * Sync the participant id with the Moose
      * @param pid int Participant ID
      */
-    public void syncParticipant(int pid) {
-        System.out.println(TAG + "Sync PID");
-        sendMssg(Strs.MSSG_PID + "-" + pid);
-    }
+//    public void syncParticipant(int pid) {
+//        System.out.println(TAG + "Sync PID");
+//        sendMssg(Strs.MSSG_PID + "-" + pid);
+//    }
 
     /**
      * Sync the phase ordinal with the Moose
@@ -214,7 +227,23 @@ public class MooseServer {
      */
     public void syncPhase(Experimenter.PHASE phase) {
         System.out.println(TAG + "Sync phase");
-        sendMssg(Strs.MSSG_BEG_PHS + "-" + phase.ordinal());
+        sendMssg(Strs.MSSG_PHASE + Prefs.SEP + phase.ordinal());
+    }
+
+    /**
+     * Sync the subblock number
+     * @param sbNum int - subblock number
+     */
+    public void syncSubblockNum(int sbNum) {
+        MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, sbNum);
+    }
+
+    /**
+     * Sync the trial number
+     * @param trNum int - trial number
+     */
+    public void syncTrialNum(int trNum) {
+        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trNum);
     }
 
 }

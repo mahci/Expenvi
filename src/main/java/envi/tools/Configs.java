@@ -21,7 +21,7 @@ public class Configs {
     // Display
     public static final int BENQ_DPI = 90;
     public static final int MacCinDisp_DPI = 109;
-    public static final int _dpi = BENQ_DPI;
+    public static final int _dpi = MacCinDisp_DPI;
 
     public static int _nScr = 1; // Set programmatically
     public static int _scrId = 1; // Used in Main

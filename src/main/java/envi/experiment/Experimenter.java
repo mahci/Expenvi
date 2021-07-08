@@ -103,8 +103,9 @@ public class Experimenter {
     public void start(PHASE phase) {
         this.phase = phase;
         if (toLog) System.out.println(TAG + "Start Phase: " + phase.name());
-        // Send phase and technique to the Moose
-        MooseServer.get().syncTechnique(techOrder[techInd]);
+
+        MooseServer.get().syncExpLogId(); // Sync the exp to the Moose (if it's out of sync)
+        MooseServer.get().syncTechnique(techOrder[techInd]); // Sync the technique
 
         // Save the log info
         mGeneralLogInfo.technique = techOrder[techInd];
@@ -120,8 +121,6 @@ public class Experimenter {
             // Show the start panel
             MainFrame.get().showPanel(
                     new StartPanel(PHASE.SHOWCASE, techOrder[techInd]));
-            // Login the participant on the Moose
-            MooseServer.get().syncParticipant(participantID);
         }
         case PRACTICE -> {
             // Enable logging

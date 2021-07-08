@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
 
@@ -46,8 +47,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     private final Action nextTrial = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent e) {
-//            if(toLog) System.out.println(TAG + "SPACE Performed");
-//            trialDone();
+            if(toLog) System.out.println(TAG + "SPACE Performed");
+            trialDone();
         }
     };
 
@@ -67,35 +68,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     
     private long triallBeginTime;
     private long sBlockBeginTime;
-    private long stPressTime;
-    private long stReleaseTime;
-    private long tgPressTime;
-    private long tgReleaseTime;
     private long sBlockEndTime;
-    private long homingTime;
-
-    private long startExitTime;
-    private Point startExitPoint;
-
-    private long targetFirstEntryTime;
-    private Point targetFirstEntryPoint;
-    private long targetLastEntryTime;
-    private Point targetLastEntryPoint;
-    private int nTargetEntries = 0;
-    
-    private Point stPressPoint;
-    private double stPressDist;
-
-    private Point stReleasePoint;
-    private double stReleaseDist;
-    
-    private Point tgPressPoint;
-    private double tgPressDist;
-
-    private Point tgReleasePoint;
-    private double tgReleaseDist;
-
-    private int tgHit; // Hit = 1, miss = 0, start double click = -1xxz
 
     private boolean startExited = false;
     private boolean targetEntered = false;
@@ -123,10 +96,10 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         addMouseMotionListener(this);
 
         // SPACE => next trrial [JFT]
-//        getInputMap().put(
-//                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
-//                "SPACE");
-//        getActionMap().put("SPACE", nextTrial);
+        getInputMap().put(
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true),
+                "SPACE");
+        getActionMap().put("SPACE", nextTrial);
 
         // For publishing mouse actions
         mouseSubject = PublishSubject.create();
@@ -136,7 +109,7 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
             if (toLog) System.out.println(TAG + " <- " + action);
             switch (action) {
                 case Actions.ACT_CLICK:
-                    vClickPrimary();
+//                    vClickPrimary();
                     break;
                 case Actions.ACT_PRESS_PRI:
                     vPressPrimary();
@@ -182,8 +155,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         mGeneralLogInfo.trialNum = 1;
 
         // Sync with the Moose
-        MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, overallSBlockNum);
-        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
+        MooseServer.get().syncSubblockNum(overallSBlockNum);
+        MooseServer.get().syncTrialNum(trialNum);
 
         // Save the start time
         triallBeginTime = Utils.nowInMillis();
@@ -381,17 +354,15 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         trialNum++;
         setScene();
 
-        // Sync with the Moose
-        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
+        MooseServer.get().syncTrialNum(trialNum); // Sync with the Moose
 
-        // Update the log info
-        mGeneralLogInfo.trialNum = trialNum;
+        mGeneralLogInfo.trialNum = trialNum; // Update the log info
     }
 
     /**
      * Go to the next subblock (may be the next block)
      */
-    public void nextSubblock(){
+    public void nextSubblock() {
         // Check if more subblocks from the same block or we should go to the next
         if (experiment.getBlock(blockNum).hasNext(subBlockNum)) {
             subBlockNum++;
@@ -409,8 +380,8 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
         mGeneralLogInfo.trialNum = trialNum;
 
         // Sync with the Moose
-        MooseServer.get().sendMssg(Strs.MSSG_SUBBLOCK, overallSBlockNum);
-        MooseServer.get().sendMssg(Strs.MSSG_TRIAL, trialNum);
+        MooseServer.get().syncSubblockNum(overallSBlockNum);
+        MooseServer.get().syncTrialNum(trialNum);
     }
 
     /**
@@ -443,22 +414,6 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     }
 
     //region [Setters]
-
-    /**
-     * Set the technique
-     * @param tech TECH
-     */
-    public void setTechnique(Configs.TECH tech) {
-        technique = tech.ordinal();
-    }
-
-    /**
-     * Set the phase
-     * @param phs PHASE
-     */
-    public void setPhase(Experimenter.PHASE phs) {
-        phase = phs.ordinal();
-    }
 
     //endregion
 
@@ -569,61 +524,61 @@ public class ExperimentPanel extends JPanel implements MouseInputListener {
     /**
      * Virtual CLICK
      */
-    public void vClickPrimary() {
-        Point crsPos = getCursorPosition(); // Position of the curser
-
-        // Log EVENT
-        MouseEvent vMouseEvent = new MouseEvent(
-                btn, MouseEvent.MOUSE_CLICKED, Utils.nowInMillis(),
-                0, crsPos.x, crsPos.y, 0, false);
-        Mologger.get().logEvent(mGeneralLogInfo, vMouseEvent);
-
-        if (trialStarted) { // Clicking on the target => Trial finished
-            // Save the position, distance, and time of press (for log)
-            tgReleasePoint = tgPressPoint = crsPos;
-            tgReleaseTime = tgPressTime = Utils.nowInMillis();
-            tgReleaseDist = tgPressDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
-
-            // Play error sound if outside the target (window in focus)
-            if (!tarcle.isInside(crsPos)) {
-                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) { // Miss
-                    Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
-                }
-
-                if (stacle.isInside(crsPos)) { // Double click on Stacle
-                    tgHit = -1;
-                } else {
-                    tgHit = 0;
-                }
-
-            } else {
-                tgHit = 1;
-            }
-
-            // Trial is done!
-            trialDone();
-
-        } else { // Clicking on the start
-            // Save the position, distance, and time of press (for log)
-            stReleasePoint = stPressPoint = crsPos;
-            stReleaseTime = stPressTime = Utils.nowInMillis();
-            stReleaseDist = stPressDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
-
-            if (stacle.isInside(crsPos)) { // Inside
-                System.out.println(TAG + "inside start");
-                trialStarted = true;
-                repaint();
-            } else { // Outside
-                System.out.println(TAG + "outside start");
-                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
-                    Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
-                }
-
-                trialStartOver();
-            }
-
-        }
-    }
+//    public void vClickPrimary() {
+//        Point crsPos = getCursorPosition(); // Position of the curser
+//
+//        // Log EVENT
+//        MouseEvent vMouseEvent = new MouseEvent(
+//                btn, MouseEvent.MOUSE_CLICKED, Utils.nowInMillis(),
+//                0, crsPos.x, crsPos.y, 0, false);
+//        Mologger.get().logEvent(mGeneralLogInfo, vMouseEvent);
+//
+//        if (trialStarted) { // Clicking on the target => Trial finished
+//            // Save the position, distance, and time of press (for log)
+//            tgReleasePoint = tgPressPoint = crsPos;
+//            tgReleaseTime = tgPressTime = Utils.nowInMillis();
+//            tgReleaseDist = tgPressDist = MainFrame.px2mm(tarcle.distToCenter(crsPos));
+//
+//            // Play error sound if outside the target (window in focus)
+//            if (!tarcle.isInside(crsPos)) {
+//                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) { // Miss
+//                    Utils.playSound(Prefs.TARGET_MISS_ERR_SOUND);
+//                }
+//
+//                if (stacle.isInside(crsPos)) { // Double click on Stacle
+//                    tgHit = -1;
+//                } else {
+//                    tgHit = 0;
+//                }
+//
+//            } else {
+//                tgHit = 1;
+//            }
+//
+//            // Trial is done!
+//            trialDone();
+//
+//        } else { // Clicking on the start
+//            // Save the position, distance, and time of press (for log)
+//            stReleasePoint = stPressPoint = crsPos;
+//            stReleaseTime = stPressTime = Utils.nowInMillis();
+//            stReleaseDist = stPressDist = MainFrame.px2mm(stacle.distToCenter(crsPos));
+//
+//            if (stacle.isInside(crsPos)) { // Inside
+//                System.out.println(TAG + "inside start");
+//                trialStarted = true;
+//                repaint();
+//            } else { // Outside
+//                System.out.println(TAG + "outside start");
+//                if (Objects.equals(MainFrame.get().getFocusOwner(), this)) {
+//                    Utils.playSound(Prefs.START_MISS_ERR_SOUND); // Play error
+//                }
+//
+//                trialStartOver();
+//            }
+//
+//        }
+//    }
 
     /**
      * Virtual cancel

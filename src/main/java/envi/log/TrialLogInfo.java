@@ -77,48 +77,48 @@ public class TrialLogInfo {
      * @return String - header with the names of the vars
      */
     public static String getLogHeader() {
-        return FittsTuple.getLogHeader() + Prefs.SEP +
-                "start_pos_x" + Prefs.SEP +
-                "start_pos_y" + Prefs.SEP +
+        return FittsTuple.getLogHeader() + Prefs.DELIM +
+                "start_pos_x" + Prefs.DELIM +
+                "start_pos_y" + Prefs.DELIM +
 
-                "target_pos_x" + Prefs.SEP +
-                "target_pos_y" + Prefs.SEP +
+                "target_pos_x" + Prefs.DELIM +
+                "target_pos_y" + Prefs.DELIM +
 
-                "start_press_x" + Prefs.SEP +
-                "start_press_y" + Prefs.SEP +
-                "start_press_d" + Prefs.SEP +
+                "start_press_x" + Prefs.DELIM +
+                "start_press_y" + Prefs.DELIM +
+                "start_press_d" + Prefs.DELIM +
 
-                "start_release_x" + Prefs.SEP +
-                "start_release_y" + Prefs.SEP +
-                "start_release_d" + Prefs.SEP +
+                "start_release_x" + Prefs.DELIM +
+                "start_release_y" + Prefs.DELIM +
+                "start_release_d" + Prefs.DELIM +
 
-                "start_cancel_x" + Prefs.SEP +
-                "start_cancel_y" + Prefs.SEP +
-                "start_cancel_d" + Prefs.SEP +
+                "start_cancel_x" + Prefs.DELIM +
+                "start_cancel_y" + Prefs.DELIM +
+                "start_cancel_d" + Prefs.DELIM +
 
-                "start_exit_x" + Prefs.SEP +
-                "start_exit_y" + Prefs.SEP +
+                "start_exit_x" + Prefs.DELIM +
+                "start_exit_y" + Prefs.DELIM +
 
-                "n_target_entries" + Prefs.SEP +
+                "n_target_entries" + Prefs.DELIM +
 
-                "target_press_x" + Prefs.SEP +
-                "target_press_y" + Prefs.SEP +
-                "target_press_d" + Prefs.SEP +
+                "target_press_x" + Prefs.DELIM +
+                "target_press_y" + Prefs.DELIM +
+                "target_press_d" + Prefs.DELIM +
 
-                "target_release_x" + Prefs.SEP +
-                "target_release_y" + Prefs.SEP +
-                "target_release_d" + Prefs.SEP +
+                "target_release_x" + Prefs.DELIM +
+                "target_release_y" + Prefs.DELIM +
+                "target_release_d" + Prefs.DELIM +
 
-                "target_cancel_x" + Prefs.SEP +
-                "target_cancel_y" + Prefs.SEP +
-                "target_cancel_d" + Prefs.SEP +
+                "target_cancel_x" + Prefs.DELIM +
+                "target_cancel_y" + Prefs.DELIM +
+                "target_cancel_d" + Prefs.DELIM +
 
-                "target_first_entry_x" + Prefs.SEP +
-                "target_first_entry_y" + Prefs.SEP +
-                "target_last_entry_x" + Prefs.SEP +
-                "target_last_entry_y" + Prefs.SEP +
+                "target_first_entry_x" + Prefs.DELIM +
+                "target_first_entry_y" + Prefs.DELIM +
+                "target_last_entry_x" + Prefs.DELIM +
+                "target_last_entry_y" + Prefs.DELIM +
 
-                "selection_time" + Prefs.SEP +
+                "selection_time" + Prefs.DELIM +
                 "result";
     }
 
@@ -128,35 +128,35 @@ public class TrialLogInfo {
      */
     public String toLogString() {
         return fittsTuple.toLogString() +
-                pointToLogString(startPosition) + Prefs.SEP +
-                pointToLogString(targetPosition) + Prefs.SEP +
+                pointToLogString(startPosition) + Prefs.DELIM +
+                pointToLogString(targetPosition) + Prefs.DELIM +
 
-                pointToLogString(startPressPoint) + Prefs.SEP +
-                Utils.double3Dec(startPressDist) + Prefs.SEP +
+                pointToLogString(startPressPoint) + Prefs.DELIM +
+                Utils.double3Dec(startPressDist) + Prefs.DELIM +
 
-                pointToLogString(startReleasePoint) + Prefs.SEP +
-                Utils.double3Dec(startReleaseDist) + Prefs.SEP +
+                pointToLogString(startReleasePoint) + Prefs.DELIM +
+                Utils.double3Dec(startReleaseDist) + Prefs.DELIM +
 
-                pointToLogString(startCancelPoint) + Prefs.SEP +
-                Utils.double3Dec(startCancelDist) + Prefs.SEP +
+                pointToLogString(startCancelPoint) + Prefs.DELIM +
+                Utils.double3Dec(startCancelDist) + Prefs.DELIM +
 
-                pointToLogString(startExitPoint) + Prefs.SEP +
+                pointToLogString(startExitPoint) + Prefs.DELIM +
 
-                nTargetEntries + Prefs.SEP +
+                nTargetEntries + Prefs.DELIM +
 
-                pointToLogString(targetPressPoint) + Prefs.SEP +
-                Utils.double3Dec(targetPressDist) + Prefs.SEP +
+                pointToLogString(targetPressPoint) + Prefs.DELIM +
+                Utils.double3Dec(targetPressDist) + Prefs.DELIM +
 
-                pointToLogString(targetReleasePoint) + Prefs.SEP +
-                Utils.double3Dec(targetReleaseDist) + Prefs.SEP +
+                pointToLogString(targetReleasePoint) + Prefs.DELIM +
+                Utils.double3Dec(targetReleaseDist) + Prefs.DELIM +
 
-                pointToLogString(targetCancelPoint) + Prefs.SEP +
-                Utils.double3Dec(targetCancelDist) + Prefs.SEP +
+                pointToLogString(targetCancelPoint) + Prefs.DELIM +
+                Utils.double3Dec(targetCancelDist) + Prefs.DELIM +
 
-                pointToLogString(targetFirstEntyPoint) + Prefs.SEP +
-                pointToLogString(targetLastEntyPoint) + Prefs.SEP +
+                pointToLogString(targetFirstEntyPoint) + Prefs.DELIM +
+                pointToLogString(targetLastEntyPoint) + Prefs.DELIM +
 
-                selectionTime + Prefs.SEP +
+                selectionTime + Prefs.DELIM +
                 result;
     }
 
@@ -166,7 +166,7 @@ public class TrialLogInfo {
      * @return String
      */
     private String pointToLogString(Point p) {
-        return p.x + Prefs.SEP + p.y;
+        return p.x + Prefs.DELIM + p.y;
     }
 
 }

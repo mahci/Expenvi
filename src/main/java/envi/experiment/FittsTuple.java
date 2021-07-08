@@ -56,8 +56,8 @@ public class FittsTuple {
      * @return String
      */
     public static String getLogHeader() {
-        return "width" + Prefs.SEP +
-                "dist" + Prefs.SEP +
+        return "width" + Prefs.DELIM +
+                "dist" + Prefs.DELIM +
                 "l_r";
     }
 
@@ -75,8 +75,8 @@ public class FittsTuple {
      * @return String
      */
     public String toLogString() {
-        return width + Prefs.SEP +
-                dist + Prefs.SEP +
-                leftRight + Prefs.SEP;
+        return width + Prefs.DELIM +
+                dist + Prefs.DELIM +
+                leftRight + Prefs.DELIM;
     }
 }
