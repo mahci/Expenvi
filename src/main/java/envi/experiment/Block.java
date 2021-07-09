@@ -13,7 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Block {
 
     private String TAG = "[[Block]] ";
-    private boolean toLog = true;
+    private boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     private ArrayList<FittsTrial> trials = new ArrayList<>(); // List of trials

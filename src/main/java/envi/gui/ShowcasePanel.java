@@ -23,7 +23,7 @@ import java.util.Objects;
 public class ShowcasePanel extends JPanel implements MouseInputListener {
 
     private final String TAG = "[[ShowcasePanel]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     // Circles to draw

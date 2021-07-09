@@ -23,7 +23,7 @@ import java.util.Objects;
 public class MooseServer {
 
     private String TAG = "[[MooseServer]] ";
-    private boolean toLog = true;
+    private boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     private static MooseServer self; // for singleton
@@ -73,7 +73,7 @@ public class MooseServer {
             // Open socket
             if (toLog) System.out.println(TAG + "Starting server...");
 
-            serverSocket = new ServerSocket(Configs._netPort);
+            if (serverSocket == null) serverSocket = new ServerSocket(Configs._netPort);
 
             while (true) { // Keep the socket opened (while the programm is running)
                 if (toLog) System.out.println(TAG + "Socket opened, waiting for the Moose...");
@@ -92,6 +92,8 @@ public class MooseServer {
                 if (Objects.equals(line, Strs.MSSG_MOOSE)) { // Correct message
 
                     sendInit(); // Send init messages to the Moose
+                    syncPhase(Experimenter.get().getPhase());
+                    syncTechnique(Experimenter.get().getTechnique());
 
                     if (toLog) {
                         System.out.println(TAG + "Moose connected! Receiving actions...");
@@ -105,7 +107,7 @@ public class MooseServer {
             }
 
         } catch (IOException e) {
-            System.out.println("Problem in starting the server: " + e);
+            System.out.println(TAG + "Problem in starting the server: " + e);
 //            e.printStackTrace();
         }
     }
@@ -143,9 +145,11 @@ public class MooseServer {
                             // Sync technique and phase
                             syncTechnique(Experimenter.get().getTechnique());
                             syncPhase(Experimenter.get().getPhase());
+                            syncTechnique(Experimenter.get().getTechnique());
                         } else { // Continuing commands
                             actionSubject.onNext(line);
                         }
+
                     }
                 } catch (SocketException se) {
                     start();

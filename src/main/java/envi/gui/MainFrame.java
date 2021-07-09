@@ -20,7 +20,12 @@ import java.util.Objects;
 
 public class MainFrame extends JFrame {
 
+    private String TAG = "[[MainFrame]] ";
+    private boolean toLog = false;
+    // -------------------------------------------------------------------------------
+
     private static MainFrame self; // Singleton
+
 
     /**
      * Constructor
@@ -51,6 +56,7 @@ public class MainFrame extends JFrame {
     }
 
     public Pair<Integer, Integer> getDispArea() {
+        if (toLog) System.out.println("H_Margin (px) = " + mm2px(Prefs.WIN_MARG_H_mm));
         return new Pair<>(
                 getWidth() - 2 * mm2px(Prefs.WIN_MARG_W_mm),
                 getHeight() - 2 * mm2px(Prefs.WIN_MARG_H_mm)
@@ -76,10 +82,11 @@ public class MainFrame extends JFrame {
 //    }
 
     public Point dispToWin(Point inPoint) {
-        inPoint.translate(
+        Point p = inPoint;
+        p.translate(
                 mm2px(Prefs.WIN_MARG_W_mm),
                 mm2px(Prefs.WIN_MARG_H_mm));
-        return inPoint;
+        return p;
     }
 
     /**

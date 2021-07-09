@@ -12,7 +12,7 @@ import java.awt.*;
 public class FittsTrial {
 
     private final String TAG = "[[FittsTrial]] ";
-    private final boolean toLog = true;
+    private final boolean toLog = false;
     // -------------------------------------------------------------------------------
 
     // Positions of start and target circles (centers)
@@ -82,8 +82,12 @@ public class FittsTrial {
             tarclePosition.x = staclePosition.x + tarDist;
         }
 
-        if (toLog) System.out.println(TAG + "Stacle position: " + staclePosition);
+        // Check for overflow!
+        if (staclePosition.y > 1353) {
+            System.out.println(TAG + "Stacle position: " + staclePosition);
+        }
         if (toLog) System.out.println(TAG + "Tarcle position: " + tarclePosition);
+
     }
 
     /**

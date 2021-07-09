@@ -133,7 +133,7 @@ public class Mologger {
      * @return STATUS
      */
     public STATUS logTrial(GeneralLogInfo generalLogInfo, TrialLogInfo trialLogInfo) {
-        System.out.println(TAG + "Log META");
+        if (toLog) System.out.println(TAG + "Log META");
         if (!enabled) return STATUS.LOG_DISABLED;
 
         try {
@@ -160,7 +160,7 @@ public class Mologger {
      * @return STATUS
      */
     public STATUS logInst(GeneralLogInfo generalLogInfo, InstantsLogInfo instantsLogInfo) {
-        System.out.println(TAG + "Log INST");
+        if (toLog) System.out.println(TAG + "Log INST");
         if (!enabled) return STATUS.LOG_DISABLED;
 
         try {
@@ -185,7 +185,7 @@ public class Mologger {
      * @return STATUS
      */
     public STATUS logTime(GeneralLogInfo generalLogInfo, TimesLogInfo timesLogInfo) {
-        System.out.println(TAG + "Log TIME");
+        if (toLog) System.out.println(TAG + "Log TIME");
         if (!enabled) return STATUS.LOG_DISABLED;
 
         try {
