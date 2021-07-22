@@ -107,10 +107,6 @@ public class MainFrame extends JFrame {
         return ((double) px / Configs._dpi) * Utils.MM_IN_INCH;
     }
 
-    public Point pointMM2Px(Point mmP) {
-        return new Point(mm2px(mmP.x), mm2px(mmP.y));
-    }
-
     /***
      * Draw the passed panel
      * @param panel JPanel to draw

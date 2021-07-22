@@ -34,7 +34,7 @@ public class Experimenter {
     private long expStartTime;
 
     //------------------------------------------------------------------------------
-    private final int participantID = 12; // Participant's number
+    private final int participantID = 0; // Participant's number
 
     // Techniques
     private List<Configs.TECH[]> techOrderList = new ArrayList<>();
